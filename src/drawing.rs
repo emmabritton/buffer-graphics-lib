@@ -4,7 +4,7 @@ use crate::text::{normal_letters, small_letters, TextPos, TextSize};
 use crate::Graphics;
 use mint::Point2;
 
-impl<'buffer, const N: usize> Graphics<'buffer, N> {
+impl Graphics<'_> {
     /// Convert an x,y coord to idx for use with `self.pixels`
     #[inline]
     pub fn index(&self, x: usize, y: usize) -> usize {
@@ -20,7 +20,7 @@ impl<'buffer, const N: usize> Graphics<'buffer, N> {
     }
 }
 
-impl<'buffer, const N: usize> Graphics<'buffer, N> {
+impl Graphics<'_> {
     /// Get the canvas offset in pixels
     pub fn get_translate(&self) -> Point2<isize> {
         self.translate
@@ -40,7 +40,7 @@ impl<'buffer, const N: usize> Graphics<'buffer, N> {
     }
 }
 
-impl<'buffer, const N: usize> Graphics<'buffer, N> {
+impl Graphics<'_> {
     /// Copy entire pixels array to an image
     ///
     /// Although the method takes `&mut self` it doesn't mutate anything
@@ -120,7 +120,7 @@ pub trait DrawingMethods<T> {
 
 macro_rules! create_drawing_methods {
     ($T:ty) => {
-        impl<'buffer, const N: usize> DrawingMethods<$T> for Graphics<'buffer, N> {
+        impl DrawingMethods<$T> for Graphics<'_> {
             /// Draw an image at `x`, `y`
             #[inline]
             fn draw_image(&mut self, start_x: $T, start_y: $T, image: &Image) {
@@ -178,7 +178,7 @@ macro_rules! create_drawing_methods {
     };
 }
 
-impl<'buffer, const N: usize> DrawingMethods<isize> for Graphics<'buffer, N> {
+impl DrawingMethods<isize> for Graphics<'_> {
     fn draw_image(&mut self, start_x: isize, start_y: isize, image: &Image) {
         let mut x = 0;
         for (y, row) in image.pixels.chunks_exact(image.width()).enumerate() {
@@ -315,7 +315,7 @@ impl<'buffer, const N: usize> DrawingMethods<isize> for Graphics<'buffer, N> {
 
         if x >= 0 && y >= 0 && x < self.width as isize {
             let idx = self.index(x as usize, y as usize);
-            if idx < N {
+            if idx < self.buffer.len() {
                 return Some(Color::rgb(
                     self.buffer[idx],
                     self.buffer[idx + 1],
@@ -345,7 +345,7 @@ create_drawing_methods!(i32);
 create_drawing_methods!(f32);
 create_drawing_methods!(f64);
 
-impl<'buffer, const N: usize> Graphics<'buffer, N> {
+impl Graphics<'_> {
     /// Sets every pixel to the same color, this ignores translate
     pub fn clear(&mut self, color: Color) {
         self.buffer.chunks_exact_mut(4).for_each(|px| {
@@ -451,7 +451,7 @@ impl<'buffer, const N: usize> Graphics<'buffer, N> {
         if x >= 0 && y >= 0 && x < self.width as isize {
             let idx = self.index(x as usize, y as usize);
 
-            if idx < N {
+            if idx < self.buffer.len() {
                 self.buffer[idx] = color.r;
                 self.buffer[idx + 1] = color.g;
                 self.buffer[idx + 2] = color.b;

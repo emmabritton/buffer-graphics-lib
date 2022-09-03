@@ -42,19 +42,19 @@ pub enum GraphicsError {
     ImageBlendSize(usize, usize, usize, usize),
 }
 
-pub struct Graphics<'buffer, const N: usize> {
-    buffer: &'buffer mut [u8; N],
+pub struct Graphics<'buffer> {
+    buffer: &'buffer mut [u8],
     width: usize,
     height: usize,
     translate: Point2<isize>,
 }
 
-impl<'buffer, const N: usize> Graphics<'_, N> {
+impl<'buffer> Graphics<'_> {
     pub fn new(
-        buffer: &'buffer mut [u8; N],
+        buffer: &'buffer mut [u8],
         width: usize,
         height: usize,
-    ) -> Result<Graphics<'buffer, N>, GraphicsError> {
+    ) -> Result<Graphics<'buffer>, GraphicsError> {
         let count = width * height * 4;
         if count != buffer.len() {
             return Err(InvalidBufferLength(count, buffer.len()));
