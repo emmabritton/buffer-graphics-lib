@@ -1,5 +1,7 @@
 use crate::color::Color;
 use crate::image::Image;
+use crate::math::contains::Contains;
+use crate::math::Rect;
 use crate::text::{normal_letters, small_letters, TextPos, TextSize};
 use crate::Graphics;
 use mint::Point2;
@@ -17,6 +19,13 @@ impl Graphics<'_> {
 
     pub fn height(&self) -> usize {
         self.height
+    }
+
+    pub fn is_on_screen<T: PartialOrd<isize>>(&self, point: Point2<T>) -> bool {
+        let mut rect = Rect::new(0, 0, self.width as isize, self.height as isize);
+        rect = rect.translate(self.translate.x, self.translate.y);
+        rect.contains(point.x, point.y)
+        // Contains::<T>::contains(&rect, point.x, point.y)
     }
 }
 
@@ -60,7 +69,7 @@ impl Graphics<'_> {
     }
 
     /// Get top left pixel coord for letter px coord
-    pub fn get_px_for_char(&self, x: usize, y: usize, size: TextSize) -> (usize, usize) {
+    pub fn get_px_for_char(x: usize, y: usize, size: TextSize) -> (usize, usize) {
         let (width, height) = size.get_size();
         let margin = size.get_margin();
         (x * (width + margin), y * (height + margin))
@@ -76,7 +85,7 @@ impl Graphics<'_> {
     /// # Returns
     ///
     /// The width and height of the string in pixels
-    pub fn get_text_size(&self, text: &str, width: usize, size: TextSize) -> (usize, usize) {
+    pub fn get_text_size(text: &str, width: usize, size: TextSize) -> (usize, usize) {
         let len = text.chars().count();
         let x = if len < width { len } else { width };
         let y = (len as f64 / width as f64).ceil() as usize;
@@ -352,6 +361,7 @@ impl Graphics<'_> {
             px[0] = color.r;
             px[1] = color.g;
             px[2] = color.b;
+            px[3] = color.a;
         });
     }
 
@@ -455,7 +465,45 @@ impl Graphics<'_> {
                 self.buffer[idx] = color.r;
                 self.buffer[idx + 1] = color.g;
                 self.buffer[idx + 2] = color.b;
+                self.buffer[idx + 3] = color.a;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::color::WHITE;
+    use crate::drawing::DrawingMethods;
+    use crate::Graphics;
+    use mint::Point2;
+
+    #[test]
+    fn is_inside() {
+        let mut buf = [0; 400];
+        let mut graphics = Graphics::new(&mut buf, 10, 10).unwrap();
+        assert!(graphics.is_on_screen(Point2 { x: 1, y: 1 }));
+        assert!(graphics.is_on_screen(Point2 { x: 9, y: 9 }));
+        assert!(graphics.is_on_screen(Point2 { x: 0, y: 0 }));
+        assert!(!graphics.is_on_screen(Point2 { x: 10, y: 10 }));
+        assert!(!graphics.is_on_screen(Point2 { x: 4, y: -1 }));
+        assert!(!graphics.is_on_screen(Point2 { x: -1, y: 4 }));
+
+        graphics.set_translate(Point2 { x: 2, y: -1 });
+        assert!(graphics.is_on_screen(Point2 { x: 4, y: 4 }));
+        assert!(graphics.is_on_screen(Point2 { x: 4, y: 0 }));
+        assert!(!graphics.is_on_screen(Point2 { x: 0, y: 0 }));
+        assert!(!graphics.is_on_screen(Point2 { x: 4, y: 9 }));
+    }
+
+    #[test]
+    fn line() {
+        let mut buf = [0; 400];
+        assert_eq!(&buf[0..8], [0; 8]);
+        let mut graphics = Graphics::new(&mut buf, 10, 10).unwrap();
+        graphics.draw_line(0, 0, 2, 0, WHITE);
+        drop(graphics);
+        assert_eq!(&buf[0..12], [255; 12]);
+        assert_eq!(&buf[12..16], [0; 4]);
     }
 }

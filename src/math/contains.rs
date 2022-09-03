@@ -4,10 +4,10 @@ pub trait Contains<T> {
     fn contains(&self, x: T, y: T) -> bool;
 }
 
-impl<T: Ord> Contains<T> for Rect<T> {
+impl<U, T: PartialOrd<U>> Contains<T> for Rect<U> {
     #[inline]
     fn contains(&self, x: T, y: T) -> bool {
-        self.x1 <= x && x <= self.x2 && self.y1 <= y && y <= self.y2
+        x >= self.x1 && x < self.x2 && y >= self.y1 && y < self.y2
     }
 }
 
