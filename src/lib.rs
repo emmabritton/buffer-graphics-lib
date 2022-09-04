@@ -10,11 +10,14 @@
 //! # use buffer_graphics_lib::drawing::DrawingMethods;
 //! # use buffer_graphics_lib::Graphics;
 //! # use buffer_graphics_lib::image_loading::load_image;
+//! use buffer_graphics_lib::shapes::{DrawType, Shape};
+//! # use buffer_graphics_lib::shapes::rect::Rect;
 //! # use buffer_graphics_lib::text::{TextPos, TextSize};
 //!let mut buffer = [0_u8; 800 * 600 * 4]; //800 x 600 RGBA
 //!let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
 //!graphics.draw_text("Some text", None, TextPos::Px(1, 1), TextSize::Normal, BLACK);
-//!graphics.draw_rect(1, 1, 100, 100, LIGHT_GRAY);
+//!let shape = Rect::new((1,1),(15,16));
+//!shape.render(&mut graphics, &DrawType::Fill(LIGHT_GRAY));
 //! ```
 
 #![deny(clippy::all)]
@@ -24,13 +27,15 @@ pub mod drawing;
 pub mod image;
 #[cfg(feature = "image_loading")]
 pub mod image_loading;
-pub mod math;
 pub mod scaling;
 pub mod text;
+pub mod shapes;
+pub mod lerp;
+pub mod coord;
 
 use crate::GraphicsError::InvalidBufferLength;
-use mint::Point2;
 use thiserror::Error;
+use crate::coord::Coord;
 
 #[derive(Error, Debug)]
 pub enum GraphicsError {
@@ -46,7 +51,7 @@ pub struct Graphics<'buffer> {
     buffer: &'buffer mut [u8],
     width: usize,
     height: usize,
-    translate: Point2<isize>,
+    translate: Coord,
 }
 
 impl<'buffer> Graphics<'_> {
@@ -63,7 +68,7 @@ impl<'buffer> Graphics<'_> {
             buffer,
             width,
             height,
-            translate: Point2 { x: 0, y: 0 },
+            translate: Coord::default(),
         })
     }
 }

@@ -1,6 +1,10 @@
 use crate::Tint;
 
+#[cfg(feature = "serde_derive")]
+use serde::{Deserialize, Serialize};
+
 ///This represents an RGBA color and is used to store a pixel by [`Image`](crate::image::Image) and [`PixelsWrapper`](crate::drawing::PixelsWrapper)
+#[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Color {
     //red channel

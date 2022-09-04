@@ -9,7 +9,7 @@ pub enum TextSize {
 pub enum TextPos {
     Px(isize, isize),
     /// See [TextSize::get_max_characters] for maximum x and y
-    Coord(usize, usize),
+    ColRow(usize, usize),
 }
 
 impl TextPos {

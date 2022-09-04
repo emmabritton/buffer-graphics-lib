@@ -1,10 +1,15 @@
-use crate::color::Color;
+use crate::color::{BLACK, Color};
 use crate::image::Image;
-use crate::math::contains::Contains;
-use crate::math::Rect;
 use crate::text::{normal_letters, small_letters, TextPos, TextSize};
 use crate::Graphics;
-use mint::Point2;
+use crate::coord::Coord;
+use crate::shapes::math::Contains;
+use crate::shapes::rect::Rect;
+use crate::shapes::{DrawType, Shape};
+
+pub trait Renderable {
+    fn render(&self, graphics: &mut Graphics);
+}
 
 impl Graphics<'_> {
     /// Convert an x,y coord to idx for use with `self.pixels`
@@ -21,35 +26,32 @@ impl Graphics<'_> {
         self.height
     }
 
-    pub fn is_on_screen<T: PartialOrd<isize>>(&self, point: Point2<T>) -> bool {
-        let mut rect = Rect::new(0, 0, self.width as isize, self.height as isize);
-        rect = rect.translate(self.translate.x, self.translate.y);
-        rect.contains(point.x, point.y)
-        // Contains::<T>::contains(&rect, point.x, point.y)
+    pub fn is_on_screen(&self, point: Coord) -> bool {
+        let mut rect = Rect::new((0, 0), (self.width, self.height), DrawType::Stroke(BLACK));
+        rect = rect.translate_by((self.translate.x, self.translate.y));
+        rect.contains((point.x, point.y))
     }
 }
 
 impl Graphics<'_> {
     /// Get the canvas offset in pixels
-    pub fn get_translate(&self) -> Point2<isize> {
+    pub fn get_translate(&self) -> Coord {
         self.translate
     }
 
     /// Set the canvas offset in pixels
     ///
     /// All drawing commands will be offset by this value
-    pub fn set_translate(&mut self, new_value: Point2<isize>) {
+    pub fn set_translate(&mut self, new_value: Coord) {
         self.translate = new_value;
     }
 
     /// Adds `delta` to the current canvas offset
-    pub fn update_translate(&mut self, delta: Point2<isize>) {
+    pub fn update_translate(&mut self, delta: Coord) {
         self.translate.x += delta.x;
         self.translate.y += delta.y;
     }
-}
 
-impl Graphics<'_> {
     /// Copy entire pixels array to an image
     ///
     /// Although the method takes `&mut self` it doesn't mutate anything
@@ -93,107 +95,15 @@ impl Graphics<'_> {
         let margin = size.get_margin();
         ((width + margin) * x, (height + margin) * y)
     }
-}
 
-pub trait DrawingMethods<T> {
     /// Draw an image at `x`, `y`
-    fn draw_image(&mut self, start_x: T, start_y: T, image: &Image);
-
-    /// Draw line from `x1,y1` to `x2,y2` in `color`
-    fn draw_line(&mut self, x1: T, y1: T, x2: T, y2: T, color: Color);
-
-    /// Draw a filled rectangle from `x1,y1` to `x2,y2` in `color`
-    fn draw_rect(&mut self, x1: T, y1: T, x2: T, y2: T, color: Color);
-
-    /// Draw a hollow rectangle from `x1,y1` to `x2,y2` in `color`
-    fn draw_frame(&mut self, x1: T, y1: T, x2: T, y2: T, color: Color);
-
-    /// Draw a hollow circle at `x,y` with `radius` in `color`
-    fn draw_circle(&mut self, x: T, y: T, radius: T, color: Color);
-
-    /// Draw a filled circle at `x,y` with `radius` in `color`
-    fn draw_circle_filled(&mut self, x: T, y: T, radius: T, color: Color);
-
-    /// Get the RGB values for a pixel
-    /// Alpha will always be 255
-    ///
-    /// If `use_translate` is true than the x,y will be updated with `self.translate`
-    ///
-    /// Although the method takes `&mut self` it doesn't mutate anything
-    fn get_pixel(&mut self, x: T, y: T, use_translate: bool) -> Option<Color>;
-
-    /// Update a pixel color, using [PixelWrapper::set_pixel] or [PixelWrapper::blend_pixel] depending
-    /// on whether `color`s alpha is 255 or not
-    fn update_pixel(&mut self, x: T, y: T, color: Color);
-}
-
-macro_rules! create_drawing_methods {
-    ($T:ty) => {
-        impl DrawingMethods<$T> for Graphics<'_> {
-            /// Draw an image at `x`, `y`
-            #[inline]
-            fn draw_image(&mut self, start_x: $T, start_y: $T, image: &Image) {
-                self.draw_image(start_x as isize, start_y as isize, image)
-            }
-
-            /// Draw line from `x1,y1` to `x2,y2` in `color`
-            #[inline]
-            fn draw_line(&mut self, x1: $T, y1: $T, x2: $T, y2: $T, color: Color) {
-                self.draw_line(x1 as isize, y1 as isize, x2 as isize, y2 as isize, color)
-            }
-
-            /// Draw a filled rectangle from `x1,y1` to `x2,y2` in `color`
-            #[inline]
-            fn draw_rect(&mut self, x1: $T, y1: $T, x2: $T, y2: $T, color: Color) {
-                self.draw_rect(x1 as isize, y1 as isize, x2 as isize, y2 as isize, color)
-            }
-
-            /// Draw a hollow rectangle from `x1,y1` to `x2,y2` in `color`
-            #[inline]
-            fn draw_frame(&mut self, x1: $T, y1: $T, x2: $T, y2: $T, color: Color) {
-                self.draw_frame(x1 as isize, y1 as isize, x2 as isize, y2 as isize, color)
-            }
-
-            /// Draw a hollow circle at `x,y` with `radius` in `color`
-            #[inline]
-            fn draw_circle(&mut self, x: $T, y: $T, radius: $T, color: Color) {
-                self.draw_circle(x as isize, y as isize, radius as isize, color)
-            }
-
-            /// Draw a filled circle at `x,y` with `radius` in `color`
-            #[inline]
-            fn draw_circle_filled(&mut self, x: $T, y: $T, radius: $T, color: Color) {
-                self.draw_circle_filled(x as isize, y as isize, radius as isize, color)
-            }
-
-            /// Get the RGB values for a pixel
-            /// Alpha will always be 255
-            ///
-            /// If `use_translate` is true than the x,y will be updated with `self.translate`
-            ///
-            /// Although the method takes `&mut self` it doesn't mutate anything
-            #[inline]
-            fn get_pixel(&mut self, x: $T, y: $T, use_translate: bool) -> Option<Color> {
-                self.get_pixel(x as isize, y as isize, use_translate)
-            }
-
-            /// Update a pixel color, using [PixelWrapper::set_pixel] or [PixelWrapper::blend_pixel] depending
-            /// on whether `color`s alpha is 255 or not
-            #[inline]
-            fn update_pixel(&mut self, x: $T, y: $T, color: Color) {
-                self.update_pixel(x as isize, y as isize, color)
-            }
-        }
-    };
-}
-
-impl DrawingMethods<isize> for Graphics<'_> {
-    fn draw_image(&mut self, start_x: isize, start_y: isize, image: &Image) {
+    pub fn draw_image<P: Into<Coord>>(&mut self, xy: P, image: &Image) {
+        let xy = xy.into();
         let mut x = 0;
         for (y, row) in image.pixels.chunks_exact(image.width()).enumerate() {
-            for px in row {
-                if px.a > 0 {
-                    self.update_pixel(start_x + x, start_y + y as isize, *px);
+            for color in row {
+                if color.a > 0 {
+                    self.update_pixel(xy.x + x, xy.y + y as isize, *color);
                 }
                 x += 1;
             }
@@ -201,119 +111,25 @@ impl DrawingMethods<isize> for Graphics<'_> {
         }
     }
 
-    fn draw_line(&mut self, x1: isize, y1: isize, x2: isize, y2: isize, color: Color) {
-        let mut delta = 0;
-        let x1 = x1 as isize;
-        let y1 = y1 as isize;
-        let x2 = x2 as isize;
-        let y2 = y2 as isize;
-        let dx = isize::abs(x2 - x1);
-        let dy = isize::abs(y2 - y1);
-        let dx2 = dx * 2;
-        let dy2 = dy * 2;
-        let ix: isize = if x1 < x2 { 1 } else { -1 };
-        let iy: isize = if y1 < y2 { 1 } else { -1 };
-        let mut x = x1;
-        let mut y = y1;
-        if dx >= dy {
-            loop {
-                self.update_pixel(x, y, color);
-                if x == x2 {
-                    break;
-                }
-                x += ix;
-                delta += dy2;
-                if delta > dx {
-                    y += iy;
-                    delta -= dx2;
-                }
-            }
-        } else {
-            loop {
-                self.update_pixel(x, y, color);
-                if y == y2 {
-                    break;
-                }
-                y += iy;
-                delta += dx2;
-                if delta > dy {
-                    x += ix;
-                    delta -= dy2;
-                }
-            }
-        }
+    /// Draw renderable
+    pub fn draw_at<P: Into<Coord>>(&mut self, xy: P, shape: &dyn Renderable) {
+        let xy = xy.into();
+        self.update_translate(xy);
+        shape.render(self);
+        self.update_translate(-xy);
     }
 
-    fn draw_rect(&mut self, x1: isize, y1: isize, x2: isize, y2: isize, color: Color) {
-        for x in x1..=x2 {
-            for y in y1..=y2 {
-                self.update_pixel(x, y, color);
-            }
-        }
+    /// Draw renderable
+    pub fn draw(&mut self, shape: &dyn Renderable) {
+        shape.render(self);
     }
 
-    fn draw_frame(&mut self, x1: isize, y1: isize, x2: isize, y2: isize, color: Color) {
-        self.draw_line(x1, y1, x1, y2, color);
-        self.draw_line(x1, y1, x2, y1, color);
-        self.draw_line(x1, y2, x2, y2, color);
-        self.draw_line(x2, y1, x2, y2, color);
-    }
-
-    fn draw_circle(&mut self, x: isize, y: isize, radius: isize, color: Color) {
-        let cx = x as isize;
-        let cy = y as isize;
-        let mut d = (5_isize - (radius as isize) * 4) / 4;
-        let mut x = 0;
-        let mut y = radius as isize;
-        let w = self.width as isize;
-        let h = self.height as isize;
-
-        let clamp_w = |num: isize| num.clamp(0, w);
-        let clamp_h = |num: isize| num.clamp(0, h);
-
-        while x <= y {
-            self.update_pixel(clamp_w(cx + x), clamp_h(cy + y), color);
-            self.update_pixel(clamp_w(cx + x), clamp_h(cy - y), color);
-            self.update_pixel(clamp_w(cx - x), clamp_h(cy + y), color);
-            self.update_pixel(clamp_w(cx - x), clamp_h(cy - y), color);
-            self.update_pixel(clamp_w(cx + y), clamp_h(cy + x), color);
-            self.update_pixel(clamp_w(cx + y), clamp_h(cy - x), color);
-            self.update_pixel(clamp_w(cx - y), clamp_h(cy + x), color);
-            self.update_pixel(clamp_w(cx - y), clamp_h(cy - x), color);
-            if d < 0 {
-                d += 2 * x + 1
-            } else {
-                d += 2 * (x - y) + 1;
-                y -= 1;
-            }
-            x += 1;
-        }
-    }
-
-    fn draw_circle_filled(&mut self, x: isize, y: isize, radius: isize, color: Color) {
-        let cx = x as isize;
-        let cy = y as isize;
-        let w = self.width as isize;
-        let h = self.height as isize;
-        let double_radius = (radius * radius) as isize;
-        let clamp_w = |num: isize| num.clamp(0, w);
-        let clamp_h = |num: isize| num.clamp(0, h);
-        for y in 0..radius {
-            let y = y as isize;
-            let up = cy - y;
-            let down = cy + y;
-            let half_width = (((double_radius - y * y) as f64).sqrt().round() as isize).max(0);
-            for x in 0..half_width {
-                let left = cx - x;
-                let right = cx + x;
-                self.update_pixel(clamp_w(left), clamp_h(up), color);
-                self.update_pixel(clamp_w(right), clamp_h(up), color);
-                self.update_pixel(clamp_w(left), clamp_h(down), color);
-                self.update_pixel(clamp_w(right), clamp_h(down), color);
-            }
-        }
-    }
-
+    /// Get the RGB values for a pixel
+    /// Alpha will always be 255
+    ///
+    /// If `use_translate` is true than the x,y will be updated with `self.translate`
+    ///
+    /// Although the method takes `&mut self` it doesn't mutate anything
     #[inline]
     fn get_pixel(&mut self, x: isize, y: isize, use_translate: bool) -> Option<Color> {
         let (x, y) = if use_translate {
@@ -336,25 +152,17 @@ impl DrawingMethods<isize> for Graphics<'_> {
         None
     }
 
+    /// Update a pixel color, using [PixelWrapper::set_pixel] or [PixelWrapper::blend_pixel] depending
+    /// on whether `color`s alpha is 255 or not
     #[inline]
-    fn update_pixel(&mut self, x: isize, y: isize, color: Color) {
+    pub fn update_pixel(&mut self, x: isize, y: isize, color: Color) {
         if color.a == 255 {
-            self.set_pixel(x, y, color);
+            self.set_pixel(x,y, color);
         } else {
-            self.blend_pixel(x, y, color);
+            self.blend_pixel(x,y, color);
         }
     }
-}
 
-create_drawing_methods!(usize);
-create_drawing_methods!(u64);
-create_drawing_methods!(i64);
-create_drawing_methods!(u32);
-create_drawing_methods!(i32);
-create_drawing_methods!(f32);
-create_drawing_methods!(f64);
-
-impl Graphics<'_> {
     /// Sets every pixel to the same color, this ignores translate
     pub fn clear(&mut self, color: Color) {
         self.buffer.chunks_exact_mut(4).for_each(|px| {
@@ -382,7 +190,7 @@ impl Graphics<'_> {
                 start_x = x;
                 start_y = y;
             }
-            TextPos::Coord(x, y) => {
+            TextPos::ColRow(x, y) => {
                 start_x = (x * size.get_size().0) as isize;
                 start_y = (y * size.get_size().1) as isize;
             }
@@ -417,7 +225,7 @@ impl Graphics<'_> {
                 start_x = xpx;
                 y = ypx;
             }
-            TextPos::Coord(c, r) => {
+            TextPos::ColRow(c, r) => {
                 start_x = (c * size.get_size().0) as isize;
                 y = (r * size.get_size().1) as isize;
             }
@@ -439,10 +247,10 @@ impl Graphics<'_> {
     /// This method uses alpha blending, note that the canvas pixels always have 255 alpha
     #[inline]
     pub fn blend_pixel(&mut self, x: isize, y: isize, color: Color) {
-        let x = x as isize + self.translate.x;
-        let y = y as isize + self.translate.y;
+        let x = x + self.translate.x;
+        let y = y + self.translate.y;
         if x >= 0 && y >= 0 && x < self.width as isize {
-            if let Some(base) = self.get_pixel(x, y, false) {
+            if let Some(base) = self.get_pixel(x,y, false) {
                 let new_color = base.blend(color);
                 let idx = self.index(x as usize, y as usize);
                 self.buffer[idx] = new_color.r;
@@ -473,37 +281,23 @@ impl Graphics<'_> {
 
 #[cfg(test)]
 mod test {
-    use crate::color::WHITE;
-    use crate::drawing::DrawingMethods;
-    use crate::Graphics;
-    use mint::Point2;
+    use crate::{Coord, Graphics};
 
     #[test]
     fn is_inside() {
         let mut buf = [0; 400];
         let mut graphics = Graphics::new(&mut buf, 10, 10).unwrap();
-        assert!(graphics.is_on_screen(Point2 { x: 1, y: 1 }));
-        assert!(graphics.is_on_screen(Point2 { x: 9, y: 9 }));
-        assert!(graphics.is_on_screen(Point2 { x: 0, y: 0 }));
-        assert!(!graphics.is_on_screen(Point2 { x: 10, y: 10 }));
-        assert!(!graphics.is_on_screen(Point2 { x: 4, y: -1 }));
-        assert!(!graphics.is_on_screen(Point2 { x: -1, y: 4 }));
+        assert!(graphics.is_on_screen(Coord { x: 1, y: 1 }));
+        assert!(graphics.is_on_screen(Coord { x: 9, y: 9 }));
+        assert!(graphics.is_on_screen(Coord { x: 0, y: 0 }));
+        assert!(!graphics.is_on_screen(Coord { x: 10, y: 10 }));
+        assert!(!graphics.is_on_screen(Coord { x: 4, y: -1 }));
+        assert!(!graphics.is_on_screen(Coord { x: -1, y: 4 }));
 
-        graphics.set_translate(Point2 { x: 2, y: -1 });
-        assert!(graphics.is_on_screen(Point2 { x: 4, y: 4 }));
-        assert!(graphics.is_on_screen(Point2 { x: 4, y: 0 }));
-        assert!(!graphics.is_on_screen(Point2 { x: 0, y: 0 }));
-        assert!(!graphics.is_on_screen(Point2 { x: 4, y: 9 }));
-    }
-
-    #[test]
-    fn line() {
-        let mut buf = [0; 400];
-        assert_eq!(&buf[0..8], [0; 8]);
-        let mut graphics = Graphics::new(&mut buf, 10, 10).unwrap();
-        graphics.draw_line(0, 0, 2, 0, WHITE);
-        drop(graphics);
-        assert_eq!(&buf[0..12], [255; 12]);
-        assert_eq!(&buf[12..16], [0; 4]);
+        graphics.set_translate(Coord { x: 2, y: -1 });
+        assert!(graphics.is_on_screen(Coord { x: 4, y: 4 }));
+        assert!(graphics.is_on_screen(Coord { x: 4, y: 0 }));
+        assert!(!graphics.is_on_screen(Coord { x: 0, y: 0 }));
+        assert!(!graphics.is_on_screen(Coord { x: 4, y: 9 }));
     }
 }

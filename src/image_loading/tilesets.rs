@@ -7,7 +7,7 @@ use std::fs;
 
 /// BasicTileset can be used for simple tile sets/atlas
 ///
-/// The format must be:
+/// The format is:
 /// {
 ///     name: string, optional
 ///     image_file: string, path
@@ -16,7 +16,7 @@ use std::fs;
 ///         height: integer, px
 ///     tiles: [
 ///         id: string
-///         x: integer, coord
+///         x: integer, coord (ie this tile will be x * width .. (x + 1) * width)
 ///         y: integer, coord
 ///     ]
 /// }
