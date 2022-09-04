@@ -1,7 +1,7 @@
-use crate::Graphics;
-use crate::shapes::{DrawType, Shape};
 use crate::coord::Coord;
 use crate::drawing::Renderable;
+use crate::shapes::{DrawType, Shape};
+use crate::Graphics;
 
 #[cfg(feature = "serde_derive")]
 use serde::{Deserialize, Serialize};
@@ -12,12 +12,17 @@ pub struct Circle {
     center_x: isize,
     center_y: isize,
     radius: usize,
-    draw_type: DrawType
+    draw_type: DrawType,
 }
 
 impl Circle {
     pub fn new(center_x: isize, center_y: isize, radius: usize, draw_type: DrawType) -> Self {
-        Self { center_x, center_y, radius, draw_type }
+        Self {
+            center_x,
+            center_y,
+            radius,
+            draw_type,
+        }
     }
 
     pub fn center(&self) -> Coord {
@@ -40,7 +45,12 @@ impl Shape for Circle {
 
     fn translate_by<P: Into<Coord>>(&self, delta: P) -> Self {
         let delta = delta.into();
-        Circle::new(self.center_x + delta.x, self.center_y + delta.y, self.radius, self.draw_type)
+        Circle::new(
+            self.center_x + delta.x,
+            self.center_y + delta.y,
+            self.radius,
+            self.draw_type,
+        )
     }
 
     fn move_to<P: Into<Coord>>(&self, xy: P) -> Self {
@@ -97,7 +107,8 @@ impl Renderable for Circle {
                 for y in 0..(self.radius as isize) {
                     let up = cy - y;
                     let down = cy + y;
-                    let half_width = (((squared_radius - y * y) as f64).sqrt().round() as isize).max(0);
+                    let half_width =
+                        (((squared_radius - y * y) as f64).sqrt().round() as isize).max(0);
                     for x in 0..half_width {
                         let left = cx - x;
                         let right = cx + x;

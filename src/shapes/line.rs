@@ -1,8 +1,8 @@
-use crate::Graphics;
-use crate::coord::Coord;
-use crate::shapes::{DrawType, Shape};
-use crate::drawing::Renderable;
 use crate::color::Color;
+use crate::coord::Coord;
+use crate::drawing::Renderable;
+use crate::shapes::{DrawType, Shape};
+use crate::Graphics;
 
 #[cfg(feature = "serde_derive")]
 use serde::{Deserialize, Serialize};
@@ -13,7 +13,7 @@ pub struct Line {
     start: Coord,
     end: Coord,
     len: isize,
-    color: Color
+    color: Color,
 }
 
 impl Line {
@@ -21,12 +21,16 @@ impl Line {
         let start = start.into();
         let end = end.into();
         let diff = start.diff(end);
-        let len = ((((diff.0 ^ 2) as f32) +
-            (diff.1 ^ 2) as f32).sqrt()) as isize;
-        Self { start, end, len, color }
+        let len = ((((diff.0 ^ 2) as f32) + (diff.1 ^ 2) as f32).sqrt()) as isize;
+        Self {
+            start,
+            end,
+            len,
+            color,
+        }
     }
 
-    pub fn len(&self) -> isize {
+    pub fn length(&self) -> isize {
         self.len
     }
 }
@@ -39,7 +43,7 @@ impl Shape for Line {
     fn with_draw_type(&self, draw_type: DrawType) -> Self {
         let color = match draw_type {
             DrawType::Stroke(c) => c,
-            DrawType::Fill(c) => c
+            DrawType::Fill(c) => c,
         };
         Line::new(self.start, self.end, color)
     }

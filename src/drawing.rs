@@ -1,11 +1,11 @@
-use crate::color::{BLACK, Color};
-use crate::image::Image;
-use crate::text::{normal_letters, small_letters, TextPos, TextSize};
-use crate::Graphics;
+use crate::color::{Color, BLACK};
 use crate::coord::Coord;
+use crate::image::Image;
 use crate::shapes::math::Contains;
 use crate::shapes::rect::Rect;
 use crate::shapes::{DrawType, Shape};
+use crate::text::{normal_letters, small_letters, TextPos, TextSize};
+use crate::Graphics;
 
 pub trait Renderable {
     fn render(&self, graphics: &mut Graphics);
@@ -157,9 +157,9 @@ impl Graphics<'_> {
     #[inline]
     pub fn update_pixel(&mut self, x: isize, y: isize, color: Color) {
         if color.a == 255 {
-            self.set_pixel(x,y, color);
+            self.set_pixel(x, y, color);
         } else {
-            self.blend_pixel(x,y, color);
+            self.blend_pixel(x, y, color);
         }
     }
 
@@ -250,7 +250,7 @@ impl Graphics<'_> {
         let x = x + self.translate.x;
         let y = y + self.translate.y;
         if x >= 0 && y >= 0 && x < self.width as isize {
-            if let Some(base) = self.get_pixel(x,y, false) {
+            if let Some(base) = self.get_pixel(x, y, false) {
                 let new_color = base.blend(color);
                 let idx = self.index(x as usize, y as usize);
                 self.buffer[idx] = new_color.r;

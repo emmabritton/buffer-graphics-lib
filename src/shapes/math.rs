@@ -1,22 +1,25 @@
-use crate::Coord;
 use crate::shapes::rect::Rect;
+use crate::Coord;
 
 pub trait Contains<P: Into<Coord>> {
     fn contains(&self, xy: P) -> bool;
 }
 
-impl <P: Into<Coord>> Contains<P> for Rect {
+impl<P: Into<Coord>> Contains<P> for Rect {
     fn contains(&self, xy: P) -> bool {
         let xy = xy.into();
-        xy.x >= self.topleft().x && xy.x < self.bottomright().x && xy.y >= self.topleft().y && xy.y < self.bottomright().y
+        xy.x >= self.topleft().x
+            && xy.x < self.bottomright().x
+            && xy.y >= self.topleft().y
+            && xy.y < self.bottomright().y
     }
 }
 
 #[cfg(test)]
 mod test {
+    use super::*;
     use crate::color::BLACK;
     use crate::shapes::DrawType;
-    use super::*;
 
     #[test]
     fn contains_isize_rect() {

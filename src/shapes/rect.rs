@@ -1,7 +1,7 @@
-use crate::Graphics;
-use crate::shapes::{DrawType, Shape};
 use crate::coord::Coord;
 use crate::drawing::Renderable;
+use crate::shapes::{DrawType, Shape};
+use crate::Graphics;
 
 #[cfg(feature = "serde_derive")]
 use serde::{Deserialize, Serialize};
@@ -13,7 +13,7 @@ pub struct Rect {
     end: Coord,
     width: isize,
     height: isize,
-    draw_type: DrawType
+    draw_type: DrawType,
 }
 
 impl Rect {
@@ -29,7 +29,13 @@ impl Rect {
         let end_y = start.y.max(end.y);
         let width = end_x - start_x;
         let height = end_y - start_y;
-        Self { start: Coord::new(start_x, start_y), end: Coord::new(end_x, end_y), width, height, draw_type }
+        Self {
+            start: Coord::new(start_x, start_y),
+            end: Coord::new(end_x, end_y),
+            width,
+            height,
+            draw_type,
+        }
     }
 
     pub fn width(&self) -> isize {
@@ -140,8 +146,8 @@ impl Renderable for Rect {
 
 #[cfg(test)]
 mod test {
-    use crate::color::BLACK;
     use super::*;
+    use crate::color::BLACK;
 
     #[test]
     fn union() {
@@ -150,14 +156,20 @@ mod test {
 
         let union = rect.union(&other);
 
-        assert_eq!(union, Rect::new((10, 10), (25, 25), DrawType::Stroke(BLACK)));
+        assert_eq!(
+            union,
+            Rect::new((10, 10), (25, 25), DrawType::Stroke(BLACK))
+        );
 
         let rect = Rect::new((50, 1), (50, 100), DrawType::Stroke(BLACK));
         let other = Rect::new((1, 50), (100, 50), DrawType::Stroke(BLACK));
 
         let union = rect.union(&other);
 
-        assert_eq!(union, Rect::new((1, 1), (100, 100), DrawType::Stroke(BLACK)));
+        assert_eq!(
+            union,
+            Rect::new((1, 1), (100, 100), DrawType::Stroke(BLACK))
+        );
     }
 
     #[test]
@@ -177,16 +189,22 @@ mod test {
 
         let intersection = rect.intersect(&other);
 
-        assert_eq!(intersection, Rect::new((15, 15), (20, 20), DrawType::Stroke(BLACK)));
+        assert_eq!(
+            intersection,
+            Rect::new((15, 15), (20, 20), DrawType::Stroke(BLACK))
+        );
 
         let rect = Rect::new((50, 1), (51, 100), DrawType::Stroke(BLACK));
         let other = Rect::new((1, 50), (100, 51), DrawType::Stroke(BLACK));
 
         let intersection = rect.intersect(&other);
 
-        assert_eq!(intersection, Rect::new((50, 50), (51, 51), DrawType::Stroke(BLACK)));
+        assert_eq!(
+            intersection,
+            Rect::new((50, 50), (51, 51), DrawType::Stroke(BLACK))
+        );
 
-        let rect = Rect::new((10, 10),( 20, 20), DrawType::Stroke(BLACK));
+        let rect = Rect::new((10, 10), (20, 20), DrawType::Stroke(BLACK));
         let doesnt_intersect = Rect::new((30, 30), (40, 40), DrawType::Stroke(BLACK));
 
         assert_eq!(rect.intersect(&doesnt_intersect), rect);

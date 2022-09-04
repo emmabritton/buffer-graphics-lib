@@ -3,11 +3,11 @@ use crate::coord::Coord;
 #[cfg(feature = "serde_derive")]
 use serde::{Deserialize, Serialize};
 
-pub mod line;
-pub mod rect;
 pub mod circle;
 pub mod convert_shape;
+pub mod line;
 pub mod math;
+pub mod rect;
 //add arc, triangle, polygon, segment
 
 #[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]

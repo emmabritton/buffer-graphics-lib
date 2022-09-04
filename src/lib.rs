@@ -23,19 +23,19 @@
 #![deny(clippy::all)]
 
 pub mod color;
+pub mod coord;
 pub mod drawing;
 pub mod image;
 #[cfg(feature = "image_loading")]
 pub mod image_loading;
-pub mod scaling;
-pub mod text;
-pub mod shapes;
 pub mod lerp;
-pub mod coord;
+pub mod scaling;
+pub mod shapes;
+pub mod text;
 
+use crate::coord::Coord;
 use crate::GraphicsError::InvalidBufferLength;
 use thiserror::Error;
-use crate::coord::Coord;
 
 #[derive(Error, Debug)]
 pub enum GraphicsError {

@@ -1,13 +1,13 @@
-use std::ops::{Add, Neg, Sub};
 use mint::Point2;
 #[cfg(feature = "serde_derive")]
 use serde::{Deserialize, Serialize};
+use std::ops::{Add, Neg, Sub};
 
 #[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug, Default)]
 pub struct Coord {
     pub x: isize,
-    pub y: isize
+    pub y: isize,
 }
 
 impl Coord {
@@ -29,7 +29,7 @@ impl Add for Coord {
     fn add(self, rhs: Self) -> Self::Output {
         Coord {
             x: self.x + rhs.x,
-            y: self.y + rhs.y
+            y: self.y + rhs.y,
         }
     }
 }
@@ -40,7 +40,7 @@ impl Neg for Coord {
     fn neg(self) -> Self::Output {
         Coord {
             x: -self.x,
-            y: -self.y
+            y: -self.y,
         }
     }
 }
@@ -51,7 +51,7 @@ impl Sub for Coord {
     fn sub(self, rhs: Self) -> Self::Output {
         Coord {
             x: self.x - rhs.x,
-            y: self.y - rhs.y
+            y: self.y - rhs.y,
         }
     }
 }
@@ -60,7 +60,7 @@ impl From<Point2<isize>> for Coord {
     fn from(point: Point2<isize>) -> Self {
         Coord {
             x: point.x,
-            y: point.y
+            y: point.y,
         }
     }
 }
@@ -69,18 +69,18 @@ impl From<Coord> for Point2<isize> {
     fn from(coord: Coord) -> Self {
         Point2 {
             x: coord.x,
-            y: coord.y
+            y: coord.y,
         }
     }
 }
 
 macro_rules! impl_from_num {
     ($num_type:ty) => {
-        impl From<($num_type,$num_type)> for Coord {
+        impl From<($num_type, $num_type)> for Coord {
             fn from(nums: ($num_type, $num_type)) -> Coord {
                 Coord {
                     x: nums.0 as isize,
-                    y: nums.1 as isize
+                    y: nums.1 as isize,
                 }
             }
         }

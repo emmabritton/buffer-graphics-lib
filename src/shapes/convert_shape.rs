@@ -16,7 +16,11 @@ impl From<Circle> for Rect {
     fn from(circle: Circle) -> Self {
         let center = circle.center();
         let r = circle.radius() as isize;
-        Rect::new((center.x - r, center.y - r), (center.x + r, center.y + r), circle.draw_type())
+        Rect::new(
+            (center.x - r, center.y - r),
+            (center.x + r, center.y + r),
+            circle.draw_type(),
+        )
     }
 }
 
@@ -30,7 +34,7 @@ impl From<Rect> for Line {
     fn from(rect: Rect) -> Self {
         let color = match rect.draw_type() {
             DrawType::Stroke(c) => c,
-            DrawType::Fill(c) => c
+            DrawType::Fill(c) => c,
         };
         Line::new(rect.points()[0], rect.points()[1], color)
     }
