@@ -41,11 +41,7 @@ impl Shape for Line {
     }
 
     fn with_draw_type(&self, draw_type: DrawType) -> Self {
-        let color = match draw_type {
-            DrawType::Stroke(c) => c,
-            DrawType::Fill(c) => c,
-        };
-        Line::new(self.start, self.end, color)
+        Line::new(self.start, self.end, draw_type.color())
     }
 
     fn translate_by<P: Into<Coord>>(&self, delta: P) -> Self {
@@ -82,55 +78,6 @@ impl Shape for Line {
 
 impl Renderable for Line {
     fn render(&self, graphics: &mut Graphics) {
-        if self.start.x == self.end.x {
-            for y in self.start.y..self.end.y {
-                graphics.update_pixel(self.start.x, y, self.color);
-            }
-        } else if self.start.y == self.end.y {
-            for x in self.start.x..self.end.x {
-                graphics.update_pixel(x, self.start.y, self.color);
-            }
-        } else {
-            let mut delta = 0;
-            let x1 = self.start.x as isize;
-            let y1 = self.start.y as isize;
-            let x2 = self.end.x as isize;
-            let y2 = self.end.y as isize;
-            let dx = isize::abs(x2 - x1);
-            let dy = isize::abs(y2 - y1);
-            let dx2 = dx * 2;
-            let dy2 = dy * 2;
-            let ix: isize = if x1 < x2 { 1 } else { -1 };
-            let iy: isize = if y1 < y2 { 1 } else { -1 };
-            let mut x = x1;
-            let mut y = y1;
-            if dx >= dy {
-                loop {
-                    graphics.update_pixel(x, y, self.color);
-                    if x == x2 {
-                        break;
-                    }
-                    x += ix;
-                    delta += dy2;
-                    if delta > dx {
-                        y += iy;
-                        delta -= dx2;
-                    }
-                }
-            } else {
-                loop {
-                    graphics.update_pixel(x, y, self.color);
-                    if y == y2 {
-                        break;
-                    }
-                    y += iy;
-                    delta += dx2;
-                    if delta > dy {
-                        x += ix;
-                        delta -= dy2;
-                    }
-                }
-            }
-        }
+        graphics.draw_line(self.start, self.end, self.color)
     }
 }

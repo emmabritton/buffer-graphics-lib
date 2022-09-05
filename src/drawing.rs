@@ -111,6 +111,61 @@ impl Graphics<'_> {
         }
     }
 
+    pub fn draw_line<P1: Into<Coord>,P2: Into<Coord>>(&mut self, start: P1, end: P2, color: Color) {
+        let start = start.into();
+        let end = end.into();
+        if start.x == end.x {
+            for y in start.y..end.y {
+                self.update_pixel(start.x, y, color);
+            }
+        } else if start.y == end.y {
+            for x in start.x..end.x {
+                self.update_pixel(x, start.y, color);
+            }
+        } else {
+            let mut delta = 0;
+            let x1 = start.x as isize;
+            let y1 = start.y as isize;
+            let x2 = end.x as isize;
+            let y2 = end.y as isize;
+            let dx = isize::abs(x2 - x1);
+            let dy = isize::abs(y2 - y1);
+            let dx2 = dx * 2;
+            let dy2 = dy * 2;
+            let ix: isize = if x1 < x2 { 1 } else { -1 };
+            let iy: isize = if y1 < y2 { 1 } else { -1 };
+            let mut x = x1;
+            let mut y = y1;
+            if dx >= dy {
+                loop {
+                    self.update_pixel(x, y, color);
+                    if x == x2 {
+                        break;
+                    }
+                    x += ix;
+                    delta += dy2;
+                    if delta > dx {
+                        y += iy;
+                        delta -= dx2;
+                    }
+                }
+            } else {
+                loop {
+                    self.update_pixel(x, y, color);
+                    if y == y2 {
+                        break;
+                    }
+                    y += iy;
+                    delta += dx2;
+                    if delta > dy {
+                        x += ix;
+                        delta -= dy2;
+                    }
+                }
+            }
+        }
+    }
+
     /// Draw renderable
     pub fn draw_at<P: Into<Coord>>(&mut self, xy: P, shape: &dyn Renderable) {
         let xy = xy.into();
