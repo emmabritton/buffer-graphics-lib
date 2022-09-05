@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 pub mod circle;
 pub mod convert_shape;
 pub mod line;
-pub mod math;
 pub mod rect;
 pub mod triangle;
 //add arc, triangle, polygon, segment

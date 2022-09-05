@@ -1,7 +1,6 @@
 use crate::color::{Color, BLACK};
 use crate::coord::Coord;
 use crate::image::Image;
-use crate::shapes::math::Contains;
 use crate::shapes::rect::Rect;
 use crate::shapes::{DrawType, Shape};
 use crate::text::{normal_letters, small_letters, TextPos, TextSize};

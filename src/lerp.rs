@@ -1,4 +1,3 @@
-use mint::Point2;
 use crate::Coord;
 
 pub trait Lerp {
@@ -87,40 +86,40 @@ mod test {
 
     #[test]
     fn point_simple() {
-        let start1 = Point2 { x: 0, y: 0 };
-        let end1 = Point2 { x: 10, y: 10 };
+        let start1 = Coord { x: 0, y: 0 };
+        let end1 = Coord { x: 10, y: 10 };
 
-        let start2 = Point2 { x: -1, y: -1 };
-        let end2 = Point2 { x: 1, y: 1 };
+        let start2 = Coord { x: -1, y: -1 };
+        let end2 = Coord { x: 1, y: 1 };
 
-        let start3 = Point2 { x: 1, y: -1 };
-        let end3 = Point2 { x: -1, y: 1 };
+        let start3 = Coord { x: 1, y: -1 };
+        let end3 = Coord { x: -1, y: 1 };
 
-        assert_eq!(start1.lerp(end1, 0.), Point2 { x: 0, y: 0 });
-        assert_eq!(start1.lerp(end1, 0.5), Point2 { x: 5, y: 5 });
-        assert_eq!(start1.lerp(end1, 1.), Point2 { x: 10, y: 10 });
+        assert_eq!(start1.lerp(end1, 0.), Coord { x: 0, y: 0 });
+        assert_eq!(start1.lerp(end1, 0.5), Coord { x: 5, y: 5 });
+        assert_eq!(start1.lerp(end1, 1.), Coord { x: 10, y: 10 });
 
-        assert_eq!(end1.lerp(start1, 0.), Point2 { x: 10, y: 10 });
-        assert_eq!(end1.lerp(start1, 0.5), Point2 { x: 5, y: 5 });
-        assert_eq!(end1.lerp(start1, 1.), Point2 { x: 0, y: 0 });
+        assert_eq!(end1.lerp(start1, 0.), Coord { x: 10, y: 10 });
+        assert_eq!(end1.lerp(start1, 0.5), Coord { x: 5, y: 5 });
+        assert_eq!(end1.lerp(start1, 1.), Coord { x: 0, y: 0 });
 
-        assert_eq!(start2.lerp(end2, 0.), Point2 { x: -1, y: -1 });
-        assert_eq!(start2.lerp(end2, 0.5), Point2 { x: 0, y: 0 });
-        assert_eq!(start2.lerp(end2, 1.), Point2 { x: 1, y: 1 });
+        assert_eq!(start2.lerp(end2, 0.), Coord { x: -1, y: -1 });
+        assert_eq!(start2.lerp(end2, 0.5), Coord { x: 0, y: 0 });
+        assert_eq!(start2.lerp(end2, 1.), Coord { x: 1, y: 1 });
 
-        assert_eq!(end2.lerp(start2, 0.), Point2 { x: 1, y: 1 });
-        assert_eq!(end2.lerp(start2, 0.5), Point2 { x: 0, y: 0 });
-        assert_eq!(end2.lerp(start2, 1.), Point2 { x: -1, y: -1 });
+        assert_eq!(end2.lerp(start2, 0.), Coord { x: 1, y: 1 });
+        assert_eq!(end2.lerp(start2, 0.5), Coord { x: 0, y: 0 });
+        assert_eq!(end2.lerp(start2, 1.), Coord { x: -1, y: -1 });
 
-        assert_eq!(start3.lerp(end3, 0.), Point2 { x: 1, y: -1 });
-        assert_eq!(start3.lerp(end3, 0.5), Point2 { x: 0, y: 0 });
-        assert_eq!(start3.lerp(end3, 1.), Point2 { x: -1, y: 1 });
+        assert_eq!(start3.lerp(end3, 0.), Coord { x: 1, y: -1 });
+        assert_eq!(start3.lerp(end3, 0.5), Coord { x: 0, y: 0 });
+        assert_eq!(start3.lerp(end3, 1.), Coord { x: -1, y: 1 });
 
-        assert_eq!(end3.lerp(start3, 0.), Point2 { x: -1, y: 1 });
-        assert_eq!(end3.lerp(start3, 0.5), Point2 { x: 0, y: 0 });
-        assert_eq!(end3.lerp(start3, 1.), Point2 { x: 1, y: -1 });
+        assert_eq!(end3.lerp(start3, 0.), Coord { x: -1, y: 1 });
+        assert_eq!(end3.lerp(start3, 0.5), Coord { x: 0, y: 0 });
+        assert_eq!(end3.lerp(start3, 1.), Coord { x: 1, y: -1 });
 
-        assert_eq!(start1.lerp(end1, 2.), Point2 { x: 20, y: 20 });
-        assert_eq!(start1.lerp(end1, -1.), Point2 { x: -10, y: -10 });
+        assert_eq!(start1.lerp(end1, 2.), Coord { x: 20, y: 20 });
+        assert_eq!(start1.lerp(end1, -1.), Coord { x: -10, y: -10 });
     }
 }

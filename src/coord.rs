@@ -17,8 +17,8 @@ impl Coord {
     }
 
     pub fn from_angle(center: Coord, distance: isize, degrees: f32) -> Self {
-        let x = (distance as f32 * degrees.to_radians().cos() + center.x as f32);
-        let y = (distance as f32 * degrees.to_radians().cos() + center.y as f32);
+        let x = (distance as f32) * degrees.to_radians().cos() + (center.x as f32);
+        let y = (distance as f32) * degrees.to_radians().cos() + (center.y as f32);
         Coord::new(x as isize, y as isize)
     }
 }
@@ -41,11 +41,11 @@ impl Coord {
     }
 
     pub fn cross_product(self, rhs: Self) -> isize {
-        (self.x * rhs.y - self.y * rhs.x)
+        self.x * rhs.y - self.y * rhs.x
     }
 
     pub fn dot_product(self, rhs: Self) -> isize {
-        (self.x * rhs.x + self.y * rhs.y)
+        self.x * rhs.x + self.y * rhs.y
     }
 
     pub fn perpendicular(self) -> Coord {
