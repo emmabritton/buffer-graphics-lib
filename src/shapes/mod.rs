@@ -8,6 +8,7 @@ pub mod convert_shape;
 pub mod line;
 pub mod math;
 pub mod rect;
+pub mod triangle;
 //add arc, triangle, polygon, segment
 
 #[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
