@@ -16,10 +16,11 @@ pub struct Circle {
 }
 
 impl Circle {
-    pub fn new(center_x: isize, center_y: isize, radius: usize, draw_type: DrawType) -> Self {
+    pub fn new<P: Into<Coord>>(center: P, radius: usize, draw_type: DrawType) -> Self {
+        let c = center.into();
         Self {
-            center_x,
-            center_y,
+            center_x: c.x,
+            center_y: c.y,
             radius,
             draw_type,
         }
@@ -40,14 +41,13 @@ impl Shape for Circle {
     }
 
     fn with_draw_type(&self, draw_type: DrawType) -> Self {
-        Circle::new(self.center_x, self.center_y, self.radius, draw_type)
+        Circle::new((self.center_x, self.center_y), self.radius, draw_type)
     }
 
     fn translate_by<P: Into<Coord>>(&self, delta: P) -> Self {
         let delta = delta.into();
         Circle::new(
-            self.center_x + delta.x,
-            self.center_y + delta.y,
+            (self.center_x + delta.x, self.center_y + delta.y),
             self.radius,
             self.draw_type,
         )
@@ -55,7 +55,15 @@ impl Shape for Circle {
 
     fn move_to<P: Into<Coord>>(&self, xy: P) -> Self {
         let xy = xy.into();
-        Circle::new(xy.x, xy.y, self.radius, self.draw_type)
+        Circle::new(xy, self.radius, self.draw_type)
+    }
+
+    fn contains<P: Into<Coord>>(&self, point: P) -> bool {
+        let p = point.into();
+
+        let result = (self.radius^2) - ((self.center_x-p.x)^2) + ((self.center_x-p.x)^2);
+
+        result >= 0
     }
 
     fn points(&self) -> Vec<Coord> {

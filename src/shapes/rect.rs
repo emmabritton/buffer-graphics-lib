@@ -115,6 +115,12 @@ impl Shape for Rect {
         Rect::new(start, end, self.draw_type)
     }
 
+    fn contains<P: Into<Coord>>(&self, point: P) -> bool {
+        let p = point.into();
+        self.start.x <= p.x && self.end.x > p.x &&
+            self.start.y <= p.y && self.end.y > p.y
+    }
+
     fn points(&self) -> Vec<Coord> {
         vec![self.start, self.end]
     }

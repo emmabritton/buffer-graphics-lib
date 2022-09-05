@@ -61,6 +61,20 @@ impl Shape for Line {
         Line::new(start, end, self.color)
     }
 
+    fn contains<P: Into<Coord>>(&self, point: P) -> bool {
+        let p = point.into();
+        let min = Coord::new(self.start.x.min(self.end.x), self.start.y.min(self.end.y));
+        let max = Coord::new(self.start.x.max(self.end.x), self.start.y.max(self.end.y));
+        if p.x >= min.x && p.x <= max.x && p.y >= min.y && p.y <= max.y {
+            let normal = (self.end - self.start).perpendicular();
+            let d = self.start - p;
+            if d.dot_product(normal) == 0 {
+                return true;
+            }
+        }
+        false
+    }
+
     fn points(&self) -> Vec<Coord> {
         vec![self.start, self.end]
     }
