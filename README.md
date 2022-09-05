@@ -12,7 +12,7 @@ The `Graphics` struct needs a mutable slice to work on and so mostly likely you'
 
 In your `Cargo.toml` file add
 ```toml
-buffer-graphics-lib = "0.1.2"
+buffer-graphics-lib = "0.4.1"
 ```
 
 ### Code
@@ -27,7 +27,8 @@ Drawing is then quite simple:
 ```rust
 graphics.draw_text("Some text", None, TextPos::Px(1, 1), TextSize::Normal, BLACK);
 graphics.draw_image(20, 20, &image);
-graphics.draw_rect(1, 1, 100, 100, LIGHT_GRAY);
+let shape = Shape::rect((10,10),(50,50),stroke(BLUE));
+graphics.draw(shape);
 ```
 
 ## Features

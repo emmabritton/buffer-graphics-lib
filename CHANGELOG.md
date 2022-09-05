@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.4.1
+- Add polygon shape
+
 ### Version 0.4.0
 - Change shapes from structs to enum as due to Rust trait limitations which meant working with Shape and Renderable was very awkward and annoying.
   - Unfortunately this means the shapes lose their unique methods (line.len(), rect.width(), etc) and shape conversions had to be removed
