@@ -3,6 +3,7 @@ use crate::coord::Coord;
 use crate::drawing::Renderable;
 use crate::shapes::circle::*;
 use crate::shapes::line::*;
+use crate::shapes::polygon::{polygon_contains, polygon_draw};
 use crate::shapes::rect::*;
 use crate::shapes::triangle::*;
 use crate::Graphics;
@@ -11,12 +12,13 @@ use serde::{Deserialize, Serialize};
 
 mod circle;
 mod line;
+mod polygon;
 mod rect;
 mod triangle;
-//add arc, polygon, segment
+//add arc, segment
 
 #[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Shape {
     Line {
         start: Coord,
@@ -37,13 +39,23 @@ pub enum Shape {
         points: [Coord; 3],
         draw_type: DrawType,
     },
+    Polygon {
+        points: Vec<Coord>,
+        draw_type: DrawType,
+    },
 }
 
 impl Shape {
     pub fn line<P1: Into<Coord>, P2: Into<Coord>>(start: P1, end: P2, color: Color) -> Shape {
         let start = start.into();
         let end = end.into();
-        let points = if start.y < end.y {
+        let points = if start.x == end.x {
+            if start.y <= end.y {
+                (start, end)
+            } else {
+                (end, start)
+            }
+        } else if start.x < end.x {
             (start, end)
         } else {
             (end, start)
@@ -94,6 +106,14 @@ impl Shape {
             draw_type,
         }
     }
+
+    pub fn polygon<P: Into<Coord> + Clone>(points: Vec<P>, draw_type: DrawType) -> Shape {
+        let points: Vec<Coord> = points.iter().map(|p| p.clone().into()).collect();
+        Shape::Polygon {
+            points,
+            draw_type,
+        }
+    }
 }
 
 impl Shape {
@@ -103,6 +123,7 @@ impl Shape {
             Shape::Rect { draw_type, .. } => *draw_type,
             Shape::Circle { draw_type, .. } => *draw_type,
             Shape::Triangle { draw_type, .. } => *draw_type,
+            Shape::Polygon { draw_type, .. } => *draw_type,
         }
     }
 
@@ -118,6 +139,7 @@ impl Shape {
             Shape::Triangle { points, .. } => {
                 Shape::triangle(points[0], points[1], points[2], draw_type)
             }
+            Shape::Polygon { points, .. } => Shape::polygon(points.clone(), draw_type),
         }
     }
 
@@ -138,6 +160,12 @@ impl Shape {
             Shape::Triangle { points, draw_type } => {
                 let points: Vec<Coord> = points.iter().map(|p| *p + delta).collect();
                 Shape::triangle(points[0], points[1], points[2], *draw_type)
+            }
+            Shape::Polygon {
+                points, draw_type
+            } => {
+                let points: Vec<Coord> = points.iter().map(|p| *p + delta).collect();
+                Shape::polygon(points, *draw_type)
             }
         }
     }
@@ -165,6 +193,11 @@ impl Shape {
                 let diff2 = points[2] - points[0];
                 Shape::triangle(point, point + diff1, point + diff2, *draw_type)
             }
+            Shape::Polygon { points, draw_type } => {
+                let delta: Coord = point.into();
+                let points: Vec<Coord> = points.iter().map(|p| *p - delta).collect();
+                Shape::polygon(points, *draw_type)
+            },
         }
     }
 
@@ -178,6 +211,7 @@ impl Shape {
             } => rect_contains(*topleft, *bottomright, point.into()),
             Shape::Circle { center, radius, .. } => circle_contains(*center, *radius, point.into()),
             Shape::Triangle { points, .. } => triangle_contains(*points, point.into()),
+            Shape::Polygon { points, .. } => polygon_contains(points_to_f32(points), point.into()),
         }
     }
 
@@ -191,6 +225,7 @@ impl Shape {
             } => vec![*topleft, *bottomright],
             Shape::Circle { center, .. } => vec![*center],
             Shape::Triangle { points, .. } => points.to_vec(),
+            Shape::Polygon { points, .. } => points.to_vec(),
         }
     }
 
@@ -216,6 +251,9 @@ impl Renderable for Shape {
                 draw_type,
             } => circle_draw(graphics, *center, *radius, *draw_type),
             Shape::Triangle { points, draw_type } => triangle_draw(graphics, *points, *draw_type),
+            Shape::Polygon {
+                points, draw_type, ..
+            } => polygon_draw(graphics, points_to_f32(points), *draw_type),
         }
     }
 }
@@ -242,4 +280,9 @@ pub fn fill(color: Color) -> DrawType {
 
 pub fn stroke(color: Color) -> DrawType {
     DrawType::Stroke(color)
+}
+
+#[inline]
+fn points_to_f32(points: &Vec<Coord>) -> Vec<(f32, f32)> {
+    points.iter().map(|p| (p.x as f32, p.y as f32)).collect()
 }
