@@ -3,8 +3,10 @@ use crate::shapes::DrawType;
 use crate::Graphics;
 
 pub fn rect_contains(topleft: Coord, bottomright: Coord, point: Coord) -> bool {
-    topleft.x <= point.x && bottomright.x > point.x &&
-        topleft.y <= point.y && bottomright.y > point.y
+    topleft.x <= point.x
+        && bottomright.x > point.x
+        && topleft.y <= point.y
+        && bottomright.y > point.y
 }
 
 pub fn rect_draw(graphics: &mut Graphics, topleft: Coord, bottomright: Coord, draw_type: DrawType) {

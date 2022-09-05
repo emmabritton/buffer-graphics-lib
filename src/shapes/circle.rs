@@ -50,8 +50,7 @@ pub fn circle_draw(graphics: &mut Graphics, center: Coord, radius: usize, draw_t
             for y in 0..(radius as isize) {
                 let up = cy - y;
                 let down = cy + y;
-                let half_width =
-                    (((squared_radius - y * y) as f64).sqrt().round() as isize).max(0);
+                let half_width = (((squared_radius - y * y) as f64).sqrt().round() as isize).max(0);
                 for x in 0..half_width {
                     let left = cx - x;
                     let right = cx + x;

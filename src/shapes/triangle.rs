@@ -1,10 +1,9 @@
-use mint::Point2;
-use crate::{Coord, Graphics};
 use crate::color::Color;
 use crate::shapes::DrawType;
+use crate::{Coord, Graphics};
+use mint::Point2;
 
-
-pub fn triangle_contains(points: [Coord;3], point: Coord) -> bool {
+pub fn triangle_contains(points: [Coord; 3], point: Coord) -> bool {
     let p1 = Coord::new(points[1].x - points[0].x, points[1].y - points[0].y);
     let p2 = Coord::new(points[2].x - points[0].x, points[2].y - points[0].y);
     let q = Coord::new(point.x - points[0].x, point.y - points[0].y);
@@ -15,16 +14,25 @@ pub fn triangle_contains(points: [Coord;3], point: Coord) -> bool {
     s >= 0.0 && t >= 0.0 && (s + t) <= 1.0
 }
 
-pub fn triangle_draw(graphics: &mut Graphics, points: [Coord;3], draw_type: DrawType) {
+pub fn triangle_draw(graphics: &mut Graphics, points: [Coord; 3], draw_type: DrawType) {
     let color = draw_type.color();
     graphics.draw_line(points[0], points[1], color);
     graphics.draw_line(points[1], points[2], color);
     graphics.draw_line(points[0], points[2], color);
     if let DrawType::Fill(_) = draw_type {
         let points = [
-            Point2 { x: points[0].x as f32, y: points[0].y as f32 },
-            Point2 { x: points[1].x as f32, y: points[1].y as f32 },
-            Point2 { x: points[2].x as f32, y: points[2].y as f32 },
+            Point2 {
+                x: points[0].x as f32,
+                y: points[0].y as f32,
+            },
+            Point2 {
+                x: points[1].x as f32,
+                y: points[1].y as f32,
+            },
+            Point2 {
+                x: points[2].x as f32,
+                y: points[2].y as f32,
+            },
         ];
         if points[1].y == points[2].y {
             draw_flat_bottom(graphics, points, color);
@@ -32,7 +40,9 @@ pub fn triangle_draw(graphics: &mut Graphics, points: [Coord;3], draw_type: Draw
             draw_flat_top(graphics, points, color);
         } else {
             let p = Point2 {
-                x: points[0].x + ((points[1].y - points[0].y) / (points[2].y - points[0].y)) * (points[2].x - points[0].x),
+                x: points[0].x
+                    + ((points[1].y - points[0].y) / (points[2].y - points[0].y))
+                        * (points[2].x - points[0].x),
                 y: points[1].y,
             };
             draw_flat_bottom(graphics, [points[0], points[1], p], color);

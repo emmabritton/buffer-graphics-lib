@@ -6,7 +6,6 @@ pub fn line_contains(start: Coord, end: Coord, point: Coord) -> bool {
     } else if start.y == end.y && start.y == point.y {
         start.x <= point.x && point.x <= end.x
     } else {
-        start.distance(point) + end.distance(point) ==
-            start.distance(end)
+        start.distance(point) + end.distance(point) == start.distance(end)
     }
 }

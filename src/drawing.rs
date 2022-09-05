@@ -108,7 +108,12 @@ impl Graphics<'_> {
         }
     }
 
-    pub fn draw_line<P1: Into<Coord>,P2: Into<Coord>>(&mut self, start: P1, end: P2, color: Color) {
+    pub fn draw_line<P1: Into<Coord>, P2: Into<Coord>>(
+        &mut self,
+        start: P1,
+        end: P2,
+        color: Color,
+    ) {
         let start = start.into();
         let end = end.into();
         if start.x == end.x {
