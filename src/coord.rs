@@ -15,11 +15,41 @@ impl Coord {
     pub fn new(x: isize, y: isize) -> Self {
         Self { x, y }
     }
+
+    pub fn from_angle(center: Coord, distance: isize, degrees: f32) -> Self {
+        let x = (distance as f32 * degrees.to_radians().cos() + center.x as f32);
+        let y = (distance as f32 * degrees.to_radians().cos() + center.y as f32);
+        Coord::new(x as isize, y as isize)
+    }
 }
 
 impl Coord {
-    pub fn diff(self, rhs: Self) -> (isize, isize) {
-        ((self.x - rhs.x).abs(), (self.y - rhs.y).abs())
+    pub fn diff(self, rhs: Self) -> Self {
+        Coord::new((self.x - rhs.x).abs(), (self.y - rhs.y).abs())
+    }
+
+    pub fn mid_point(self, rhs: Self) -> Coord {
+        let x = (self.x + rhs.x) / 2;
+        let y = (self.y + rhs.y) / 2;
+        Coord::new(x, y)
+    }
+
+    pub fn angle_to(self, rhs: Self) -> f32 {
+        let x = (rhs.x - self.x) as f32;
+        let y = (rhs.y - self.y) as f32;
+        y.atan2(x).to_degrees()
+    }
+
+    pub fn cross_product(self, rhs: Self) -> isize {
+        (self.x * rhs.y - self.y * rhs.x)
+    }
+
+    pub fn dot_product(self, rhs: Self) -> isize {
+        (self.x * rhs.x + self.y * rhs.y)
+    }
+
+    pub fn perpendicular(self) -> Coord {
+        Coord::new(self.y, -self.x)
     }
 }
 
