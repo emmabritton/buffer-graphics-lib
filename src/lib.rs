@@ -6,18 +6,15 @@
 //!
 //! Using the library is as simple as:
 //!```
-//! # use buffer_graphics_lib::color::{BLACK, LIGHT_GRAY};
-//! # use buffer_graphics_lib::drawing::DrawingMethods;
 //! # use buffer_graphics_lib::Graphics;
-//! # use buffer_graphics_lib::image_loading::load_image;
-//! use buffer_graphics_lib::shapes::{DrawType, Shape};
-//! # use buffer_graphics_lib::shapes::rect::Rect;
+//! # use buffer_graphics_lib::color::{BLUE, LIGHT_GRAY};
+//! # use buffer_graphics_lib::shapes::{Shape, stroke};
 //! # use buffer_graphics_lib::text::{TextPos, TextSize};
 //!let mut buffer = [0_u8; 800 * 600 * 4]; //800 x 600 RGBA
 //!let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
-//!graphics.draw_text("Some text", None, TextPos::Px(1, 1), TextSize::Normal, BLACK);
-//!let shape = Rect::new((1,1),(15,16));
-//!shape.render(&mut graphics, &DrawType::Fill(LIGHT_GRAY));
+//!graphics.draw_text("Some text", None, TextPos::Px(1,1), TextSize::Normal, LIGHT_GRAY);
+//!let shape = Shape::rect((1,1),(15,16), stroke(BLUE));
+//1graphics.draw(&shape);
 //! ```
 
 #![deny(clippy::all)]

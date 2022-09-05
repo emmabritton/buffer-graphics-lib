@@ -28,6 +28,12 @@ impl Coord {
         Coord::new((self.x - rhs.x).abs(), (self.y - rhs.y).abs())
     }
 
+    pub fn distance(self, rhs: Self) -> usize {
+        let x = (rhs.x - self.x) as f32;
+        let y = (rhs.y - self.y) as f32;
+        x.hypot(y).abs() as usize
+    }
+
     pub fn mid_point(self, rhs: Self) -> Coord {
         let x = (self.x + rhs.x) / 2;
         let y = (self.y + rhs.y) / 2;

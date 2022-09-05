@@ -1,8 +1,6 @@
-use crate::color::{Color, BLACK};
+use crate::color::Color;
 use crate::coord::Coord;
 use crate::image::Image;
-use crate::shapes::rect::Rect;
-use crate::shapes::{DrawType, Shape};
 use crate::text::{normal_letters, small_letters, TextPos, TextSize};
 use crate::Graphics;
 
@@ -26,9 +24,9 @@ impl Graphics<'_> {
     }
 
     pub fn is_on_screen(&self, point: Coord) -> bool {
-        let mut rect = Rect::new((0, 0), (self.width, self.height), DrawType::Stroke(BLACK));
-        rect = rect.translate_by((self.translate.x, self.translate.y));
-        rect.contains((point.x, point.y))
+        let x = point.x - self.translate.x;
+        let y = point.y - self.translate.y;
+        x >= 0 && y >= 0 && x < self.width as isize && y < self.height as isize
     }
 }
 
