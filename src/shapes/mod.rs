@@ -90,11 +90,7 @@ impl Shape {
         let mut sorted_points: Vec<Coord> = vec![point1.into(), point2.into(), point3.into()];
         sorted_points.sort_by_key(|c| c.y);
         Shape::Triangle {
-            points: [
-                sorted_points[0],
-                sorted_points[1],
-                sorted_points[2],
-            ],
+            points: [sorted_points[0], sorted_points[1], sorted_points[2]],
             draw_type,
         }
     }
