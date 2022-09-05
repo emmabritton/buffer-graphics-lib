@@ -18,7 +18,7 @@ mod triangle;
 //add arc, segment
 
 #[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Shape {
     Line {
         start: Coord,
@@ -46,6 +46,7 @@ pub enum Shape {
 }
 
 impl Shape {
+    #[allow(clippy::comparison_chain)] //don't care
     pub fn line<P1: Into<Coord>, P2: Into<Coord>>(start: P1, end: P2, color: Color) -> Shape {
         let start = start.into();
         let end = end.into();
@@ -109,10 +110,7 @@ impl Shape {
 
     pub fn polygon<P: Into<Coord> + Clone>(points: Vec<P>, draw_type: DrawType) -> Shape {
         let points: Vec<Coord> = points.iter().map(|p| p.clone().into()).collect();
-        Shape::Polygon {
-            points,
-            draw_type,
-        }
+        Shape::Polygon { points, draw_type }
     }
 }
 
@@ -161,9 +159,7 @@ impl Shape {
                 let points: Vec<Coord> = points.iter().map(|p| *p + delta).collect();
                 Shape::triangle(points[0], points[1], points[2], *draw_type)
             }
-            Shape::Polygon {
-                points, draw_type
-            } => {
+            Shape::Polygon { points, draw_type } => {
                 let points: Vec<Coord> = points.iter().map(|p| *p + delta).collect();
                 Shape::polygon(points, *draw_type)
             }
@@ -194,10 +190,9 @@ impl Shape {
                 Shape::triangle(point, point + diff1, point + diff2, *draw_type)
             }
             Shape::Polygon { points, draw_type } => {
-                let delta: Coord = point.into();
-                let points: Vec<Coord> = points.iter().map(|p| *p - delta).collect();
+                let points: Vec<Coord> = points.iter().map(|p| *p - point).collect();
                 Shape::polygon(points, *draw_type)
-            },
+            }
         }
     }
 
@@ -283,6 +278,6 @@ pub fn stroke(color: Color) -> DrawType {
 }
 
 #[inline]
-fn points_to_f32(points: &Vec<Coord>) -> Vec<(f32, f32)> {
+fn points_to_f32(points: &[Coord]) -> Vec<(f32, f32)> {
     points.iter().map(|p| (p.x as f32, p.y as f32)).collect()
 }
