@@ -91,9 +91,9 @@ impl Shape {
         sorted_points.sort_by_key(|c| c.y);
         Shape::Triangle {
             points: [
-                sorted_points[0].into(),
-                sorted_points[1].into(),
-                sorted_points[2].into(),
+                sorted_points[0],
+                sorted_points[1],
+                sorted_points[2],
             ],
             draw_type,
         }
