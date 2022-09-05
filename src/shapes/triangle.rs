@@ -111,10 +111,10 @@ impl Shape for Triangle {
         let p2 = Coord::new(self.points[2].x - self.points[0].x, self.points[2].y - self.points[0].y);
         let q = Coord::new(p.x - self.points[0].x, p.y - self.points[0].y);
 
-        let s = q.cross_product(p2) as f32 / p1.cross_product(p2);
-        let t = p1.cross_product(q) as f32 / p1.cross_product(p2);
+        let s = q.cross_product(p2) as f32 / p1.cross_product(p2) as f32;
+        let t = p1.cross_product(q) as f32 / p1.cross_product(p2) as f32;
 
-        s >= 0 && t >= 0 && (s+t) <= 1
+        s >= 0.0 && t >= 0.0 && (s+t) <= 1.0
     }
 
     fn points(&self) -> Vec<Coord> {

@@ -61,7 +61,7 @@ impl Shape for Circle {
     fn contains<P: Into<Coord>>(&self, point: P) -> bool {
         let p = point.into();
 
-        let result = (self.radius^2) - ((self.center_x-p.x)^2) + ((self.center_x-p.x)^2);
+        let result = ((self.radius as isize)^2) - ((self.center_x-p.x)^2) + ((self.center_x-p.x)^2);
 
         result >= 0
     }

@@ -39,7 +39,7 @@ impl_lerp!(i128);
 impl_lerp!(usize);
 impl_lerp!(isize);
 
-impl<T: Lerp> Lerp for Coord {
+impl Lerp for Coord {
     #[inline]
     fn lerp(self, end: Coord, percent: f32) -> Coord {
         Coord {

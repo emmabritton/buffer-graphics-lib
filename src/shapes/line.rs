@@ -21,7 +21,7 @@ impl Line {
         let start = start.into();
         let end = end.into();
         let diff = start.diff(end);
-        let len = ((((diff.0 ^ 2) as f32) + (diff.1 ^ 2) as f32).sqrt()) as isize;
+        let len = ((((diff.x ^ 2) as f32) + (diff.y ^ 2) as f32).sqrt()) as isize;
         Self {
             start,
             end,
