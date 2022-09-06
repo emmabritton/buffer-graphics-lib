@@ -17,10 +17,10 @@ buffer-graphics-lib = "0.4.1"
 
 ### Code
 
-This bit of boilerplate/framework must be used inside your code to use this library:
+Setup a graphics instance
 ```rust
 let mut buffer: [u8; 1920000] = [0; 800 * 600 * 4]; //800 x 600 RGBA 
-let mut graphics = Graphics::new(&mut buffer)?;
+let mut graphics = Graphics::new(&mut buffer, 800, 600)?;
 ```
 
 Drawing is then quite simple:
