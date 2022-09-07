@@ -95,6 +95,7 @@ impl TextSize {
     pub const fn get_px(&self, chr: char) -> &[bool] {
         match self {
             TextSize::Small => small::get_px(chr),
+            TextSize::Normal => normal::get_px(chr),
             TextSize::Large => large::get_px(chr)
         }
     }

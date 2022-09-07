@@ -129,11 +129,11 @@ mod test {
     fn space_before_col() {
         assert_eq!(
             SpaceBeforeCol(4).wrap("some words, and some are longer"),
-            c(&["some", " wor", "ds, ", "and ", "some", " are", " lon", "ger"])
+            c(&["some", "wor", "ds,", "and", "some", "are", "lon", "ger"])
         );
         assert_eq!(
             SpaceBeforeCol(8).wrap("some words, and some are longer"),
-            c(&["some", " words, ", "and some", " are", " longer"])
+            c(&["some", "words,", "and some", "are", "longer"])
         );
     }
 

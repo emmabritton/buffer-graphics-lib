@@ -11,7 +11,7 @@ impl TextPos {
     pub fn to_px(&self, size: TextSize) -> (isize, isize) {
         match self {
             TextPos::Px(x, y) => (*x,*y),
-            TextPos::ColRow(col, row) => ((col * (size.get_size().0 + size.get_spacing())) as isize, (row * size.get_size().1) as isize)
+            TextPos::ColRow(col, row) => ((col * (size.get_size().0 + size.get_spacing())) as isize, (row * (size.get_size().1 + size.get_spacing())) as isize)
         }
     }
 }

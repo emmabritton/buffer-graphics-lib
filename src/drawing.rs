@@ -3,7 +3,7 @@ use crate::coord::Coord;
 use crate::image::Image;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
-use crate::text::{large, small, TextSize};
+use crate::text::TextSize;
 use crate::Graphics;
 
 pub trait Renderable {
