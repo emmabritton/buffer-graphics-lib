@@ -3,6 +3,7 @@ pub mod large;
 pub mod pos;
 pub mod small;
 pub mod wrapping;
+pub mod normal;
 
 use crate::drawing::Renderable;
 use crate::text::format::TextFormat;
@@ -59,12 +60,13 @@ impl Renderable for Text {
 #[derive(Copy, Clone, Debug, Hash)]
 pub enum TextSize {
     Small,
+    Normal,
     Large,
 }
 
 impl Default for TextSize {
     fn default() -> Self {
-        TextSize::Small
+        TextSize::Normal
     }
 }
 
@@ -74,6 +76,7 @@ impl TextSize {
     pub const fn get_size(&self) -> (usize, usize) {
         match self {
             TextSize::Small => (small::CHAR_WIDTH, small::CHAR_HEIGHT),
+            TextSize::Normal => (normal::CHAR_WIDTH, normal::CHAR_HEIGHT),
             TextSize::Large => (large::CHAR_WIDTH, large::CHAR_HEIGHT),
         }
     }
@@ -83,6 +86,7 @@ impl TextSize {
     pub const fn get_spacing(&self) -> usize {
         match self {
             TextSize::Small => 1,
+            TextSize::Normal => 1,
             TextSize::Large => 2,
         }
     }
@@ -99,6 +103,7 @@ impl TextSize {
     pub const fn get_px_ascii(&self, code: u8) -> &[bool] {
         match self {
             TextSize::Small => small::get_px_ascii(code),
+            TextSize::Normal => normal::get_px_ascii(code),
             TextSize::Large => large::get_px_ascii(code),
         }
     }

@@ -10,6 +10,7 @@
 - Rename normal to large (as it's double the size of small)
 - Move text to it's own module
 - Add ellipsis, power, backslash, at, curly braces, back tick, tilde and pound characters
+- Add normal text size
 
 ### Version 0.4.1
 - Add polygon shape
