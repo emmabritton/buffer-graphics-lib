@@ -11,6 +11,7 @@
 - Move text to it's own module
 - Add ellipsis, power, backslash, at, curly braces, back tick, tilde and pound characters
 - Add normal text size
+- Make mint optional
 
 ### Version 0.4.1
 - Add polygon shape

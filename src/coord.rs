@@ -1,3 +1,4 @@
+#[cfg(feature = "mint")]
 use mint::Point2;
 #[cfg(feature = "serde_derive")]
 use serde::{Deserialize, Serialize};
@@ -92,6 +93,7 @@ impl Sub for Coord {
     }
 }
 
+#[cfg(feature = "mint")]
 impl From<Point2<isize>> for Coord {
     fn from(point: Point2<isize>) -> Self {
         Coord {
@@ -101,6 +103,7 @@ impl From<Point2<isize>> for Coord {
     }
 }
 
+#[cfg(feature = "mint")]
 impl From<Coord> for Point2<isize> {
     fn from(coord: Coord) -> Self {
         Point2 {
