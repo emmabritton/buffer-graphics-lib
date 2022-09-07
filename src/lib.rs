@@ -12,7 +12,7 @@
 //! # use buffer_graphics_lib::text::{TextPos, TextSize};
 //!let mut buffer = [0_u8; 800 * 600 * 4]; //800 x 600 RGBA
 //!let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
-//!graphics.draw_text("Some text", None, (1,1), TextSize::Normal, LIGHT_GRAY);
+//!graphics.draw_text("Some text", None, (1,1), TextSize::Large, LIGHT_GRAY);
 //!let shape = Shape::rect((1,1),(15,16), stroke(BLUE));
 //!graphics.draw(&shape);
 //! ```

@@ -1,9 +1,15 @@
 # Changelog
 
-### Version 0.4.2
+### Version 0.5.0
 - Add From(num,num) for TextPos
   - signed to TextPos::Px
   - unsigned to TextPos::ColRow
+- Add Text renderable
+- Add TextFormat
+- Add WrappingStrategy (provides various options for wrapping text - can only handle ASCII English)
+- Rename normal to large (as it's double the size of small)
+- Move text to it's own module
+- Add ellipsis, power, backslash, at, curly braces, back tick, tilde and pound characters
 
 ### Version 0.4.1
 - Add polygon shape

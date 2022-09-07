@@ -1,7 +1,9 @@
 use crate::color::Color;
 use crate::coord::Coord;
 use crate::image::Image;
-use crate::text::{normal_letters, small_letters, TextPos, TextSize};
+use crate::text::format::TextFormat;
+use crate::text::pos::TextPos;
+use crate::text::{large, small, TextSize};
 use crate::Graphics;
 
 pub trait Renderable {
@@ -70,7 +72,7 @@ impl Graphics<'_> {
     /// Get top left pixel coord for letter px coord
     pub fn get_px_for_char(x: usize, y: usize, size: TextSize) -> (usize, usize) {
         let (width, height) = size.get_size();
-        let margin = size.get_margin();
+        let margin = size.get_spacing();
         (x * (width + margin), y * (height + margin))
     }
 
@@ -89,7 +91,7 @@ impl Graphics<'_> {
         let x = if len < width { len } else { width };
         let y = (len as f64 / width as f64).ceil() as usize;
         let (width, height) = size.get_size();
-        let margin = size.get_margin();
+        let margin = size.get_spacing();
         ((width + margin) * x, (height + margin) * y)
     }
 
@@ -231,73 +233,99 @@ impl Graphics<'_> {
     }
 
     /// Draw a letter at pos
-    pub fn draw_letter<P: Into<TextPos>>(&mut self, pos: P, chr: char, size: TextSize, color: Color) {
-        let pos = pos.into();
+    pub fn draw_letter(
+        &mut self,
+        pos: (isize, isize),
+        chr: char,
+        size: TextSize,
+        color: Color,
+    ) {
         if chr == ' ' {
             return;
         }
         let (width, height) = size.get_size();
-        let px: Vec<bool> = match size {
-            TextSize::Small => small_letters::get_px(chr).to_vec(),
-            TextSize::Normal => normal_letters::get_px(chr).to_vec(),
-        };
-        let start_x;
-        let start_y;
-        match pos {
-            TextPos::Px(x, y) => {
-                start_x = x;
-                start_y = y;
-            }
-            TextPos::ColRow(x, y) => {
-                start_x = (x * size.get_size().0) as isize;
-                start_y = (y * size.get_size().1) as isize;
-            }
-        }
+        let px = size.get_px(chr);
 
         for x in 0..width {
             for y in 0..height {
                 let i = x + y * width;
                 if px[i] {
-                    self.update_pixel(x as isize + start_x, y as isize + start_y, color);
+                    self.update_pixel(x as isize + pos.0, y as isize + pos.1, color);
                 }
             }
         }
     }
 
-    /// Draws text in lines at most `width` chars long at pixel coord
-    ///
-    /// Width should be max chars - x
-    /// See [TextSize::get_max_characters] for maximum chars
-    pub fn draw_text<P: Into<TextPos>>(
+    pub fn draw_ascii_letter(
         &mut self,
-        text: &str,
-        line_width: Option<usize>,
-        start_pos: P,
+        pos: (isize, isize),
+        code: u8,
         size: TextSize,
         color: Color,
     ) {
-        let start_pos = start_pos.into();
-        let start_x;
-        let mut y;
-        match start_pos {
-            TextPos::Px(xpx, ypx) => {
-                start_x = xpx;
-                y = ypx;
-            }
-            TextPos::ColRow(c, r) => {
-                start_x = (c * size.get_size().0) as isize;
-                y = (r * size.get_size().1) as isize;
+        if code == 32 || code == 9 { return; }
+        let (width, height) = size.get_size();
+        let px = size.get_px_ascii(code);
+
+        for x in 0..width {
+            for y in 0..height {
+                let i = x + y * width;
+                if px[i] {
+                    self.update_pixel(x as isize + pos.0, y as isize + pos.1, color);
+                }
             }
         }
-        let mut x = start_x;
-        for char in text.chars() {
-            self.draw_letter(TextPos::Px(x, y), char, size, color);
-            x += (size.get_size().0 + size.get_margin()) as isize;
-            if let Some(width) = line_width {
-                if x >= (width * (size.get_size().0 + size.get_margin())) as isize + start_x {
-                    y += (size.get_size().1 + size.get_margin()) as isize;
-                    x = start_x;
-                }
+    }
+
+    pub fn draw_ascii<P: Into<TextPos>, F: Into<TextFormat>>(
+        &mut self,
+        text: &Vec<Vec<u8>>,
+        pos: P,
+        format: F,
+    ) {
+        let format = format.into();
+        let size = format.size();
+        let color = format.color();
+        let (start_x, start_y) = pos.into().to_px(size);
+
+        let per_x = size.get_size().0 + size.get_spacing();
+        let per_y = size.get_size().1 + size.get_spacing();
+
+        for (y, line) in text.iter().enumerate() {
+            let y = (y * per_y) as isize;
+            for (x, char) in line.iter().enumerate() {
+                let x = (x * per_x) as isize;
+                self.draw_ascii_letter(
+                    (start_x + x, start_y + y),
+                    *char,
+                    size,
+                    color,
+                );
+            }
+        }
+    }
+
+    pub fn draw_text<P: Into<TextPos>, F: Into<TextFormat>>(
+        &mut self,
+        text: &[String],
+        pos: P,
+        format: F,
+    ) {
+        let format = format.into();
+        let size = format.size();
+        let color = format.color();
+        let (start_x, start_y) = pos.into().to_px(size);
+
+        for (y, line) in text.iter().enumerate() {
+            let y = (y * (size.get_size().1 + size.get_spacing())) as isize;
+            for (x, char) in line.chars().enumerate() {
+                let x = (x * (size.get_size().0 + size.get_spacing())) as isize;
+                self.draw_letter(
+                    (start_x + x, start_y + y),
+                    char,
+                    size,
+                    color,
+                );
             }
         }
     }
