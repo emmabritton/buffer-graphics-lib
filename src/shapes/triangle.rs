@@ -47,7 +47,7 @@ pub fn draw_flat_bottom(graphics: &mut Graphics, points: [(f32,f32); 3], color: 
     let mut x1 = points[0].0;
     let mut x2 = points[0].0;
     for y in (points[0].1 as usize)..(points[1].1 as usize) {
-        graphics.draw_line((x1 as usize, y), (x2 as usize + 1, y), color);
+        graphics.draw_line(((x1.min(x2)) as usize, y), (x2.max(x1) as usize + 1, y), color);
         x1 += slope1;
         x2 += slope2;
     }
@@ -59,7 +59,7 @@ pub fn draw_flat_top(graphics: &mut Graphics, points: [(f32,f32); 3], color: Col
     let mut x1 = points[2].0;
     let mut x2 = points[2].0;
     for y in ((points[0].1 as usize)..(points[2].1 as usize)).rev() {
-        graphics.draw_line((x1 as usize, y), (x2 as usize + 1, y), color);
+        graphics.draw_line(((x1.min(x2)) as usize, y), (x2.max(x1) as usize + 1, y), color);
         x1 -= slope1;
         x2 -= slope2;
     }
