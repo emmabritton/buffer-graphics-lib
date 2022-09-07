@@ -5,6 +5,7 @@ pub mod pos;
 pub mod small;
 pub mod wrapping;
 
+use crate::color::Color;
 use crate::drawing::Renderable;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
@@ -18,13 +19,13 @@ pub struct Text {
 }
 
 impl Text {
-    pub fn new<P: Into<TextPos>, F: Into<TextFormat>>(
-        content: String,
+    pub fn new<S: AsRef<str>, P: Into<TextPos>, F: Into<TextFormat>>(
+        content: S,
         pos: P,
         formatting: F,
     ) -> Self {
         let formatting = formatting.into();
-        let content = formatting.wrapping().wrap(&content);
+        let content = formatting.wrapping().wrap(content.as_ref());
         let content = content
             .iter()
             .map(|line| {
@@ -58,6 +59,30 @@ impl Text {
     #[inline]
     pub fn formatting(&self) -> &TextFormat {
         &self.formatting
+    }
+
+    /// As text wrapping is calculated when the text object is created
+    /// changing it as no effect
+    pub fn with_formatting<F: Into<TextFormat>>(&self, format: F) -> Self {
+        let format = format.into();
+        Text {
+            content: self.content.clone(),
+            pos: self.pos,
+            formatting: format
+        }
+    }
+
+    pub fn with_color(&self, color: Color) -> Self {
+        text.with_formatting(text.formatting().with_color(color))
+    }
+
+    pub fn with_pos<P: Into<TextPos>>(&self, pos: P) -> Self {
+        let pos = pos.into();
+        Text {
+            content: self.content.clone(),
+            pos: pos,
+            formatting: self.formatting.clone()
+        }
     }
 }
 
