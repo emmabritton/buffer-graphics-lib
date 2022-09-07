@@ -68,20 +68,20 @@ impl Text {
         Text {
             content: self.content.clone(),
             pos: self.pos,
-            formatting: format
+            formatting: format,
         }
     }
 
     pub fn with_color(&self, color: Color) -> Self {
-        text.with_formatting(text.formatting().with_color(color))
+        self.with_formatting(self.formatting().with_color(color))
     }
 
     pub fn with_pos<P: Into<TextPos>>(&self, pos: P) -> Self {
         let pos = pos.into();
         Text {
             content: self.content.clone(),
-            pos: pos,
-            formatting: self.formatting.clone()
+            pos,
+            formatting: self.formatting.clone(),
         }
     }
 }
