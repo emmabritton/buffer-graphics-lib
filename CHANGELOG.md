@@ -1,5 +1,10 @@
 # Changelog
 
+### Version 0.4.2
+- Add From(num,num) for TextPos
+  - signed to TextPos::Px
+  - unsigned to TextPos::ColRow
+
 ### Version 0.4.1
 - Add polygon shape
 
