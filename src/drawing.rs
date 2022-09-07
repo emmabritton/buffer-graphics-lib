@@ -231,7 +231,8 @@ impl Graphics<'_> {
     }
 
     /// Draw a letter at pos
-    pub fn draw_letter(&mut self, pos: TextPos, chr: char, size: TextSize, color: Color) {
+    pub fn draw_letter<P: Into<TextPos>>(&mut self, pos: P, chr: char, size: TextSize, color: Color) {
+        let pos = pos.into();
         if chr == ' ' {
             return;
         }
@@ -267,14 +268,15 @@ impl Graphics<'_> {
     ///
     /// Width should be max chars - x
     /// See [TextSize::get_max_characters] for maximum chars
-    pub fn draw_text(
+    pub fn draw_text<P: Into<TextPos>>(
         &mut self,
         text: &str,
         line_width: Option<usize>,
-        start_pos: TextPos,
+        start_pos: P,
         size: TextSize,
         color: Color,
     ) {
+        let start_pos = start_pos.into();
         let start_x;
         let mut y;
         match start_pos {

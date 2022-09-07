@@ -25,7 +25,7 @@ let mut graphics = Graphics::new(&mut buffer, 800, 600)?;
 
 Drawing is then quite simple:
 ```rust
-graphics.draw_text("Some text", None, TextPos::Px(1, 1), TextSize::Normal, BLACK);
+graphics.draw_text("Some text", None, (1, 1), TextSize::Normal, BLACK);
 graphics.draw_image(20, 20, &image);
 let shape = Shape::rect((10,10),(50,50),stroke(BLUE));
 graphics.draw(shape);
