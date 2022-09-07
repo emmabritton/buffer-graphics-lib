@@ -25,10 +25,11 @@ let mut graphics = Graphics::new(&mut buffer, 800, 600)?;
 
 Drawing is then quite simple:
 ```rust
-graphics.draw_text("Some text", None, (1, 1), TextSize::Normal, BLACK);
+let text = Text::new(String::from("Some text"), (1,1), (WHITE, Large));
+graphics.draw(&text);
 graphics.draw_image(20, 20, &image);
 let shape = Shape::rect((10,10),(50,50),stroke(BLUE));
-graphics.draw(shape);
+graphics.draw(&shape);
 ```
 
 ## Features

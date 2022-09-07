@@ -9,10 +9,12 @@
 //! # use buffer_graphics_lib::Graphics;
 //! # use buffer_graphics_lib::color::{BLUE, LIGHT_GRAY};
 //! # use buffer_graphics_lib::shapes::{Shape, stroke};
-//! # use buffer_graphics_lib::text::{TextPos, TextSize};
+//! # use buffer_graphics_lib::text::{Text, TextSize};
+//! use buffer_graphics_lib::text::TextSize::Large;
 //!let mut buffer = [0_u8; 800 * 600 * 4]; //800 x 600 RGBA
 //!let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
-//!graphics.draw_text("Some text", None, (1,1), TextSize::Large, LIGHT_GRAY);
+//!let text = Text::new(String::from("Some text"), (1,1), (LIGHT_GRAY, Large));
+//!graphics.draw(&text);
 //!let shape = Shape::rect((1,1),(15,16), stroke(BLUE));
 //!graphics.draw(&shape);
 //! ```
