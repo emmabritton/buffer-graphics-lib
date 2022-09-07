@@ -77,14 +77,14 @@ impl TextFormat {
 }
 
 impl
-From<(
-    Color,
-    TextSize,
-    WrappingStrategy,
-    isize,
-    isize,
-    (isize, isize),
-)> for TextFormat
+    From<(
+        Color,
+        TextSize,
+        WrappingStrategy,
+        isize,
+        isize,
+        (isize, isize),
+    )> for TextFormat
 {
     fn from(
         (color, size, wrap_at, line_height, kerning, per_letter_adjustment): (

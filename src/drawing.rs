@@ -233,13 +233,7 @@ impl Graphics<'_> {
     }
 
     /// Draw a letter at pos
-    pub fn draw_letter(
-        &mut self,
-        pos: (isize, isize),
-        chr: char,
-        size: TextSize,
-        color: Color,
-    ) {
+    pub fn draw_letter(&mut self, pos: (isize, isize), chr: char, size: TextSize, color: Color) {
         if chr == ' ' {
             return;
         }
@@ -263,7 +257,9 @@ impl Graphics<'_> {
         size: TextSize,
         color: Color,
     ) {
-        if code == 32 || code == 9 { return; }
+        if code == 32 || code == 9 {
+            return;
+        }
         let (width, height) = size.get_size();
         let px = size.get_px_ascii(code);
 
@@ -279,7 +275,7 @@ impl Graphics<'_> {
 
     pub fn draw_ascii<P: Into<TextPos>, F: Into<TextFormat>>(
         &mut self,
-        text: &Vec<Vec<u8>>,
+        text: &[Vec<u8>],
         pos: P,
         format: F,
     ) {
@@ -295,12 +291,7 @@ impl Graphics<'_> {
             let y = (y * per_y) as isize;
             for (x, char) in line.iter().enumerate() {
                 let x = (x * per_x) as isize;
-                self.draw_ascii_letter(
-                    (start_x + x, start_y + y),
-                    *char,
-                    size,
-                    color,
-                );
+                self.draw_ascii_letter((start_x + x, start_y + y), *char, size, color);
             }
         }
     }
@@ -320,12 +311,7 @@ impl Graphics<'_> {
             let y = (y * (size.get_size().1 + size.get_spacing())) as isize;
             for (x, char) in line.chars().enumerate() {
                 let x = (x * (size.get_size().0 + size.get_spacing())) as isize;
-                self.draw_letter(
-                    (start_x + x, start_y + y),
-                    char,
-                    size,
-                    color,
-                );
+                self.draw_letter((start_x + x, start_y + y), char, size, color);
             }
         }
     }

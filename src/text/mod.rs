@@ -1,9 +1,9 @@
 pub mod format;
 pub mod large;
+pub mod normal;
 pub mod pos;
 pub mod small;
 pub mod wrapping;
-pub mod normal;
 
 use crate::drawing::Renderable;
 use crate::text::format::TextFormat;
@@ -18,18 +18,29 @@ pub struct Text {
 }
 
 impl Text {
-    pub fn new<P: Into<TextPos>, F: Into<TextFormat>>(content: String, pos: P, formatting: F) -> Self {
+    pub fn new<P: Into<TextPos>, F: Into<TextFormat>>(
+        content: String,
+        pos: P,
+        formatting: F,
+    ) -> Self {
         let formatting = formatting.into();
         let content = formatting.wrapping().wrap(&content);
-        let content = content.iter().map(|line| line.chars().map(|c| {
-            if c.is_ascii() {
-                c as u8
-            } else if c == '…' {
-                31
-            } else{
-                0
-            }
-        }).collect::<Vec<u8>>()).collect();
+        let content = content
+            .iter()
+            .map(|line| {
+                line.chars()
+                    .map(|c| {
+                        if c.is_ascii() {
+                            c as u8
+                        } else if c == '…' {
+                            31
+                        } else {
+                            0
+                        }
+                    })
+                    .collect::<Vec<u8>>()
+            })
+            .collect();
         Self {
             content,
             pos: pos.into(),
@@ -96,7 +107,7 @@ impl TextSize {
         match self {
             TextSize::Small => small::get_px(chr),
             TextSize::Normal => normal::get_px(chr),
-            TextSize::Large => large::get_px(chr)
+            TextSize::Large => large::get_px(chr),
         }
     }
 

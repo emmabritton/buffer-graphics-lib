@@ -43,9 +43,8 @@ impl WrappingStrategy {
                     if line.ends_with(|c: char| c.is_whitespace())
                         || text
                             .chars()
-                            .skip(*col)
-                            .next()
-                            .and_then(|c| Some(c.is_whitespace()))
+                            .nth(*col)
+                            .map(|c| c.is_whitespace())
                             .unwrap_or(false)
                     {
                         output.push(text.chars().take(*col).collect());

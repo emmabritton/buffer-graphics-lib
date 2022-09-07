@@ -6,29 +6,29 @@ pub const fn get_px_ascii(code: u8) -> &'static [bool] {
         65 | 97 => &A,
         66 | 98 => &B,
         67 | 99 => &C,
-        68 | 100=> &D,
-        69 | 101=> &E,
-        70 | 102=> &F,
-        71 |103=> &G,
-        72 |104=> &H,
-        73 |105=> &I,
-        74 |106=> &J,
-        75 |107=> &K,
-        76 |108=> &L,
-        77 |109=> &M,
-        78 |110=> &N,
-        79 |111=> &O,
-        80 |112=> &P,
-        81 |113=> &Q,
-        82 |114=> &R,
-        83 |115=> &S,
-        84 |116=> &T,
-        85 |117=> &U,
-        86 |118=> &V,
-        87 |119=> &W,
-        88 |120=> &X,
-        89 |121=> &Y,
-        90 |122=> &Z,
+        68 | 100 => &D,
+        69 | 101 => &E,
+        70 | 102 => &F,
+        71 | 103 => &G,
+        72 | 104 => &H,
+        73 | 105 => &I,
+        74 | 106 => &J,
+        75 | 107 => &K,
+        76 | 108 => &L,
+        77 | 109 => &M,
+        78 | 110 => &N,
+        79 | 111 => &O,
+        80 | 112 => &P,
+        81 | 113 => &Q,
+        82 | 114 => &R,
+        83 | 115 => &S,
+        84 | 116 => &T,
+        85 | 117 => &U,
+        86 | 118 => &V,
+        87 | 119 => &W,
+        88 | 120 => &X,
+        89 | 121 => &Y,
+        90 | 122 => &Z,
         33 => &EXCLAIM,
         34 => &DOUBLE_QUOTE,
         35 => &HASH,
@@ -70,7 +70,7 @@ pub const fn get_px_ascii(code: u8) -> &'static [bool] {
         125 => &CURLY_R,
         126 => &TILDE,
         31 => &ELLIPSIS,
-        _ => &UNKNOWN
+        _ => &UNKNOWN,
     }
 }
 
@@ -151,11 +151,8 @@ pub const fn get_px(chr: char) -> &'static [bool] {
 const LETTER_PX_COUNT: usize = 4 * 5;
 
 const AT: [bool; LETTER_PX_COUNT] = [
-    true,true,true,true,
-    true, false, false, true,
-    true, false, true, true,
-    true, false, false, false,
-    true,true,true,true,
+    true, true, true, true, true, false, false, true, true, false, true, true, true, false, false,
+    false, true, true, true, true,
 ];
 const A: [bool; LETTER_PX_COUNT] = [
     false, true, true, false, true, false, false, true, true, true, true, true, true, false, false,
@@ -278,18 +275,12 @@ const COMMA: [bool; LETTER_PX_COUNT] = [
     true, false, false, false, true, false, false,
 ];
 const COLON: [bool; LETTER_PX_COUNT] = [
-    false, false, false, false,
-    false, true, false, false,
-    false, false, false, false,
-    false, true, false, false,
-    false, false, false, false,
+    false, false, false, false, false, true, false, false, false, false, false, false, false, true,
+    false, false, false, false, false, false,
 ];
 const SEMICOLON: [bool; LETTER_PX_COUNT] = [
-    false, false, false, false,
-    false, true, false, false,
-    false, false, false, false,
-    false, true, false, false,
-    false, true, false, false,
+    false, false, false, false, false, true, false, false, false, false, false, false, false, true,
+    false, false, false, true, false, false,
 ];
 const PLUS: [bool; LETTER_PX_COUNT] = [
     false, false, false, false, false, true, false, false, true, true, true, false, false, true,
@@ -336,25 +327,16 @@ const QUOTE: [bool; LETTER_PX_COUNT] = [
     false, false, false, false, false, false,
 ];
 const QUESTION: [bool; LETTER_PX_COUNT] = [
-    false, true, true, false,
-    true, false, false, true,
-    false, false, false, true,
-    false, false, true, false,
-    false, true, false, false,
+    false, true, true, false, true, false, false, true, false, false, false, true, false, false,
+    true, false, false, true, false, false,
 ];
 const SLASH: [bool; LETTER_PX_COUNT] = [
-    false, false, false, false,
-    false, false, false, true,
-    false, false, true, false,
-    false, true, false, false,
-    true, false, false, false,
+    false, false, false, false, false, false, false, true, false, false, true, false, false, true,
+    false, false, true, false, false, false,
 ];
 const BACKSLASH: [bool; LETTER_PX_COUNT] = [
-    false, false, false, false,
-    true, false, false, false,
-    false, true, false, false,
-    false, false, true, false,
-    false, false, false, true,
+    false, false, false, false, true, false, false, false, false, true, false, false, false, false,
+    true, false, false, false, false, true,
 ];
 const ASTERISK: [bool; LETTER_PX_COUNT] = [
     false, false, false, false, false, true, false, true, false, false, true, false, false, true,
@@ -425,37 +407,22 @@ const POUND: [bool; LETTER_PX_COUNT] = [
     false, false, true, true, true, true,
 ];
 const POWER: [bool; LETTER_PX_COUNT] = [
-    false, true, false, false,
-    true, false, true, false,
-    false, false, false, false,
-    false, false, false, false,
-    false, false, false, false,
+    false, true, false, false, true, false, true, false, false, false, false, false, false, false,
+    false, false, false, false, false, false,
 ];
 const CURLY_L: [bool; LETTER_PX_COUNT] = [
-    false, false, true, false,
-    false, true, false, false,
-    true, true, false, false,
-    false, true, false, false,
-    false, false, true, false,
+    false, false, true, false, false, true, false, false, true, true, false, false, false, true,
+    false, false, false, false, true, false,
 ];
 const CURLY_R: [bool; LETTER_PX_COUNT] = [
-    false, true, false, false,
-    false, false, true, false,
-    false, false, true, true,
-    false, false, true, false,
-    false, true, false, false,
+    false, true, false, false, false, false, true, false, false, false, true, true, false, false,
+    true, false, false, true, false, false,
 ];
 const BACKTICK: [bool; LETTER_PX_COUNT] = [
-    false, true, false, false,
-    false, false, true, false,
-    false, false, false, false,
-    false, false, false, false,
-    false, false, false, false,
+    false, true, false, false, false, false, true, false, false, false, false, false, false, false,
+    false, false, false, false, false, false,
 ];
 const TILDE: [bool; LETTER_PX_COUNT] = [
-    false, false, false, false,
-    false, true, false, true,
-    true, false, true, false,
-    false, false, false, false,
-    false, false, false, false,
+    false, false, false, false, false, true, false, true, true, false, true, false, false, false,
+    false, false, false, false, false, false,
 ];
