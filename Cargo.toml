@@ -15,12 +15,10 @@ categories = ["graphics", "game-development"]
 default = ["image_loading", "serde_derive"]
 image_loading = ["image", "serde_json"]
 serde_derive = ["serde"]
-#mint = ["dep:mint", "dep:graphics-shapes:mint"]
 
 [dependencies]
 thiserror = "1.0"
-graphics-shapes = {path="../../graphics-shapes"}
-#mint = { version = "0.5.9", optional = true }
+graphics-shapes = "0.1.0"
 serde = { version = "1.0", features = ["derive"], optional = true }
 image = { version = "0.24.3", optional = true }
 serde_json = { version = "1.0", optional = true }

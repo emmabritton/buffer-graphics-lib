@@ -2,14 +2,14 @@ use crate::color::Color;
 use crate::text::wrapping::WrappingStrategy;
 use crate::text::TextSize;
 
-#[derive(Debug, Clone, Default)]
+/// Characters be drawn be at idx * char_width, idx * char_height
+#[derive(Debug, Clone)]
 pub struct TextFormat {
     color: Color,
     size: TextSize,
     wrap_at: WrappingStrategy,
-    line_spacing: isize,
-    letter_spacing: isize,
-    per_letter_adjustment: (isize, isize),
+    char_height: isize,
+    char_width: isize,
 }
 
 impl TextFormat {
@@ -18,9 +18,8 @@ impl TextFormat {
             wrap_at,
             size,
             color,
-            line_spacing: (size.get_size().1 + size.get_spacing()) as isize,
-            letter_spacing: size.get_spacing() as isize,
-            per_letter_adjustment: (0, 0),
+            char_height: (size.get_size().1 + size.get_spacing()) as isize,
+            char_width: (size.get_size().0 + size.get_spacing()) as isize,
         }
     }
 
@@ -28,17 +27,28 @@ impl TextFormat {
         wrap_at: WrappingStrategy,
         size: TextSize,
         color: Color,
-        line_height: isize,
-        kerning: isize,
-        per_letter_adjustment: (isize, isize),
+        char_height: isize,
+        char_width: isize,
     ) -> Self {
         Self {
             wrap_at,
             size,
             color,
-            line_spacing: line_height,
-            letter_spacing: kerning,
-            per_letter_adjustment,
+            char_height,
+            char_width,
+        }
+    }
+}
+
+impl Default for TextFormat {
+    fn default() -> Self {
+        let size = TextSize::default();
+        Self {
+            wrap_at: WrappingStrategy::default(),
+            size,
+            color: Color::default(),
+            char_height: (size.get_size().1 + size.get_spacing()) as isize,
+            char_width: (size.get_size().0 + size.get_spacing()) as isize,
         }
     }
 }
@@ -61,55 +71,23 @@ impl TextFormat {
 
     #[inline]
     pub fn line_spacing(&self) -> isize {
-        self.line_spacing
+        self.char_height
     }
+
     #[inline]
     pub fn letter_spacing(&self) -> isize {
-        self.letter_spacing
+        self.char_width
     }
+
     #[inline]
-    pub fn per_letter_adjustment(&self) -> (isize, isize) {
-        self.per_letter_adjustment
-    }
     pub fn with_color(&self, color: Color) -> Self {
         TextFormat { color, ..*self }
     }
 }
 
-impl
-    From<(
-        Color,
-        TextSize,
-        WrappingStrategy,
-        isize,
-        isize,
-        (isize, isize),
-    )> for TextFormat
-{
-    fn from(
-        (color, size, wrap_at, line_height, kerning, per_letter_adjustment): (
-            Color,
-            TextSize,
-            WrappingStrategy,
-            isize,
-            isize,
-            (isize, isize),
-        ),
-    ) -> Self {
-        TextFormat {
-            color,
-            size,
-            wrap_at,
-            line_spacing: line_height,
-            letter_spacing: kerning,
-            per_letter_adjustment,
-        }
-    }
-}
-
 impl From<(Color, TextSize, WrappingStrategy, isize, isize)> for TextFormat {
     fn from(
-        (color, size, wrap_at, line_height, kerning): (
+        (color, size, wrap_at, char_height, char_width): (
             Color,
             TextSize,
             WrappingStrategy,
@@ -121,22 +99,21 @@ impl From<(Color, TextSize, WrappingStrategy, isize, isize)> for TextFormat {
             color,
             size,
             wrap_at,
-            line_spacing: line_height,
-            letter_spacing: kerning,
-            ..Self::default()
+            char_height,
+            char_width
         }
     }
 }
 
 impl From<(Color, TextSize, WrappingStrategy, isize)> for TextFormat {
     fn from(
-        (color, size, wrap_at, line_height): (Color, TextSize, WrappingStrategy, isize),
+        (color, size, wrap_at, char_height): (Color, TextSize, WrappingStrategy, isize),
     ) -> Self {
         TextFormat {
             color,
             size,
             wrap_at,
-            line_spacing: line_height,
+            char_height,
             ..Self::default()
         }
     }

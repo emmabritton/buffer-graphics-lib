@@ -3,6 +3,7 @@
 ### Version 0.6.0
 - Extract shapes to shape library
 - Add yen, dollar, cent, and currency characters
+- Allow custom character size
 
 ### Version 0.5.0
 - Add From(num,num) for TextPos
