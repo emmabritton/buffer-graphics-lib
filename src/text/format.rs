@@ -100,7 +100,7 @@ impl From<(Color, TextSize, WrappingStrategy, isize, isize)> for TextFormat {
             size,
             wrap_at,
             char_height,
-            char_width
+            char_width,
         }
     }
 }
