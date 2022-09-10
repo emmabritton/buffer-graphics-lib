@@ -6,34 +6,33 @@
 //!
 //! Using the library is as simple as:
 //!```
-//! # use buffer_graphics_lib::Graphics;
 //! # use buffer_graphics_lib::color::{BLUE, LIGHT_GRAY};
-//! # use buffer_graphics_lib::shapes::{Shape, stroke};
-//! # use buffer_graphics_lib::text::{Text, TextSize};
-//! use buffer_graphics_lib::text::TextSize::Large;
-//!let mut buffer = [0_u8; 800 * 600 * 4]; //800 x 600 RGBA
-//!let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
-//!let text = Text::new(String::from("Some text"), (1,1), (LIGHT_GRAY, Large));
-//!graphics.draw(&text);
-//!let shape = Shape::rect((1,1),(15,16), stroke(BLUE));
-//!graphics.draw(&shape);
+//! # use buffer_graphics_lib::drawable::stroke;
+//! # use buffer_graphics_lib::Graphics;
+//! # use buffer_graphics_lib::text::Text;
+//! # use buffer_graphics_lib::text::TextSize::Large;
+//! let mut buffer = [0_u8; 800 * 600 * 4]; //800 x 600 RGBA
+//! let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
+//! let text = Text::new("Some text", (1,1), (LIGHT_GRAY, Large));
+//! graphics.draw(&text);
+//! let shape = Shape::rect((1,1),(15,16), stroke(BLUE));
+//! graphics.draw(&shape);
 //! ```
 
 #![deny(clippy::all)]
 
 pub mod color;
-pub mod coord;
+pub mod drawable;
 pub mod drawing;
 pub mod image;
 #[cfg(feature = "image_loading")]
 pub mod image_loading;
-pub mod lerp;
 pub mod scaling;
 pub mod shapes;
 pub mod text;
 
-use crate::coord::Coord;
 use crate::GraphicsError::InvalidBufferLength;
+use graphics_shapes::coord::Coord;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -69,6 +68,23 @@ impl<'buffer> Graphics<'_> {
             height,
             translate: Coord::default(),
         })
+    }
+
+    pub fn new_unchecked(
+        buffer: &'buffer mut [u8],
+        width: usize,
+        height: usize,
+    ) -> Graphics<'buffer> {
+        if cfg!(debug) {
+            let count = width * height * 4;
+            debug_assert_eq!(count, buffer.len());
+        }
+        Graphics {
+            buffer,
+            width,
+            height,
+            translate: Coord::default(),
+        }
     }
 }
 

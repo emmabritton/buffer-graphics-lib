@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.6.0
+- Extract shapes to shape library
+- Add yen, dollar, cent, and currency characters
+
 ### Version 0.5.0
 - Add From(num,num) for TextPos
   - signed to TextPos::Px

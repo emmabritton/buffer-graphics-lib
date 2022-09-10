@@ -11,6 +11,33 @@ use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
 use crate::Graphics;
 
+const ASCII_DEGREE: u8 = 30;
+const ASCII_ELLIPSIS: u8 = 31;
+const ASCII_CURRENCY: u8 = 29;
+const ASCII_POUND: u8 = 28;
+const ASCII_YEN: u8 = 27;
+const ASCII_CENT: u8 = 26;
+
+const fn custom_ascii_code(chr: char) -> u8 {
+    match chr {
+        '°' => ASCII_DEGREE,
+        '…' => ASCII_ELLIPSIS,
+        '¤' => ASCII_CURRENCY,
+        '£' => ASCII_POUND,
+        '¥' => ASCII_YEN,
+        '¢' => ASCII_CENT,
+        _ => 0,
+    }
+}
+
+pub const fn chr_to_code(chr: char) -> u8 {
+    if chr.is_ascii() {
+        chr as u8
+    } else {
+        custom_ascii_code(chr)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Text {
     content: Vec<Vec<u8>>,
@@ -19,28 +46,16 @@ pub struct Text {
 }
 
 impl Text {
-    pub fn new<S: AsRef<str>, P: Into<TextPos>, F: Into<TextFormat>>(
-        content: S,
+    pub fn new<P: Into<TextPos>, F: Into<TextFormat>>(
+        content: &str,
         pos: P,
         formatting: F,
     ) -> Self {
         let formatting = formatting.into();
-        let content = formatting.wrapping().wrap(content.as_ref());
+        let content = formatting.wrapping().wrap(content);
         let content = content
             .iter()
-            .map(|line| {
-                line.chars()
-                    .map(|c| {
-                        if c.is_ascii() {
-                            c as u8
-                        } else if c == '…' {
-                            31
-                        } else {
-                            0
-                        }
-                    })
-                    .collect::<Vec<u8>>()
-            })
+            .map(|line| line.chars().map(chr_to_code).collect::<Vec<u8>>())
             .collect();
         Self {
             content,
@@ -124,15 +139,6 @@ impl TextSize {
             TextSize::Small => 1,
             TextSize::Normal => 1,
             TextSize::Large => 2,
-        }
-    }
-
-    #[inline]
-    pub const fn get_px(&self, chr: char) -> &[bool] {
-        match self {
-            TextSize::Small => small::get_px(chr),
-            TextSize::Normal => normal::get_px(chr),
-            TextSize::Large => large::get_px(chr),
         }
     }
 

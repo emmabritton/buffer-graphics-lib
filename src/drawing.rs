@@ -1,10 +1,11 @@
 use crate::color::Color;
-use crate::coord::Coord;
 use crate::image::Image;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
-use crate::text::TextSize;
+use crate::text::{chr_to_code, Text, TextSize};
 use crate::Graphics;
+use graphics_shapes::coord::Coord;
+use std::mem::swap;
 
 pub trait Renderable {
     fn render(&self, graphics: &mut Graphics);
@@ -102,7 +103,7 @@ impl Graphics<'_> {
         for (y, row) in image.pixels.chunks_exact(image.width()).enumerate() {
             for color in row {
                 if color.a > 0 {
-                    self.update_pixel(xy.x + x, xy.y + y as isize, *color);
+                    self.update_pixel(xy.x as isize + x, xy.y as isize + y as isize, *color);
                 }
                 x += 1;
             }
@@ -116,15 +117,18 @@ impl Graphics<'_> {
         end: P2,
         color: Color,
     ) {
-        let start = start.into();
-        let end = end.into();
+        let mut start = start.into();
+        let mut end = end.into();
+        if start.x > end.x {
+            swap(&mut start, &mut end);
+        }
         if start.x == end.x {
-            for y in start.y..end.y {
-                self.update_pixel(start.x, y, color);
+            for y in start.y as isize..end.y as isize {
+                self.update_pixel(start.x as isize, y, color);
             }
         } else if start.y == end.y {
-            for x in start.x..end.x {
-                self.update_pixel(x, start.y, color);
+            for x in start.x as isize..end.x as isize {
+                self.update_pixel(x, start.y as isize, color);
             }
         } else {
             let mut delta = 0;
@@ -192,7 +196,10 @@ impl Graphics<'_> {
     #[inline]
     fn get_pixel(&mut self, x: isize, y: isize, use_translate: bool) -> Option<Color> {
         let (x, y) = if use_translate {
-            (x as isize + self.translate.x, y as isize + self.translate.y)
+            (
+                x as isize + self.translate.x as isize,
+                y as isize + self.translate.y as isize,
+            )
         } else {
             (x as isize, y as isize)
         };
@@ -234,20 +241,7 @@ impl Graphics<'_> {
 
     /// Draw a letter at pos
     pub fn draw_letter(&mut self, pos: (isize, isize), chr: char, size: TextSize, color: Color) {
-        if chr == ' ' {
-            return;
-        }
-        let (width, height) = size.get_size();
-        let px = size.get_px(chr);
-
-        for x in 0..width {
-            for y in 0..height {
-                let i = x + y * width;
-                if px[i] {
-                    self.update_pixel(x as isize + pos.0, y as isize + pos.1, color);
-                }
-            }
-        }
+        self.draw_ascii_letter(pos, chr_to_code(chr), size, color);
     }
 
     pub fn draw_ascii_letter(
@@ -273,6 +267,8 @@ impl Graphics<'_> {
         }
     }
 
+    /// Should only be used by Text::render
+    /// `text` param must already be corrected wrapped
     pub fn draw_ascii<P: Into<TextPos>, F: Into<TextFormat>>(
         &mut self,
         text: &[Vec<u8>],
@@ -298,30 +294,20 @@ impl Graphics<'_> {
 
     pub fn draw_text<P: Into<TextPos>, F: Into<TextFormat>>(
         &mut self,
-        text: &[String],
+        text: &str,
         pos: P,
         format: F,
     ) {
-        let format = format.into();
-        let size = format.size();
-        let color = format.color();
-        let (start_x, start_y) = pos.into().to_px(size);
-
-        for (y, line) in text.iter().enumerate() {
-            let y = (y * (size.get_size().1 + size.get_spacing())) as isize;
-            for (x, char) in line.chars().enumerate() {
-                let x = (x * (size.get_size().0 + size.get_spacing())) as isize;
-                self.draw_letter((start_x + x, start_y + y), char, size, color);
-            }
-        }
+        let text = Text::new(text, pos.into(), format.into());
+        text.render(self);
     }
 
     /// Set the RGB values for a pixel by blending it with the provided color
     /// This method uses alpha blending, note that the canvas pixels always have 255 alpha
     #[inline]
     pub fn blend_pixel(&mut self, x: isize, y: isize, color: Color) {
-        let x = x + self.translate.x;
-        let y = y + self.translate.y;
+        let x = x + self.translate.x as isize;
+        let y = y + self.translate.y as isize;
         if x >= 0 && y >= 0 && x < self.width as isize {
             if let Some(base) = self.get_pixel(x, y, false) {
                 let new_color = base.blend(color);
@@ -337,8 +323,8 @@ impl Graphics<'_> {
     /// This ignores alpha, so 255,0,0,0 will draw a red pixel
     #[inline]
     pub fn set_pixel(&mut self, x: isize, y: isize, color: Color) {
-        let x = x + self.translate.x;
-        let y = y + self.translate.y;
+        let x = x + self.translate.x as isize;
+        let y = y + self.translate.y as isize;
         if x >= 0 && y >= 0 && x < self.width as isize {
             let idx = self.index(x as usize, y as usize);
 
@@ -354,7 +340,8 @@ impl Graphics<'_> {
 
 #[cfg(test)]
 mod test {
-    use crate::{Coord, Graphics};
+    use crate::Graphics;
+    use graphics_shapes::coord::Coord;
 
     #[test]
     fn is_inside() {
