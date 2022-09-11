@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.6.1
+- Update shapes lib (0.1.2)
+- Expose some Shape methods on Drawable<Shape>
+
 ### Version 0.6.0
 - Extract shapes to shape library
 - Add yen, dollar, cent, and currency characters
