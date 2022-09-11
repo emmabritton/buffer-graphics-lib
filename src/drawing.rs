@@ -121,13 +121,15 @@ impl Graphics<'_> {
         let mut end = end.into();
         if start.x > end.x {
             swap(&mut start, &mut end);
+        } else if start.y > end.y {
+            swap(&mut start, &mut end);
         }
         if start.x == end.x {
-            for y in start.y as isize..end.y as isize {
+            for y in start.y as isize..=end.y as isize {
                 self.update_pixel(start.x as isize, y, color);
             }
         } else if start.y == end.y {
-            for x in start.x as isize..end.x as isize {
+            for x in start.x as isize..=end.x as isize {
                 self.update_pixel(x, start.y as isize, color);
             }
         } else {
