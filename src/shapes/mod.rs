@@ -1,4 +1,5 @@
 pub mod rendering;
+pub mod collection;
 
 use crate::drawable::{DrawType, Drawable};
 use graphics_shapes::circle::Circle;

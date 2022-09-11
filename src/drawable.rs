@@ -32,7 +32,7 @@ pub fn stroke(color: Color) -> DrawType {
     DrawType::Stroke(color)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct Drawable<T: Clone> {
     obj: T,
     draw_type: DrawType,

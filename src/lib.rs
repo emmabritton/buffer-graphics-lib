@@ -6,16 +6,18 @@
 //!
 //! Using the library is as simple as:
 //!```
+//! # use graphics_shapes::rect::Rect;
 //! # use buffer_graphics_lib::color::{BLUE, LIGHT_GRAY};
-//! # use buffer_graphics_lib::drawable::stroke;
+//! # use buffer_graphics_lib::drawable::{Drawable, stroke};
 //! # use buffer_graphics_lib::Graphics;
+//! # use buffer_graphics_lib::shapes::CreateDrawable;
 //! # use buffer_graphics_lib::text::Text;
 //! # use buffer_graphics_lib::text::TextSize::Large;
 //! let mut buffer = [0_u8; 800 * 600 * 4]; //800 x 600 RGBA
 //! let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
 //! let text = Text::new("Some text", (1,1), (LIGHT_GRAY, Large));
 //! graphics.draw(&text);
-//! let shape = Shape::rect((1,1),(15,16), stroke(BLUE));
+//! let shape = Drawable::from_obj(Rect::new((1,1),(15,16)), stroke(BLUE));
 //! graphics.draw(&shape);
 //! ```
 
