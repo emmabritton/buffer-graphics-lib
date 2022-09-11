@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.6.2
+- Add shape collection for batch rendering
+
 ### Version 0.6.1
 - Update shapes lib (0.1.2)
 - Expose some Shape methods on Drawable<Shape>
