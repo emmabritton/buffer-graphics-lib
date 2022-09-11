@@ -1,13 +1,13 @@
-use std::collections::HashMap;
-use std::fmt::Debug;
-use std::hash::Hash;
+use crate::drawable::Drawable;
+use crate::Graphics;
 use graphics_shapes::circle::Circle;
 use graphics_shapes::line::Line;
 use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
-use crate::drawable::Drawable;
-use crate::Graphics;
+use std::collections::HashMap;
+use std::fmt::Debug;
+use std::hash::Hash;
 
 #[derive(Debug, Default)]
 pub struct AutoShapeCollection {
@@ -141,11 +141,10 @@ trait AutoAddShape<K: Eq + PartialEq + Hash + Clone, T: Clone> {
 
 macro_rules! impl_add_shape {
     ($shape_type: ty, $var: ident) => {
-        impl <K: Eq + PartialEq + Hash + Clone> AddShape<K, $shape_type> for ShapeCollection<K> {
+        impl<K: Eq + PartialEq + Hash + Clone> AddShape<K, $shape_type> for ShapeCollection<K> {
             fn add(&mut self, key: K, shape: Drawable<$shape_type>) {
-                self.$var.insert(key.clone(),shape);
+                self.$var.insert(key.clone(), shape);
             }
-
 
             fn remove(&mut self, shape: &Drawable<$shape_type>) {
                 let mut keys = vec![];
@@ -178,8 +177,8 @@ macro_rules! impl_add_auto_shape {
     ($shape_type: ty, $var: ident) => {
         impl AutoAddShape<usize, $shape_type> for AutoShapeCollection {
             fn add(&mut self, shape: Drawable<$shape_type>) -> usize {
-                let key = self.$var.iter().last().map(|(k,_)| k).unwrap_or(&0) + 1;
-                self.$var.insert(key,shape);
+                let key = self.$var.iter().last().map(|(k, _)| k).unwrap_or(&0) + 1;
+                self.$var.insert(key, shape);
                 key
             }
 
@@ -224,22 +223,28 @@ impl_add_auto_shape!(Rect, rects);
 
 #[cfg(test)]
 mod test {
-    use graphics_shapes::line::Line;
     use crate::color::BLUE;
-    use crate::drawable::{Drawable, stroke};
+    use crate::drawable::{stroke, Drawable};
     use crate::shapes::collection::{AddShape, AutoAddShape, AutoShapeCollection, ShapeCollection};
     use crate::shapes::CreateDrawable;
+    use graphics_shapes::line::Line;
 
     #[test]
     fn shape_collection() {
         let mut collection: ShapeCollection<String> = ShapeCollection::new();
         let line = Line::new((10, 10), (20, 20));
         let drawable = Drawable::from_obj(line.clone(), stroke(BLUE));
-        collection.add(String::from("test"), Drawable::from_obj(line.clone(), stroke(BLUE)));
+        collection.add(
+            String::from("test"),
+            Drawable::from_obj(line.clone(), stroke(BLUE)),
+        );
         assert_eq!(collection.lines()["test"], drawable);
         collection.remove_by_id(&"test".to_string());
         assert!(collection.lines().is_empty());
-        collection.add(String::from("test2"), Drawable::from_obj(line.clone(), stroke(BLUE)));
+        collection.add(
+            String::from("test2"),
+            Drawable::from_obj(line.clone(), stroke(BLUE)),
+        );
         assert_eq!(collection.lines()["test2"], drawable);
         collection.remove_shape(&line);
         assert!(collection.lines().is_empty());
