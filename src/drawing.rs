@@ -119,9 +119,7 @@ impl Graphics<'_> {
     ) {
         let mut start = start.into();
         let mut end = end.into();
-        if start.x > end.x {
-            swap(&mut start, &mut end);
-        } else if start.y > end.y {
+        if start.x > end.x || start.y > end.y {
             swap(&mut start, &mut end);
         }
         if start.x == end.x {
