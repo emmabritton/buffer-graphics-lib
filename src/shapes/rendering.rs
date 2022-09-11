@@ -53,21 +53,16 @@ impl Renderable for Drawable<Circle> {
                 let mut d = (5_isize - (self.obj().radius() as isize) * 4) / 4;
                 let mut x = 0;
                 let mut y = self.obj().radius() as isize;
-                let w = graphics.width as isize;
-                let h = graphics.height as isize;
-
-                let clamp_w = |num: isize| num.clamp(0, w);
-                let clamp_h = |num: isize| num.clamp(0, h);
 
                 while x <= y {
-                    graphics.update_pixel(clamp_w(cx + x), clamp_h(cy + y), color);
-                    graphics.update_pixel(clamp_w(cx + x), clamp_h(cy - y), color);
-                    graphics.update_pixel(clamp_w(cx - x), clamp_h(cy + y), color);
-                    graphics.update_pixel(clamp_w(cx - x), clamp_h(cy - y), color);
-                    graphics.update_pixel(clamp_w(cx + y), clamp_h(cy + x), color);
-                    graphics.update_pixel(clamp_w(cx + y), clamp_h(cy - x), color);
-                    graphics.update_pixel(clamp_w(cx - y), clamp_h(cy + x), color);
-                    graphics.update_pixel(clamp_w(cx - y), clamp_h(cy - x), color);
+                    graphics.update_pixel(cx + x, cy + y, color);
+                    graphics.update_pixel(cx + x, cy - y, color);
+                    graphics.update_pixel(cx - x, cy + y, color);
+                    graphics.update_pixel(cx - x, cy - y, color);
+                    graphics.update_pixel(cx + y, cy + x, color);
+                    graphics.update_pixel(cx + y, cy - x, color);
+                    graphics.update_pixel(cx - y, cy + x, color);
+                    graphics.update_pixel(cx - y, cy - x, color);
                     if d < 0 {
                         d += 2 * x + 1
                     } else {
@@ -80,23 +75,19 @@ impl Renderable for Drawable<Circle> {
             DrawType::Fill(color) => {
                 let cx = self.obj().center().x as isize;
                 let cy = self.obj().center().y as isize;
-                let w = graphics.width as isize;
-                let h = graphics.height as isize;
                 let squared_radius = (self.obj().radius() * self.obj().radius()) as isize;
-                let clamp_w = |num: isize| num.clamp(0, w);
-                let clamp_h = |num: isize| num.clamp(0, h);
                 for y in 0..(self.obj().radius() as isize) {
                     let up = cy - y;
                     let down = cy + y;
                     let half_width =
                         (((squared_radius - y * y) as f64).sqrt().round() as isize).max(0);
-                    for x in 0..half_width {
+                    for x in 0..=half_width {
                         let left = cx - x;
                         let right = cx + x;
-                        graphics.update_pixel(clamp_w(left), clamp_h(up), color);
-                        graphics.update_pixel(clamp_w(right), clamp_h(up), color);
-                        graphics.update_pixel(clamp_w(left), clamp_h(down), color);
-                        graphics.update_pixel(clamp_w(right), clamp_h(down), color);
+                        graphics.update_pixel(left, up, color);
+                        graphics.update_pixel(right, up, color);
+                        graphics.update_pixel(left, down, color);
+                        graphics.update_pixel(right, down, color);
                     }
                 }
             }
