@@ -127,13 +127,13 @@ impl<K: Eq + PartialEq + Hash + Clone> ShapeCollection<K> {
     }
 }
 
-trait AddShape<K: Eq + PartialEq + Hash + Clone, T: Clone> {
+pub trait AddShape<K: Eq + PartialEq + Hash + Clone, T: Clone> {
     fn add(&mut self, key: K, shape: Drawable<T>);
     fn remove_shape(&mut self, shape: &T);
     fn remove(&mut self, shape: &Drawable<T>);
 }
 
-trait AutoAddShape<K: Eq + PartialEq + Hash + Clone, T: Clone> {
+pub trait AutoAddShape<K: Eq + PartialEq + Hash + Clone, T: Clone> {
     fn add(&mut self, shape: Drawable<T>) -> K;
     fn remove_shape(&mut self, shape: &T);
     fn remove(&mut self, shape: &Drawable<T>);

@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.6.3
+- Fix method access bug
+
 ### Version 0.6.2
 - Add shape collection for batch rendering
 
