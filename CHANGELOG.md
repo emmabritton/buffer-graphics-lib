@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.6.4
+- Fix bug in AutoShapeCollection where the same id would apply to multiple shapes
+
 ### Version 0.6.3
 - Fix method access bug
 

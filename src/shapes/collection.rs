@@ -11,6 +11,7 @@ use std::hash::Hash;
 
 #[derive(Debug, Default)]
 pub struct AutoShapeCollection {
+    next_id: usize,
     rects: HashMap<usize, Drawable<Rect>>,
     lines: HashMap<usize, Drawable<Line>>,
     circles: HashMap<usize, Drawable<Circle>>,
@@ -177,7 +178,8 @@ macro_rules! impl_add_auto_shape {
     ($shape_type: ty, $var: ident) => {
         impl AutoAddShape<usize, $shape_type> for AutoShapeCollection {
             fn add(&mut self, shape: Drawable<$shape_type>) -> usize {
-                let key = self.$var.iter().last().map(|(k, _)| k).unwrap_or(&0) + 1;
+                let key = self.next_id;
+                self.next_id += 1;
                 self.$var.insert(key, shape);
                 key
             }
