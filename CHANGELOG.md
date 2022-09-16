@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.7.0
+- Add Ellipse
+
 ### Version 0.6.4
 - Fix bug in AutoShapeCollection where the same id would apply to multiple shapes
 

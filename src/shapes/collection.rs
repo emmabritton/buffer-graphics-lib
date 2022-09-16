@@ -1,6 +1,7 @@
 use crate::drawable::Drawable;
 use crate::Graphics;
 use graphics_shapes::circle::Circle;
+use graphics_shapes::ellipse::Ellipse;
 use graphics_shapes::line::Line;
 use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
@@ -17,6 +18,7 @@ pub struct AutoShapeCollection {
     circles: HashMap<usize, Drawable<Circle>>,
     triangles: HashMap<usize, Drawable<Triangle>>,
     polygons: HashMap<usize, Drawable<Polygon>>,
+    ellipses: HashMap<usize, Drawable<Ellipse>>,
 }
 
 impl AutoShapeCollection {
@@ -41,6 +43,9 @@ impl AutoShapeCollection {
     pub fn polygons(&self) -> &HashMap<usize, Drawable<Polygon>> {
         &self.polygons
     }
+    pub fn ellipses(&self) -> &HashMap<usize, Drawable<Ellipse>> {
+        &self.ellipses
+    }
 
     pub fn render(&self, graphics: &mut Graphics) {
         for rect in self.rects.values() {
@@ -58,6 +63,9 @@ impl AutoShapeCollection {
         for line in self.lines.values() {
             graphics.draw(line);
         }
+        for ellipse in self.ellipses.values() {
+            graphics.draw(ellipse);
+        }
     }
 
     pub fn remove_by_id(&mut self, key: usize) {
@@ -66,6 +74,7 @@ impl AutoShapeCollection {
         self.lines.remove(&key);
         self.polygons.remove(&key);
         self.circles.remove(&key);
+        self.ellipses.remove(&key);
     }
 }
 
@@ -76,6 +85,7 @@ pub struct ShapeCollection<K: Eq + PartialEq + Hash + Clone> {
     circles: HashMap<K, Drawable<Circle>>,
     triangles: HashMap<K, Drawable<Triangle>>,
     polygons: HashMap<K, Drawable<Polygon>>,
+    ellipses: HashMap<K, Drawable<Ellipse>>,
 }
 
 impl<K: Eq + PartialEq + Hash + Clone + Default> ShapeCollection<K> {
@@ -100,6 +110,9 @@ impl<K: Eq + PartialEq + Hash + Clone> ShapeCollection<K> {
     pub fn polygons(&self) -> &HashMap<K, Drawable<Polygon>> {
         &self.polygons
     }
+    pub fn ellipses(&self) -> &HashMap<K, Drawable<Ellipse>> {
+        &self.ellipses
+    }
 
     pub fn render(&self, graphics: &mut Graphics) {
         for rect in self.rects.values() {
@@ -117,6 +130,9 @@ impl<K: Eq + PartialEq + Hash + Clone> ShapeCollection<K> {
         for line in self.lines.values() {
             graphics.draw(line);
         }
+        for ellipse in self.ellipses.values() {
+            graphics.draw(ellipse);
+        }
     }
 
     pub fn remove_by_id(&mut self, key: &K) {
@@ -125,6 +141,7 @@ impl<K: Eq + PartialEq + Hash + Clone> ShapeCollection<K> {
         self.lines.remove(key);
         self.polygons.remove(key);
         self.circles.remove(key);
+        self.ellipses.remove(key);
     }
 }
 
@@ -216,12 +233,14 @@ impl_add_shape!(Circle, circles);
 impl_add_shape!(Triangle, triangles);
 impl_add_shape!(Polygon, polygons);
 impl_add_shape!(Rect, rects);
+impl_add_shape!(Ellipse, ellipses);
 
 impl_add_auto_shape!(Line, lines);
 impl_add_auto_shape!(Circle, circles);
 impl_add_auto_shape!(Triangle, triangles);
 impl_add_auto_shape!(Polygon, polygons);
 impl_add_auto_shape!(Rect, rects);
+impl_add_auto_shape!(Ellipse, ellipses);
 
 #[cfg(test)]
 mod test {

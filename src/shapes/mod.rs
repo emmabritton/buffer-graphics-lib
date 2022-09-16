@@ -4,6 +4,7 @@ pub mod rendering;
 use crate::drawable::{DrawType, Drawable};
 use graphics_shapes::circle::Circle;
 use graphics_shapes::coord::Coord;
+use graphics_shapes::ellipse::Ellipse;
 use graphics_shapes::line::Line;
 use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
@@ -16,12 +17,11 @@ pub trait CreateDrawable<T: Clone> {
 
 impl CreateDrawable<Line> for Drawable<Line> {
     fn from_obj(line: Line, draw_type: DrawType) -> Drawable<Line> {
-        let (start, end) = if line.start().x < line.end().x || line.start().y < line.end().y {
-            (line.start(), line.end())
-        } else {
-            (line.end(), line.start())
-        };
-        Drawable::new(line, draw_type, vec![start, end])
+        let drawing_points = vec![
+            Coord::new(line.left(), line.top()),
+            Coord::new(line.right(), line.bottom()),
+        ];
+        Drawable::new(line, draw_type, drawing_points)
     }
 }
 
@@ -35,13 +35,6 @@ impl CreateDrawable<Rect> for Drawable<Rect> {
     }
 }
 
-impl CreateDrawable<Circle> for Drawable<Circle> {
-    fn from_obj(circle: Circle, draw_type: DrawType) -> Drawable<Circle> {
-        let points = circle.points();
-        Drawable::new(circle, draw_type, points)
-    }
-}
-
 impl CreateDrawable<Triangle> for Drawable<Triangle> {
     fn from_obj(triangle: Triangle, draw_type: DrawType) -> Drawable<Triangle> {
         let points = triangle.points();
@@ -51,9 +44,17 @@ impl CreateDrawable<Triangle> for Drawable<Triangle> {
     }
 }
 
-impl CreateDrawable<Polygon> for Drawable<Polygon> {
-    fn from_obj(polygon: Polygon, draw_type: DrawType) -> Drawable<Polygon> {
-        let points = polygon.points();
-        Drawable::new(polygon, draw_type, points)
-    }
+macro_rules! create_drawable_from_points {
+    ($shape: ty) => {
+        impl CreateDrawable<$shape> for Drawable<$shape> {
+            fn from_obj(shape: $shape, draw_type: DrawType) -> Drawable<$shape> {
+                let points = shape.points();
+                Drawable::new(shape, draw_type, points)
+            }
+        }
+    };
 }
+
+create_drawable_from_points!(Polygon);
+create_drawable_from_points!(Circle);
+create_drawable_from_points!(Ellipse);

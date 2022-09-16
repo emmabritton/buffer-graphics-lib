@@ -17,8 +17,8 @@
 //! let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
 //! let text = Text::new("Some text", (1,1), (LIGHT_GRAY, Large));
 //! graphics.draw(&text);
-//! let shape = Drawable::from_obj(Rect::new((1,1),(15,16)), stroke(BLUE));
-//! graphics.draw(&shape);
+//! let drawable = Drawable::from_obj(Rect::new((1,1),(15,16)), stroke(BLUE));
+//! graphics.draw(&drawable);
 //! ```
 
 #![deny(clippy::all)]

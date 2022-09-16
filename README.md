@@ -12,7 +12,8 @@ The `Graphics` struct needs a mutable slice to work on and so mostly likely you'
 
 In your `Cargo.toml` file add
 ```toml
-buffer-graphics-lib = "0.6.4"
+buffer-graphics-lib = "0.7.0"
+graphics-shapes = "0.1.3"
 ```
 
 ### Code
@@ -28,8 +29,9 @@ Drawing is then quite simple:
 let text = Text::new("Some text", (1,1), (WHITE, Large));
 graphics.draw(&text);
 graphics.draw_image(20, 20, &image);
-let shape = Shape::rect((10,10),(50,50),stroke(BLUE));
-graphics.draw(&shape);
+let shape = Rect::new((10,10),(50,50));
+let drawable = Drawable::from_obj(shape, stroke(BLUE));
+graphics.draw(&drawable);
 ```
 
 ## Features

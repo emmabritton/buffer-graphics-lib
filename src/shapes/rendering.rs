@@ -3,6 +3,7 @@ use crate::drawable::{DrawType, Drawable};
 use crate::drawing::Renderable;
 use crate::Graphics;
 use graphics_shapes::circle::Circle;
+use graphics_shapes::ellipse::Ellipse;
 use graphics_shapes::line::Line;
 use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
@@ -214,6 +215,86 @@ impl Renderable for Drawable<Polygon> {
                     }
                 }
             }
+        }
+    }
+}
+
+impl Renderable for Drawable<Ellipse> {
+    fn render(&self, graphics: &mut Graphics) {
+        let offset = self.obj().center();
+        let color = self.draw_type().color();
+
+        draw_ellipse_stroke(graphics, self);
+
+        if let DrawType::Fill(_) = self.draw_type() {
+            let height = self.obj().height() as isize / 2;
+            let width = self.obj().width() as isize / 2;
+            let height_sq = height * height;
+            let width_sq = width * width;
+            let limit = height_sq * width_sq;
+            for y in -height..height {
+                let y_amount = y * y * width_sq;
+                for x in -width..width {
+                    if x * x * height_sq + y_amount <= limit {
+                        graphics.set_pixel(offset.x + x, offset.y + y, color)
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn draw_ellipse_stroke(graphics: &mut Graphics, drawable: &Drawable<Ellipse>) {
+    let center_x = drawable.obj().center().x;
+    let center_y = drawable.obj().center().y;
+    let color = drawable.draw_type().color();
+    let rx = (drawable.obj().width() / 2) as f32;
+    let ry = (drawable.obj().height() / 2) as f32;
+
+    let mut x = 0;
+    let mut y = ry as isize;
+    let mut p1 = ry * ry - (rx * rx) * ry + (rx * rx) * (0.25);
+    let mut dx = 2.0 * (ry * ry) * (x as f32);
+    let mut dy = 2.0 * (rx * rx) * (y as f32);
+    while dx < dy {
+        //plot (x,y)
+        graphics.set_pixel(center_x + x, center_y + y, color);
+        graphics.set_pixel(center_x - x, center_y + y, color);
+        graphics.set_pixel(center_x + x, center_y - y, color);
+        graphics.set_pixel(center_x - x, center_y - y, color);
+        if p1 < 0.0 {
+            x = x + 1;
+            dx = 2.0 * (ry * ry) * (x as f32);
+            p1 = p1 + dx + (ry * ry);
+        } else {
+            x = x + 1;
+            y = y - 1;
+            dx = 2.0 * (ry * ry) * (x as f32);
+            dy = 2.0 * (rx * rx) * (y as f32);
+            p1 = p1 + dx - dy + (ry * ry);
+        }
+    }
+    let mut p2 = (ry * ry) * ((x as f32) + 0.5) * ((x as f32) + 0.5)
+        + (rx * rx) * ((y as f32) - 1.0) * ((y as f32) - 1.0)
+        - (rx * rx) * (ry * ry);
+
+    while y >= 0 {
+        graphics.set_pixel(center_x + x, center_y + y, color);
+        graphics.set_pixel(center_x - x, center_y + y, color);
+        graphics.set_pixel(center_x + x, center_y - y, color);
+        graphics.set_pixel(center_x - x, center_y - y, color);
+        if p2 > 0.0 {
+            x = x;
+            y = y - 1;
+            dy = 2.0 * (rx * rx) * (y as f32);
+            //dy = 2 * rx * rx *y;
+            p2 = p2 - dy + (rx * rx);
+        } else {
+            x = x + 1;
+            y = y - 1;
+            dy = dy - 2.0 * (rx * rx);
+            dx = dx + 2.0 * (ry * ry);
+            p2 = p2 + dx - dy + (rx * rx);
         }
     }
 }
