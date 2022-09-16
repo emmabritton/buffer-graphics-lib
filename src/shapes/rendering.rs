@@ -257,21 +257,20 @@ fn draw_ellipse_stroke(graphics: &mut Graphics, drawable: &Drawable<Ellipse>) {
     let mut dx = 2.0 * (ry * ry) * (x as f32);
     let mut dy = 2.0 * (rx * rx) * (y as f32);
     while dx < dy {
-        //plot (x,y)
         graphics.set_pixel(center_x + x, center_y + y, color);
         graphics.set_pixel(center_x - x, center_y + y, color);
         graphics.set_pixel(center_x + x, center_y - y, color);
         graphics.set_pixel(center_x - x, center_y - y, color);
         if p1 < 0.0 {
-            x = x + 1;
+            x += 1;
             dx = 2.0 * (ry * ry) * (x as f32);
-            p1 = p1 + dx + (ry * ry);
+            p1 += dx + (ry * ry);
         } else {
-            x = x + 1;
-            y = y - 1;
+            x += 1;
+            y -= 1;
             dx = 2.0 * (ry * ry) * (x as f32);
             dy = 2.0 * (rx * rx) * (y as f32);
-            p1 = p1 + dx - dy + (ry * ry);
+            p1 += dx - dy + (ry * ry);
         }
     }
     let mut p2 = (ry * ry) * ((x as f32) + 0.5) * ((x as f32) + 0.5)
@@ -284,17 +283,15 @@ fn draw_ellipse_stroke(graphics: &mut Graphics, drawable: &Drawable<Ellipse>) {
         graphics.set_pixel(center_x + x, center_y - y, color);
         graphics.set_pixel(center_x - x, center_y - y, color);
         if p2 > 0.0 {
-            x = x;
-            y = y - 1;
+            y -= 1;
             dy = 2.0 * (rx * rx) * (y as f32);
-            //dy = 2 * rx * rx *y;
-            p2 = p2 - dy + (rx * rx);
+            p2 -= dy + (rx * rx);
         } else {
-            x = x + 1;
-            y = y - 1;
-            dy = dy - 2.0 * (rx * rx);
-            dx = dx + 2.0 * (ry * ry);
-            p2 = p2 + dx - dy + (rx * rx);
+            x += 1;
+            y -= 1;
+            dy -= 2.0 * (rx * rx);
+            dx += 2.0 * (ry * ry);
+            p2 += dx - dy + (rx * rx);
         }
     }
 }
