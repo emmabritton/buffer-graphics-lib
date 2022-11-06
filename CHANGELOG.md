@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.7.1
+- Update shapes lib (0.1.4)
+
 ### Version 0.7.0
 - Add Ellipse
 
