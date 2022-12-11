@@ -1,6 +1,6 @@
 pub mod collection;
-pub mod rendering;
 pub mod collection_mutation;
+pub mod rendering;
 
 use crate::drawable::{DrawType, Drawable};
 use graphics_shapes::circle::Circle;

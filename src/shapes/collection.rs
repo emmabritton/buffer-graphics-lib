@@ -1,4 +1,5 @@
 use crate::drawable::Drawable;
+use crate::drawing::Renderable;
 use crate::Graphics;
 use graphics_shapes::circle::Circle;
 use graphics_shapes::ellipse::Ellipse;
@@ -9,7 +10,6 @@ use graphics_shapes::triangle::Triangle;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
-use crate::drawing::Renderable;
 
 #[derive(Debug, Default)]
 pub struct AutoShapeCollection {
@@ -146,7 +146,7 @@ impl<K: Eq + PartialEq + Hash + Clone> ShapeCollection<K> {
     }
 }
 
-impl <K: Eq + PartialEq + Hash + Clone> Renderable for ShapeCollection<K> {
+impl<K: Eq + PartialEq + Hash + Clone> Renderable for ShapeCollection<K> {
     fn render(&self, graphics: &mut Graphics) {
         self.render(graphics)
     }

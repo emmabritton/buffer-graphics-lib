@@ -1,38 +1,94 @@
-use std::collections::HashMap;
-use std::hash::Hash;
-use graphics_shapes::coord::Coord;
-use graphics_shapes::Shape;
 use crate::drawable::Drawable;
+use crate::shapes::collection::AutoShapeCollection;
 use crate::shapes::collection::ShapeCollection;
 use crate::shapes::CreateDrawable;
-use crate::shapes::collection::AutoShapeCollection;
+use graphics_shapes::coord::Coord;
+use graphics_shapes::Shape;
+use std::collections::HashMap;
+use std::hash::Hash;
 
-fn with_translation<K: Eq + PartialEq + Hash + Clone, P: Into<Coord>, T: Shape + Clone>(shapes: &HashMap<K, Drawable<T>>, delta: P) -> HashMap<K, Drawable<T>> where Drawable<T>: CreateDrawable<T>{
+fn with_translation<K: Eq + PartialEq + Hash + Clone, P: Into<Coord>, T: Shape + Clone>(
+    shapes: &HashMap<K, Drawable<T>>,
+    delta: P,
+) -> HashMap<K, Drawable<T>>
+where
+    Drawable<T>: CreateDrawable<T>,
+{
     let delta = delta.into();
-    shapes.iter().map(|(key,shape)| (key.clone(),shape.with_translation(delta))).collect()
+    shapes
+        .iter()
+        .map(|(key, shape)| (key.clone(), shape.with_translation(delta)))
+        .collect()
 }
 
-fn with_move<K: Eq + PartialEq + Hash + Clone, P: Into<Coord>, T: Shape + Clone>(shapes: &HashMap<K, Drawable<T>>, delta: P) -> HashMap<K, Drawable<T>> where Drawable<T>: CreateDrawable<T>{
+fn with_move<K: Eq + PartialEq + Hash + Clone, P: Into<Coord>, T: Shape + Clone>(
+    shapes: &HashMap<K, Drawable<T>>,
+    delta: P,
+) -> HashMap<K, Drawable<T>>
+where
+    Drawable<T>: CreateDrawable<T>,
+{
     let delta = delta.into();
-    shapes.iter().map(|(key,shape)| (key.clone(),shape.with_move(delta))).collect()
+    shapes
+        .iter()
+        .map(|(key, shape)| (key.clone(), shape.with_move(delta)))
+        .collect()
 }
 
-fn with_scale<K: Eq + PartialEq + Hash + Clone, T: Shape + Clone>(shapes: &HashMap<K, Drawable<T>>, delta: f32) -> HashMap<K, Drawable<T>> where Drawable<T>: CreateDrawable<T>{
-    shapes.iter().map(|(key,shape)| (key.clone(),shape.with_scale(delta))).collect()
+fn with_scale<K: Eq + PartialEq + Hash + Clone, T: Shape + Clone>(
+    shapes: &HashMap<K, Drawable<T>>,
+    delta: f32,
+) -> HashMap<K, Drawable<T>>
+where
+    Drawable<T>: CreateDrawable<T>,
+{
+    shapes
+        .iter()
+        .map(|(key, shape)| (key.clone(), shape.with_scale(delta)))
+        .collect()
 }
 
-fn with_rotation<K: Eq + PartialEq + Hash + Clone, T: Shape + Clone>(shapes: &HashMap<K, Drawable<T>>, degrees: isize) -> HashMap<K, Drawable<T>> where Drawable<T>: CreateDrawable<T>{
-    shapes.iter().map(|(key,shape)| (key.clone(),shape.with_rotation(degrees))).collect()
+fn with_rotation<K: Eq + PartialEq + Hash + Clone, T: Shape + Clone>(
+    shapes: &HashMap<K, Drawable<T>>,
+    degrees: isize,
+) -> HashMap<K, Drawable<T>>
+where
+    Drawable<T>: CreateDrawable<T>,
+{
+    shapes
+        .iter()
+        .map(|(key, shape)| (key.clone(), shape.with_rotation(degrees)))
+        .collect()
 }
 
-fn with_scale_around<K: Eq + PartialEq + Hash + Clone, T: Shape + Clone, P: Into<Coord>>(shapes: &HashMap<K, Drawable<T>>, delta: f32, center: P) -> HashMap<K, Drawable<T>> where Drawable<T>: CreateDrawable<T>{
+fn with_scale_around<K: Eq + PartialEq + Hash + Clone, T: Shape + Clone, P: Into<Coord>>(
+    shapes: &HashMap<K, Drawable<T>>,
+    delta: f32,
+    center: P,
+) -> HashMap<K, Drawable<T>>
+where
+    Drawable<T>: CreateDrawable<T>,
+{
     let center = center.into();
-    shapes.iter().map(|(key,shape)| (key.clone(),shape.with_scale_around(delta, center))).collect()
+    shapes
+        .iter()
+        .map(|(key, shape)| (key.clone(), shape.with_scale_around(delta, center)))
+        .collect()
 }
 
-fn with_rotation_around<K: Eq + PartialEq + Hash + Clone, T: Shape + Clone, P: Into<Coord>>(shapes: &HashMap<K, Drawable<T>>, delta: isize, center: P) -> HashMap<K, Drawable<T>> where Drawable<T>: CreateDrawable<T>{
+fn with_rotation_around<K: Eq + PartialEq + Hash + Clone, T: Shape + Clone, P: Into<Coord>>(
+    shapes: &HashMap<K, Drawable<T>>,
+    delta: isize,
+    center: P,
+) -> HashMap<K, Drawable<T>>
+where
+    Drawable<T>: CreateDrawable<T>,
+{
     let center = center.into();
-    shapes.iter().map(|(key,shape)| (key.clone(),shape.with_rotation_around(delta, center))).collect()
+    shapes
+        .iter()
+        .map(|(key, shape)| (key.clone(), shape.with_rotation_around(delta, center)))
+        .collect()
 }
 
 macro_rules! impl_coord_mutator {
@@ -73,7 +129,11 @@ macro_rules! impl_number_mutator {
 macro_rules! impl_number_coord_mutator {
     ($list_method: ident, $param_name: ident, $param_type: ty) => {
         impl<K: Eq + PartialEq + Hash + Clone> ShapeCollection<K> {
-            pub fn $list_method<P: Into<Coord>>(&self, $param_name: $param_type, center: P) -> Self {
+            pub fn $list_method<P: Into<Coord>>(
+                &self,
+                $param_name: $param_type,
+                center: P,
+            ) -> Self {
                 let center = center.into();
                 Self {
                     rects: $list_method(&self.rects(), $param_name, center),
@@ -135,7 +195,11 @@ macro_rules! impl_number_mutator_auto {
 macro_rules! impl_number_coord_mutator_auto {
     ($list_method: ident, $param_name: ident, $param_type: ty) => {
         impl AutoShapeCollection {
-            pub fn $list_method<P: Into<Coord>>(&self, $param_name: $param_type, center: P) -> Self {
+            pub fn $list_method<P: Into<Coord>>(
+                &self,
+                $param_name: $param_type,
+                center: P,
+            ) -> Self {
                 let center = center.into();
                 Self {
                     next_id: self.next_id,

@@ -6,6 +6,8 @@
 - Add Drawable::with_scale(), Drawable::with_scale_around and Drawable::with_rotation_around()
 - Add with_scale(), with_scale_around(), with_rotation(), with_rotation_around(), with_translate() and with_move() to ShapeCollection and AutoShapeCollection
 - Make ShapeCollection and AutoShapeCollection implement Renderable
+- Add Positioning to TextFormat
+- Remove all From for TextPos, instead use TextPos::px and TextPos::cr
 
 ### Version 0.7.1
 - Update shapes lib (0.1.4)

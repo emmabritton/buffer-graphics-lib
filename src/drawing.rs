@@ -278,10 +278,14 @@ impl Graphics<'_> {
         let format = format.into();
         let size = format.size();
         let color = format.color();
-        let (start_x, start_y) = pos.into().to_px(size);
-
         let per_x = size.get_size().0 + size.get_spacing();
         let per_y = size.get_size().1 + size.get_spacing();
+
+        let (start_x, start_y) = format.positioning().calc(
+            pos.into().to_px(size),
+            text.iter().map(|list| list.len()).max().unwrap() * per_x,
+            text.len() * per_y,
+        );
 
         for (y, line) in text.iter().enumerate() {
             let y = (y * per_y) as isize;
