@@ -1,5 +1,10 @@
 # Changelog
 
+### Version 0.7.2
+- Update shapes lib (0.1.5)
+- Fix bug in Drawable::with_rotation()
+- Add Drawable::rotation and Drawable::clear_rotation()
+
 ### Version 0.7.1
 - Update shapes lib (0.1.4)
 
