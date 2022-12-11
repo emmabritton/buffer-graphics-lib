@@ -1,9 +1,11 @@
 # Changelog
 
-### Version 0.7.2
+### Version 0.8.0
 - Update shapes lib (0.1.5)
 - Fix bug in Drawable::with_rotation()
-- Add Drawable::rotation and Drawable::clear_rotation()
+- Add Drawable::with_scale(), Drawable::with_scale_around and Drawable::with_rotation_around()
+- Add with_scale(), with_scale_around(), with_rotation(), with_rotation_around(), with_translate() and with_move() to ShapeCollection and AutoShapeCollection
+- Make ShapeCollection and AutoShapeCollection implement Renderable
 
 ### Version 0.7.1
 - Update shapes lib (0.1.4)

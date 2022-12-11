@@ -35,7 +35,6 @@ pub fn stroke(color: Color) -> DrawType {
 #[derive(Debug, Eq, PartialEq)]
 pub struct Drawable<T: Clone> {
     obj: T,
-    current_rotation: isize,
     draw_type: DrawType,
     drawing_points: Vec<Coord>,
 }
@@ -53,10 +52,6 @@ impl<T: Clone> Drawable<T> {
     pub fn drawing_points(&self) -> &Vec<Coord> {
         &self.drawing_points
     }
-    #[inline]
-    pub fn rotation(&self) -> isize {
-        self.current_rotation
-    }
 }
 
 impl<T: Clone> Drawable<T> {
@@ -66,7 +61,6 @@ impl<T: Clone> Drawable<T> {
             obj,
             draw_type,
             drawing_points,
-            current_rotation: 0,
         }
     }
 }
@@ -78,9 +72,9 @@ impl<T: Clone> Drawable<T> {
 }
 
 impl<T> Drawable<T>
-    where
-        Self: CreateDrawable<T>,
-        T: Shape + Clone,
+where
+    Self: CreateDrawable<T>,
+    T: Shape + Clone,
 {
     pub fn with_translation<P: Into<Coord>>(&self, delta: P) -> Drawable<T> {
         let moved = self.obj.translate_by(delta);
@@ -92,15 +86,23 @@ impl<T> Drawable<T>
         Drawable::from_obj(moved, self.draw_type)
     }
 
-    pub fn with_rotation(&self, degrees: isize) -> Drawable<T> {
-        let rotated = self.obj.rotate(degrees);
-        let mut drawable = Drawable::from_obj(rotated, self.draw_type);
-        drawable.current_rotation += degrees;
-        drawable
+    pub fn with_scale(&self, scale: f32) -> Drawable<T> {
+        let moved = self.obj.scale(scale);
+        Drawable::from_obj(moved, self.draw_type)
     }
 
-    pub fn clear_rotation(&self) -> Drawable<T> {
-        let rotated = self.obj.rotate(-self.current_rotation);
+    pub fn with_scale_around<P: Into<Coord>>(&self, scale: f32, point: P) -> Drawable<T> {
+        let moved = self.obj.scale_around(scale, point);
+        Drawable::from_obj(moved, self.draw_type)
+    }
+
+    pub fn with_rotation(&self, degrees: isize) -> Drawable<T> {
+        let rotated = self.obj.rotate(degrees);
+        Drawable::from_obj(rotated, self.draw_type)
+    }
+
+    pub fn with_rotation_around<P: Into<Coord>>(&self, degrees: isize, point: P) -> Drawable<T> {
+        let rotated = self.obj.rotate_around(degrees, point);
         Drawable::from_obj(rotated, self.draw_type)
     }
 }

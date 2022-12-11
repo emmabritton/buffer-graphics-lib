@@ -9,16 +9,17 @@ use graphics_shapes::triangle::Triangle;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
+use crate::drawing::Renderable;
 
 #[derive(Debug, Default)]
 pub struct AutoShapeCollection {
-    next_id: usize,
-    rects: HashMap<usize, Drawable<Rect>>,
-    lines: HashMap<usize, Drawable<Line>>,
-    circles: HashMap<usize, Drawable<Circle>>,
-    triangles: HashMap<usize, Drawable<Triangle>>,
-    polygons: HashMap<usize, Drawable<Polygon>>,
-    ellipses: HashMap<usize, Drawable<Ellipse>>,
+    pub(super) next_id: usize,
+    pub(super) rects: HashMap<usize, Drawable<Rect>>,
+    pub(super) lines: HashMap<usize, Drawable<Line>>,
+    pub(super) circles: HashMap<usize, Drawable<Circle>>,
+    pub(super) triangles: HashMap<usize, Drawable<Triangle>>,
+    pub(super) polygons: HashMap<usize, Drawable<Polygon>>,
+    pub(super) ellipses: HashMap<usize, Drawable<Ellipse>>,
 }
 
 impl AutoShapeCollection {
@@ -80,12 +81,12 @@ impl AutoShapeCollection {
 
 #[derive(Debug, Default)]
 pub struct ShapeCollection<K: Eq + PartialEq + Hash + Clone> {
-    rects: HashMap<K, Drawable<Rect>>,
-    lines: HashMap<K, Drawable<Line>>,
-    circles: HashMap<K, Drawable<Circle>>,
-    triangles: HashMap<K, Drawable<Triangle>>,
-    polygons: HashMap<K, Drawable<Polygon>>,
-    ellipses: HashMap<K, Drawable<Ellipse>>,
+    pub(super) rects: HashMap<K, Drawable<Rect>>,
+    pub(super) lines: HashMap<K, Drawable<Line>>,
+    pub(super) circles: HashMap<K, Drawable<Circle>>,
+    pub(super) triangles: HashMap<K, Drawable<Triangle>>,
+    pub(super) polygons: HashMap<K, Drawable<Polygon>>,
+    pub(super) ellipses: HashMap<K, Drawable<Ellipse>>,
 }
 
 impl<K: Eq + PartialEq + Hash + Clone + Default> ShapeCollection<K> {
@@ -142,6 +143,18 @@ impl<K: Eq + PartialEq + Hash + Clone> ShapeCollection<K> {
         self.polygons.remove(key);
         self.circles.remove(key);
         self.ellipses.remove(key);
+    }
+}
+
+impl <K: Eq + PartialEq + Hash + Clone> Renderable for ShapeCollection<K> {
+    fn render(&self, graphics: &mut Graphics) {
+        self.render(graphics)
+    }
+}
+
+impl Renderable for AutoShapeCollection {
+    fn render(&self, graphics: &mut Graphics) {
+        self.render(graphics)
     }
 }
 
