@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.8.1
+- Add wrapper RenderableImage which contains an image and position so that an image can be rendered like a shape
+
 ### Version 0.8.0
 - Update shapes lib (0.1.5)
 - Fix bug in Drawable::with_rotation()
