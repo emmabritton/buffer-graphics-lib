@@ -1,7 +1,7 @@
 use graphics_shapes::coord::Coord;
 use crate::text::TextSize;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum TextPos {
     Px(isize, isize),
     /// See [TextSize::get_max_characters] for maximum x and y
@@ -9,7 +9,7 @@ pub enum TextPos {
 }
 
 impl TextPos {
-    pub fn to_px(&self, size: TextSize) -> (isize, isize) {
+    pub fn to_coord(&self, size: TextSize) -> (isize, isize) {
         match self {
             TextPos::Px(x, y) => (*x, *y),
             TextPos::ColRow(col, row) => (
@@ -18,6 +18,21 @@ impl TextPos {
             ),
         }
     }
+
+    pub fn px<P: Into<Coord>>(coord: P) -> TextPos {
+        let coord=  coord.into();
+        TextPos::Px(coord.x, coord.y)
+    }
+}
+
+pub trait CoordIntoTextPos {
+    fn textpos(self) -> TextPos;
+}
+
+impl CoordIntoTextPos for Coord {
+    fn textpos(self) -> TextPos {
+        TextPos::px(self)
+    }
 }
 
 pub trait NewTextPos<T> {
@@ -25,12 +40,6 @@ pub trait NewTextPos<T> {
     fn cr(xy: (T, T)) -> TextPos;
     /// Creates a new TextPos::Px
     fn px(xy: (T, T)) -> TextPos;
-}
-
-impl From<Coord> for TextPos {
-    fn from(coord: Coord) -> Self {
-        TextPos::px((coord.x, coord.y))
-    }
 }
 
 macro_rules! impl_to_px {
@@ -62,3 +71,16 @@ impl_to_px!(u64);
 impl_to_px!(u128);
 impl_to_px!(f32);
 impl_to_px!(f64);
+
+#[cfg(test)]
+mod test {
+    use graphics_shapes::coord::Coord;
+    use crate::text::pos::{CoordIntoTextPos, TextPos};
+
+    #[test]
+    fn coord_textpos() {
+        let coord = Coord::new(0,0);
+        let test = coord.textpos();
+        assert_eq!(test, TextPos::Px(0,0))
+    }
+}

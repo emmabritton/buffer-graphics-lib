@@ -281,7 +281,7 @@ impl Graphics<'_> {
         let per_y = size.get_size().1 + size.get_spacing();
 
         let (start_x, start_y) = format.positioning().calc(
-            pos.into().to_px(size),
+            pos.into().to_coord(size),
             text.iter().map(|list| list.len()).max().unwrap() * per_x,
             text.len() * per_y,
         );
