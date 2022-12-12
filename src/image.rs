@@ -1,5 +1,5 @@
 use crate::color::{Color, WHITE};
-use crate::renderable_image::RenderableImage;
+use crate::renderable_image::{DrawOffset, RenderableImage};
 use crate::scaling::*;
 use crate::{GraphicsError, Tint};
 use graphics_shapes::coord::Coord;
@@ -124,8 +124,8 @@ impl Image {
         }
     }
 
-    pub fn to_renderable<P: Into<Coord>>(self, xy: P) -> RenderableImage {
-        RenderableImage::new(self, xy.into())
+    pub fn to_renderable<P: Into<Coord>>(self, xy: P, draw_offset: DrawOffset) -> RenderableImage {
+        RenderableImage::new(self, xy.into(), draw_offset)
     }
 }
 

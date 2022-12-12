@@ -2,19 +2,20 @@ use crate::drawing::Renderable;
 use crate::image::Image;
 use crate::Graphics;
 use graphics_shapes::coord::Coord;
+use std::ops::Neg;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum DrawOffset {
     TopLeft,
     Center,
-    Custom(Coord)
+    Custom(Coord),
 }
 
 #[derive(Debug, Clone)]
 pub struct RenderableImage {
     image: Image,
     xy: Coord,
-    offset: DrawOffset
+    offset: DrawOffset,
 }
 
 impl RenderableImage {
@@ -40,9 +41,13 @@ impl RenderableImage {
 impl Renderable for RenderableImage {
     fn render(&self, graphics: &mut Graphics) {
         let offset = match self.offset {
-            DrawOffset::TopLeft => (0,0).into(),
-            DrawOffset::Center => (-(self.image.width()/2), -(self.image.height()/2)).into(),
-            DrawOffset::Custom(coord) => coord
+            DrawOffset::TopLeft => (0, 0).into(),
+            DrawOffset::Center => (
+                ((self.image.width() / 2) as isize).neg(),
+                ((self.image.height() / 2) as isize).neg(),
+            )
+                .into(),
+            DrawOffset::Custom(coord) => coord,
         };
 
         graphics.draw_image(self.xy + offset, &self.image);
