@@ -1,3 +1,4 @@
+use graphics_shapes::coord::Coord;
 use crate::text::TextSize;
 
 #[derive(Copy, Clone, Debug)]
@@ -24,6 +25,12 @@ pub trait NewTextPos<T> {
     fn cr(xy: (T, T)) -> TextPos;
     /// Creates a new TextPos::Px
     fn px(xy: (T, T)) -> TextPos;
+}
+
+impl From<Coord> for TextPos {
+    fn from(coord: Coord) -> Self {
+        TextPos::px((coord.x, coord.y))
+    }
 }
 
 macro_rules! impl_to_px {
