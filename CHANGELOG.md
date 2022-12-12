@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.8.2
+- Add DrawOffset for RenderableImage so it can be drawn from the top left or center
+- Remove now unnecessary mut in copy_to_image()
+
 ### Version 0.8.1
 - Add wrapper RenderableImage which contains an image and position so that an image can be rendered like a shape
 

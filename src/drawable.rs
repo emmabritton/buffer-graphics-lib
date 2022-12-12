@@ -32,6 +32,7 @@ pub fn stroke(color: Color) -> DrawType {
     DrawType::Stroke(color)
 }
 
+/// Represents a shape that is made of points that can be drawn either as a outline or solid
 #[derive(Debug, Eq, PartialEq)]
 pub struct Drawable<T: Clone> {
     obj: T,

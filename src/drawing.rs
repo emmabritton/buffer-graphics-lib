@@ -7,6 +7,7 @@ use crate::Graphics;
 use graphics_shapes::coord::Coord;
 use std::mem::swap;
 
+/// Represents anything that [Graphics] can render
 pub trait Renderable {
     fn render(&self, graphics: &mut Graphics);
 }
@@ -53,9 +54,7 @@ impl Graphics<'_> {
     }
 
     /// Copy entire pixels array to an image
-    ///
-    /// Although the method takes `&mut self` it doesn't mutate anything
-    pub fn copy_to_image(&mut self) -> Image {
+    pub fn copy_to_image(&self) -> Image {
         let pixels = self
             .buffer
             .chunks_exact(4)
