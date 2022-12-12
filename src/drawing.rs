@@ -173,17 +173,17 @@ impl Graphics<'_> {
         }
     }
 
-    /// Draw renderable
-    pub fn draw_at<P: Into<Coord>>(&mut self, xy: P, shape: &dyn Renderable) {
+    /// Draw renderable offset by [xy]
+    pub fn draw_offset<P: Into<Coord>>(&mut self, xy: P, renderable: &dyn Renderable) {
         let xy = xy.into();
         self.update_translate(xy);
-        shape.render(self);
+        renderable.render(self);
         self.update_translate(-xy);
     }
 
     /// Draw renderable
-    pub fn draw(&mut self, shape: &dyn Renderable) {
-        shape.render(self);
+    pub fn draw(&mut self, renderable: &dyn Renderable) {
+        renderable.render(self);
     }
 
     /// Get the RGB values for a pixel
