@@ -31,6 +31,7 @@ pub mod drawing;
 pub mod image;
 #[cfg(feature = "image_loading")]
 pub mod image_loading;
+pub mod renderable_image;
 pub mod scaling;
 pub mod shapes;
 pub mod text;

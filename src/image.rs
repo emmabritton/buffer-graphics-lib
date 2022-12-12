@@ -1,6 +1,8 @@
 use crate::color::{Color, WHITE};
+use crate::renderable_image::RenderableImage;
 use crate::scaling::*;
 use crate::{GraphicsError, Tint};
+use graphics_shapes::coord::Coord;
 use std::fmt::{Debug, Formatter};
 
 /// Images are rectangles of pixels that can be manipulated and drawn on screen
@@ -121,6 +123,10 @@ impl Image {
             Scaling::Epx4x => scale_epx(&scale_epx(self)),
         }
     }
+
+    pub fn to_renderable<P: Into<Coord>>(self, xy: P) -> RenderableImage {
+        RenderableImage::new(self, xy.into())
+    }
 }
 
 impl Tint for Image {
@@ -181,7 +187,7 @@ mod test {
                 Color::gray(6),
                 Color::gray(7),
                 Color::gray(8),
-                Color::gray(9)
+                Color::gray(9),
             ]
         );
     }
@@ -200,7 +206,7 @@ mod test {
                 Color::gray(6),
                 Color::gray(7),
                 Color::gray(8),
-                Color::gray(9)
+                Color::gray(9),
             ]
         );
         let mut horz = make_image();
@@ -216,7 +222,7 @@ mod test {
                 Color::gray(4),
                 Color::gray(9),
                 Color::gray(8),
-                Color::gray(7)
+                Color::gray(7),
             ]
         );
         let mut vert = make_image();
@@ -232,7 +238,7 @@ mod test {
                 Color::gray(6),
                 Color::gray(1),
                 Color::gray(2),
-                Color::gray(3)
+                Color::gray(3),
             ]
         );
         let mut horz_vert = make_image();
@@ -249,7 +255,7 @@ mod test {
                 Color::gray(4),
                 Color::gray(3),
                 Color::gray(2),
-                Color::gray(1)
+                Color::gray(1),
             ]
         );
         let mut vert_horz = make_image();
@@ -266,7 +272,7 @@ mod test {
                 Color::gray(4),
                 Color::gray(3),
                 Color::gray(2),
-                Color::gray(1)
+                Color::gray(1),
             ]
         );
     }
