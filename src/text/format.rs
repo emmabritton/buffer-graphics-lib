@@ -30,14 +30,14 @@ impl Positioning {
     pub fn calc(&self, xy: (isize, isize), width: usize, height: usize) -> (isize, isize) {
         let factor = match self {
             Positioning::LeftTop => (0.0, 0.0),
-            Positioning::CenterTop => (0.5, 0.0),
-            Positioning::RightTop => (1.0, 0.0),
-            Positioning::LeftCenter => (0.0, 0.5),
-            Positioning::Center => (0.5, 0.5),
-            Positioning::RightCenter => (1.0, 0.5),
-            Positioning::LeftBottom => (0.0, 1.0),
-            Positioning::CenterBottom => (0.5, 1.0),
-            Positioning::RightBottom => (1.0, 1.0),
+            Positioning::CenterTop => (-0.5, 0.0),
+            Positioning::RightTop => (-1.0, 0.0),
+            Positioning::LeftCenter => (0.0, -0.5),
+            Positioning::Center => (-0.5, -0.5),
+            Positioning::RightCenter => (-1.0, -0.5),
+            Positioning::LeftBottom => (0.0, -1.0),
+            Positioning::CenterBottom => (-0.5, -1.0),
+            Positioning::RightBottom => (-1.0, -1.0),
         };
         (
             xy.0 + (factor.0 * width as f32) as isize,
