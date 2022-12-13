@@ -1,5 +1,13 @@
 # Changelog
 
+### Version 0.8.3
+- Update shapes lib (0.1.6)
+- Add from Coord for TextPos
+- Fix text positioning
+- Add TextPos::px(Coord)
+- Rename TextPos::to_px() to to_coord()
+- Rename Graphics::draw_at() to draw_offset() so the name accurately describes its behaviour
+
 ### Version 0.8.2
 - Add DrawOffset for RenderableImage so it can be drawn from the top left or center
 - Remove now unnecessary mut in copy_to_image()
