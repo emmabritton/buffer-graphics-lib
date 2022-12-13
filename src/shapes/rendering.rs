@@ -168,8 +168,9 @@ impl Renderable for Drawable<Polygon> {
         }
         graphics.draw_line(poly[poly.len() - 1], poly[0], color);
         if let DrawType::Fill(_) = self.draw_type() {
-            let width = graphics.width as f32;
-            for y in 0..graphics.height {
+            let y_start = self.obj().top();
+            let y_end = self.obj().bottom();
+            for y in y_start..y_end {
                 let mut node = vec![];
                 let mut node_count = 0;
                 let y = y as f32;
@@ -179,7 +180,7 @@ impl Renderable for Drawable<Polygon> {
                         node.push(
                             poly[i].0
                                 + (y - poly[i].1) / (poly[j].1 - poly[i].1)
-                                    * (poly[j].0 - poly[i].0),
+                                    * (poly[j].0 - poly[i].0)
                         );
                         node_count += 1;
                     }
@@ -198,19 +199,8 @@ impl Renderable for Drawable<Polygon> {
                         }
                     }
                     for i in (0..node_count - 1).step_by(2) {
-                        if node[i] >= width {
-                            break;
-                        }
-                        if node[i + 1] > 0.0 {
-                            if node[i] < 0.0 {
-                                node[i] = 0.0;
-                            }
-                            if node[i + 1] > width {
-                                node[i + 1] = width;
-                            }
-                            for x in (node[i] as usize)..(node[i + 1] as usize) {
-                                graphics.set_pixel(x as isize + 1, y as isize, color);
-                            }
+                        for x in (node[i] as isize)..(node[i + 1]as isize) {
+                            graphics.update_pixel(x  + 1, y as isize, color);
                         }
                     }
                 }
@@ -236,7 +226,7 @@ impl Renderable for Drawable<Ellipse> {
                 let y_amount = y * y * width_sq;
                 for x in -width..width {
                     if x * x * height_sq + y_amount <= limit {
-                        graphics.set_pixel(offset.x + x, offset.y + y, color)
+                        graphics.update_pixel(offset.x + x, offset.y + y, color)
                     }
                 }
             }
@@ -257,10 +247,10 @@ fn draw_ellipse_stroke(graphics: &mut Graphics, drawable: &Drawable<Ellipse>) {
     let mut dx = 2.0 * (ry * ry) * (x as f32);
     let mut dy = 2.0 * (rx * rx) * (y as f32);
     while dx < dy {
-        graphics.set_pixel(center_x + x, center_y + y, color);
-        graphics.set_pixel(center_x - x, center_y + y, color);
-        graphics.set_pixel(center_x + x, center_y - y, color);
-        graphics.set_pixel(center_x - x, center_y - y, color);
+        graphics.update_pixel(center_x + x, center_y + y, color);
+        graphics.update_pixel(center_x - x, center_y + y, color);
+        graphics.update_pixel(center_x + x, center_y - y, color);
+        graphics.update_pixel(center_x - x, center_y - y, color);
         if p1 < 0.0 {
             x += 1;
             dx = 2.0 * (ry * ry) * (x as f32);
@@ -278,10 +268,10 @@ fn draw_ellipse_stroke(graphics: &mut Graphics, drawable: &Drawable<Ellipse>) {
         - (rx * rx) * (ry * ry);
 
     while y >= 0 {
-        graphics.set_pixel(center_x + x, center_y + y, color);
-        graphics.set_pixel(center_x - x, center_y + y, color);
-        graphics.set_pixel(center_x + x, center_y - y, color);
-        graphics.set_pixel(center_x - x, center_y - y, color);
+        graphics.update_pixel(center_x + x, center_y + y, color);
+        graphics.update_pixel(center_x - x, center_y + y, color);
+        graphics.update_pixel(center_x + x, center_y - y, color);
+        graphics.update_pixel(center_x - x, center_y - y, color);
         if p2 > 0.0 {
             y -= 1;
             dy = 2.0 * (rx * rx) * (y as f32);

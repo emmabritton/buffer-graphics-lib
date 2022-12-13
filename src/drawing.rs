@@ -217,7 +217,7 @@ impl Graphics<'_> {
         None
     }
 
-    /// Update a pixel color, using [PixelWrapper::set_pixel] or [PixelWrapper::blend_pixel] depending
+    /// Update a pixel color, using [Graphics::set_pixel] or [Graphics::blend_pixel] depending
     /// on whether `color`s alpha is 255 or not
     #[inline]
     pub fn update_pixel(&mut self, x: isize, y: isize, color: Color) {
@@ -323,6 +323,9 @@ impl Graphics<'_> {
     }
 
     /// Set the RGB values for a pixel
+    ///
+    /// Generally you should use [Graphics::update_pixel] instead
+    ///
     /// This ignores alpha, so 255,0,0,0 will draw a red pixel
     #[inline]
     pub fn set_pixel(&mut self, x: isize, y: isize, color: Color) {
