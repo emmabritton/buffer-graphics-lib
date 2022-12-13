@@ -1,5 +1,5 @@
-use graphics_shapes::coord::Coord;
 use crate::text::TextSize;
+use graphics_shapes::coord::Coord;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum TextPos {
@@ -20,7 +20,7 @@ impl TextPos {
     }
 
     pub fn px<P: Into<Coord>>(coord: P) -> TextPos {
-        let coord=  coord.into();
+        let coord = coord.into();
         TextPos::Px(coord.x, coord.y)
     }
 }
@@ -74,13 +74,13 @@ impl_to_px!(f64);
 
 #[cfg(test)]
 mod test {
-    use graphics_shapes::coord::Coord;
     use crate::text::pos::{CoordIntoTextPos, TextPos};
+    use graphics_shapes::coord::Coord;
 
     #[test]
     fn coord_textpos() {
-        let coord = Coord::new(0,0);
+        let coord = Coord::new(0, 0);
         let test = coord.textpos();
-        assert_eq!(test, TextPos::Px(0,0))
+        assert_eq!(test, TextPos::Px(0, 0))
     }
 }

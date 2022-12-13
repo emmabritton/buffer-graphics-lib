@@ -180,7 +180,7 @@ impl Renderable for Drawable<Polygon> {
                         node.push(
                             poly[i].0
                                 + (y - poly[i].1) / (poly[j].1 - poly[i].1)
-                                    * (poly[j].0 - poly[i].0)
+                                    * (poly[j].0 - poly[i].0),
                         );
                         node_count += 1;
                     }
@@ -199,8 +199,8 @@ impl Renderable for Drawable<Polygon> {
                         }
                     }
                     for i in (0..node_count - 1).step_by(2) {
-                        for x in (node[i] as isize)..(node[i + 1]as isize) {
-                            graphics.update_pixel(x  + 1, y as isize, color);
+                        for x in (node[i] as isize)..(node[i + 1] as isize) {
+                            graphics.update_pixel(x + 1, y as isize, color);
                         }
                     }
                 }
