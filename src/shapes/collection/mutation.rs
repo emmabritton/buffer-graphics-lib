@@ -48,7 +48,7 @@ macro_rules! shapebox_mutate_one {
         }
 
         impl ShapeCollection {
-            pub fn $name<P: Into<Coord>>(&self, $param: $param_type) -> ShapeCollection {
+            pub fn $name(&self, $param: $param_type) -> ShapeCollection {
                 ShapeCollection {
                     shapes: self
                         .shapes

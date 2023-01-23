@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.9.1
+- Fix bug with ShapeCollection::with_rotate
+
 ### Version 0.9.0
 - Add draw_rect, draw_circle, etc methods on Graphics
 - Change renderable to require a generic param so it can impl'd outside this crate
