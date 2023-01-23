@@ -3,6 +3,7 @@
 ### Version 0.9.0
 - Add draw_rect, draw_circle, etc methods on Graphics
 - Change renderable to require a generic param so it can impl'd outside this crate
+- Refactor shape collection so now treated as a single renderable (rather than a data storage object)
 
 ### Version 0.8.3
 - Update shapes lib (0.1.6)

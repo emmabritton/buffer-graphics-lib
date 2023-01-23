@@ -33,7 +33,7 @@ pub fn stroke(color: Color) -> DrawType {
 }
 
 /// Represents a shape that is made of points that can be drawn either as a outline or solid
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Drawable<T: Clone> {
     obj: T,
     draw_type: DrawType,
