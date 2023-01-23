@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.9.0
+- Add draw_rect, draw_circle, etc methods on Graphics
+
 ### Version 0.8.3
 - Update shapes lib (0.1.6)
 - Add from Coord for TextPos

@@ -6,6 +6,13 @@ use crate::text::{chr_to_code, Text, TextSize};
 use crate::Graphics;
 use graphics_shapes::coord::Coord;
 use std::mem::swap;
+use graphics_shapes::circle::Circle;
+use graphics_shapes::ellipse::Ellipse;
+use graphics_shapes::polygon::Polygon;
+use graphics_shapes::rect::Rect;
+use graphics_shapes::triangle::Triangle;
+use crate::drawable::{Drawable, DrawType};
+use crate::shapes::CreateDrawable;
 
 /// Represents anything that [Graphics] can render
 pub trait Renderable {
@@ -303,6 +310,26 @@ impl Graphics<'_> {
     ) {
         let text = Text::new(text, pos.into(), format.into());
         text.render(self);
+    }
+
+    pub fn draw_rect<R: Into<Rect>>(&mut self, rect: R, draw_type: DrawType) {
+        Drawable::from_obj(rect.into(), draw_type).render(self)
+    }
+
+    pub fn draw_circle<C: Into<Circle>>(&mut self, circle: C, draw_type: DrawType) {
+        Drawable::from_obj(circle.into(), draw_type).render(self)
+    }
+
+    pub fn draw_polygon<P: Into<Polygon>>(&mut self, polygon: P, draw_type: DrawType) {
+        Drawable::from_obj(polygon.into(), draw_type).render(self)
+    }
+
+    pub fn draw_triangle<T: Into<Triangle>>(&mut self, triangle: T, draw_type: DrawType) {
+        Drawable::from_obj(triangle.into(), draw_type).render(self)
+    }
+
+    pub fn draw_ellipse<E: Into<Ellipse>>(&mut self, ellipse: E, draw_type: DrawType) {
+        Drawable::from_obj(ellipse.into(), draw_type).render(self)
     }
 
     /// Set the RGB values for a pixel by blending it with the provided color
