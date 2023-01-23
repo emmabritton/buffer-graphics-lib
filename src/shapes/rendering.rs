@@ -49,8 +49,8 @@ impl Renderable<Circle> for Drawable<Circle> {
     fn render(&self, graphics: &mut Graphics) {
         match self.draw_type() {
             DrawType::Stroke(color) => {
-                let cx = self.obj().center().x as isize;
-                let cy = self.obj().center().y as isize;
+                let cx = self.obj().center().x;
+                let cy = self.obj().center().y;
                 let mut d = (5_isize - (self.obj().radius() as isize) * 4) / 4;
                 let mut x = 0;
                 let mut y = self.obj().radius() as isize;
@@ -74,8 +74,8 @@ impl Renderable<Circle> for Drawable<Circle> {
                 }
             }
             DrawType::Fill(color) => {
-                let cx = self.obj().center().x as isize;
-                let cy = self.obj().center().y as isize;
+                let cx = self.obj().center().x;
+                let cy = self.obj().center().y;
                 let squared_radius = (self.obj().radius() * self.obj().radius()) as isize;
                 for y in 0..(self.obj().radius() as isize) {
                     let up = cy - y;
@@ -191,9 +191,7 @@ impl Renderable<Polygon> for Drawable<Polygon> {
                     while i < (node_count - 1) {
                         if node[i] > node[i + 1] {
                             node.swap(i, i + 1);
-                            if i != 0 {
-                                i -= 1;
-                            }
+                            i = i.saturating_sub(1);
                         } else {
                             i += 1;
                         }

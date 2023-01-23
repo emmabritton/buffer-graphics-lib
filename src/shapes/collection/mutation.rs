@@ -1,6 +1,6 @@
-use graphics_shapes::coord::Coord;
 use crate::shapes::collection::shape_box::{FromDrawable, ShapeBox};
 use crate::shapes::collection::ShapeCollection;
+use graphics_shapes::coord::Coord;
 
 macro_rules! shapebox_mutate_coord {
     ($name: ident, $param: ident) => {
@@ -20,7 +20,13 @@ macro_rules! shapebox_mutate_coord {
         impl ShapeCollection {
             pub fn $name<P: Into<Coord>>(&self, $param: P) -> ShapeCollection {
                 let $param = $param.into();
-                ShapeCollection { shapes: self.shapes.iter().map(|shape| shape.$name($param)).collect() }
+                ShapeCollection {
+                    shapes: self
+                        .shapes
+                        .iter()
+                        .map(|shape| shape.$name($param))
+                        .collect(),
+                }
             }
         }
     };
@@ -43,7 +49,13 @@ macro_rules! shapebox_mutate_one {
 
         impl ShapeCollection {
             pub fn $name<P: Into<Coord>>(&self, $param: $param_type) -> ShapeCollection {
-                ShapeCollection { shapes: self.shapes.iter().map(|shape| shape.$name($param)).collect() }
+                ShapeCollection {
+                    shapes: self
+                        .shapes
+                        .iter()
+                        .map(|shape| shape.$name($param))
+                        .collect(),
+                }
             }
         }
     };
@@ -67,7 +79,13 @@ macro_rules! shapebox_mutate_two {
         impl ShapeCollection {
             pub fn $name<P: Into<Coord>>(&self, $param: $param_type, center: P) -> ShapeCollection {
                 let center = center.into();
-                ShapeCollection { shapes: self.shapes.iter().map(|shape| shape.$name($param, center)).collect() }
+                ShapeCollection {
+                    shapes: self
+                        .shapes
+                        .iter()
+                        .map(|shape| shape.$name($param, center))
+                        .collect(),
+                }
             }
         }
     };

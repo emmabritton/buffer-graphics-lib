@@ -1,13 +1,13 @@
+use crate::drawable::{DrawType, Drawable};
+use crate::drawing::Renderable;
+use crate::shapes::CreateDrawable;
+use crate::Graphics;
 use graphics_shapes::circle::Circle;
 use graphics_shapes::ellipse::Ellipse;
 use graphics_shapes::line::Line;
 use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
-use crate::drawable::{Drawable, DrawType};
-use crate::drawing::Renderable;
-use crate::Graphics;
-use crate::shapes::CreateDrawable;
 
 /// Represents one of the shapes from graphics-shapes so they be used in a collection with
 /// generic or type issues
@@ -18,7 +18,7 @@ pub enum ShapeBox {
     Triangle(Drawable<Triangle>),
     Circle(Drawable<Circle>),
     Ellipse(Drawable<Ellipse>),
-    Polygon(Drawable<Polygon>)
+    Polygon(Drawable<Polygon>),
 }
 
 pub trait FromDrawable<S: Clone> {

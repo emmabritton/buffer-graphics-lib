@@ -1,21 +1,20 @@
-pub mod shape_box;
 pub mod mutation;
+pub mod shape_box;
 
+use crate::drawing::Renderable;
+use crate::shapes::collection::shape_box::ShapeBox;
+use crate::Graphics;
 use std::fmt::Debug;
 use std::slice::Iter;
-use crate::drawing::Renderable;
-use crate::Graphics;
-use crate::shapes::collection::shape_box::ShapeBox;
 
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct ShapeCollection {
-    shapes: Vec<ShapeBox>
+    shapes: Vec<ShapeBox>,
 }
 
 impl ShapeCollection {
     pub fn new() -> Self {
-        Self { shapes: vec![] }
+        Self::default()
     }
 }
 
@@ -26,6 +25,10 @@ impl ShapeCollection {
 
     pub fn len(&self) -> usize {
         self.shapes.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.shapes.is_empty()
     }
 
     pub fn remove(&mut self, idx: usize) -> ShapeBox {

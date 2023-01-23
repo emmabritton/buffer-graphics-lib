@@ -1,18 +1,18 @@
 use crate::color::Color;
+use crate::drawable::{DrawType, Drawable};
 use crate::image::Image;
+use crate::shapes::CreateDrawable;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
 use crate::text::{chr_to_code, Text, TextSize};
 use crate::Graphics;
-use graphics_shapes::coord::Coord;
-use std::mem::swap;
 use graphics_shapes::circle::Circle;
+use graphics_shapes::coord::Coord;
 use graphics_shapes::ellipse::Ellipse;
 use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
-use crate::drawable::{Drawable, DrawType};
-use crate::shapes::CreateDrawable;
+use std::mem::swap;
 
 /// Represents anything that [Graphics] can render
 pub trait Renderable<T> {
@@ -109,7 +109,7 @@ impl Graphics<'_> {
         for (y, row) in image.pixels.chunks_exact(image.width()).enumerate() {
             for color in row {
                 if color.a > 0 {
-                    self.update_pixel(xy.x as isize + x, xy.y as isize + y as isize, *color);
+                    self.update_pixel(xy.x + x, xy.y + y as isize, *color);
                 }
                 x += 1;
             }
@@ -129,19 +129,19 @@ impl Graphics<'_> {
             swap(&mut start, &mut end);
         }
         if start.x == end.x {
-            for y in start.y as isize..=end.y as isize {
-                self.update_pixel(start.x as isize, y, color);
+            for y in start.y..=end.y {
+                self.update_pixel(start.x, y, color);
             }
         } else if start.y == end.y {
-            for x in start.x as isize..=end.x as isize {
-                self.update_pixel(x, start.y as isize, color);
+            for x in start.x..=end.x {
+                self.update_pixel(x, start.y, color);
             }
         } else {
             let mut delta = 0;
-            let x1 = start.x as isize;
-            let y1 = start.y as isize;
-            let x2 = end.x as isize;
-            let y2 = end.y as isize;
+            let x1 = start.x;
+            let y1 = start.y;
+            let x2 = end.x;
+            let y2 = end.y;
             let dx = isize::abs(x2 - x1);
             let dy = isize::abs(y2 - y1);
             let dx2 = dx * 2;
@@ -181,7 +181,7 @@ impl Graphics<'_> {
     }
 
     /// Draw renderable offset by [xy]
-    pub fn draw_offset<T,P: Into<Coord>>(&mut self, xy: P, renderable: &dyn Renderable<T>) {
+    pub fn draw_offset<T, P: Into<Coord>>(&mut self, xy: P, renderable: &dyn Renderable<T>) {
         let xy = xy.into();
         self.update_translate(xy);
         renderable.render(self);
@@ -202,12 +202,9 @@ impl Graphics<'_> {
     #[inline]
     fn get_pixel(&mut self, x: isize, y: isize, use_translate: bool) -> Option<Color> {
         let (x, y) = if use_translate {
-            (
-                x as isize + self.translate.x as isize,
-                y as isize + self.translate.y as isize,
-            )
+            (x + self.translate.x, y + self.translate.y)
         } else {
-            (x as isize, y as isize)
+            (x, y)
         };
 
         if x >= 0 && y >= 0 && x < self.width as isize {
@@ -336,8 +333,8 @@ impl Graphics<'_> {
     /// This method uses alpha blending, note that the canvas pixels always have 255 alpha
     #[inline]
     pub fn blend_pixel(&mut self, x: isize, y: isize, color: Color) {
-        let x = x + self.translate.x as isize;
-        let y = y + self.translate.y as isize;
+        let x = x + self.translate.x;
+        let y = y + self.translate.y;
         if x >= 0 && y >= 0 && x < self.width as isize {
             if let Some(base) = self.get_pixel(x, y, false) {
                 let new_color = base.blend(color);
@@ -356,8 +353,8 @@ impl Graphics<'_> {
     /// This ignores alpha, so 255,0,0,0 will draw a red pixel
     #[inline]
     pub fn set_pixel(&mut self, x: isize, y: isize, color: Color) {
-        let x = x + self.translate.x as isize;
-        let y = y + self.translate.y as isize;
+        let x = x + self.translate.x;
+        let y = y + self.translate.y;
         if x >= 0 && y >= 0 && x < self.width as isize {
             let idx = self.index(x as usize, y as usize);
 
