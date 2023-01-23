@@ -101,7 +101,7 @@ impl Text {
     }
 }
 
-impl Renderable for Text {
+impl Renderable<Text> for Text {
     fn render(&self, graphics: &mut Graphics) {
         graphics.draw_ascii(&self.content, self.pos, self.formatting.clone());
     }

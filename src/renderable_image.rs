@@ -38,7 +38,7 @@ impl RenderableImage {
     }
 }
 
-impl Renderable for RenderableImage {
+impl Renderable<Image> for RenderableImage {
     fn render(&self, graphics: &mut Graphics) {
         let offset = match self.offset {
             DrawOffset::TopLeft => (0, 0).into(),

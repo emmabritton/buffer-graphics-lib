@@ -15,7 +15,7 @@ use crate::drawable::{Drawable, DrawType};
 use crate::shapes::CreateDrawable;
 
 /// Represents anything that [Graphics] can render
-pub trait Renderable {
+pub trait Renderable<T> {
     fn render(&self, graphics: &mut Graphics);
 }
 
@@ -181,7 +181,7 @@ impl Graphics<'_> {
     }
 
     /// Draw renderable offset by [xy]
-    pub fn draw_offset<P: Into<Coord>>(&mut self, xy: P, renderable: &dyn Renderable) {
+    pub fn draw_offset<T,P: Into<Coord>>(&mut self, xy: P, renderable: &dyn Renderable<T>) {
         let xy = xy.into();
         self.update_translate(xy);
         renderable.render(self);
@@ -189,7 +189,7 @@ impl Graphics<'_> {
     }
 
     /// Draw renderable
-    pub fn draw(&mut self, renderable: &dyn Renderable) {
+    pub fn draw<T>(&mut self, renderable: &dyn Renderable<T>) {
         renderable.render(self);
     }
 

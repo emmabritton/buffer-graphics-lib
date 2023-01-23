@@ -10,7 +10,7 @@ use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
 use graphics_shapes::Shape;
 
-impl Renderable for Drawable<Line> {
+impl Renderable<Line> for Drawable<Line> {
     fn render(&self, graphics: &mut Graphics) {
         graphics.draw_line(
             self.drawing_points()[0],
@@ -20,7 +20,7 @@ impl Renderable for Drawable<Line> {
     }
 }
 
-impl Renderable for Drawable<Rect> {
+impl Renderable<Rect> for Drawable<Rect> {
     fn render(&self, graphics: &mut Graphics) {
         let points = &self.drawing_points();
         match self.draw_type() {
@@ -45,7 +45,7 @@ impl Renderable for Drawable<Rect> {
     }
 }
 
-impl Renderable for Drawable<Circle> {
+impl Renderable<Circle> for Drawable<Circle> {
     fn render(&self, graphics: &mut Graphics) {
         match self.draw_type() {
             DrawType::Stroke(color) => {
@@ -96,7 +96,7 @@ impl Renderable for Drawable<Circle> {
     }
 }
 
-impl Renderable for Drawable<Triangle> {
+impl Renderable<Triangle> for Drawable<Triangle> {
     fn render(&self, graphics: &mut Graphics) {
         let color = self.draw_type().color();
         let points = self.drawing_points();
@@ -159,7 +159,7 @@ pub fn draw_flat_top(graphics: &mut Graphics, points: [(f32, f32); 3], color: Co
     }
 }
 
-impl Renderable for Drawable<Polygon> {
+impl Renderable<Polygon> for Drawable<Polygon> {
     fn render(&self, graphics: &mut Graphics) {
         let poly = self.obj().fpoints();
         let color = self.draw_type().color();
@@ -209,7 +209,7 @@ impl Renderable for Drawable<Polygon> {
     }
 }
 
-impl Renderable for Drawable<Ellipse> {
+impl Renderable<Ellipse> for Drawable<Ellipse> {
     fn render(&self, graphics: &mut Graphics) {
         let offset = self.obj().center();
         let color = self.draw_type().color();
