@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.9.2
+- Update shapes library
+
 ### Version 0.9.1
 - Fix bug with ShapeCollection::with_rotate
 

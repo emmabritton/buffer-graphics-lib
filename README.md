@@ -12,8 +12,8 @@ The `Graphics` struct needs a mutable slice to work on and so mostly likely you'
 
 In your `Cargo.toml` file add
 ```toml
-buffer-graphics-lib = "0.9.1"
-graphics-shapes = "0.1.6"
+buffer-graphics-lib = "0.9.2"
+graphics-shapes = "0.1.7"
 ```
 
 ### Code

@@ -73,7 +73,7 @@ impl WrappingStrategy {
                     if line.chars().last().unwrap_or(' ').is_alphabetic()
                         && text.chars().next().unwrap_or(' ').is_alphabetic()
                     {
-                        output.push(format!("{}-", line));
+                        output.push(format!("{line}-"));
                     } else {
                         output.push(line);
                     }
