@@ -40,6 +40,15 @@ use crate::GraphicsError::InvalidBufferLength;
 use graphics_shapes::coord::Coord;
 use thiserror::Error;
 
+pub mod prelude {
+    pub use crate::color::*;
+    pub use crate::drawable::*;
+    pub use crate::drawing::Renderable;
+    pub use crate::Graphics;
+    pub use crate::GraphicsError;
+    pub use graphics_shapes::prelude::*;
+}
+
 #[derive(Error, Debug)]
 pub enum GraphicsError {
     #[error("Invalid buffer length, expected: {0}, found: {1}")]
