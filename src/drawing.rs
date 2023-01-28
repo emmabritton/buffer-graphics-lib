@@ -117,6 +117,29 @@ impl Graphics<'_> {
         }
     }
 
+    pub fn draw_arc(
+        &mut self,
+        center: Coord,
+        angle_start: isize,
+        angle_end: isize,
+        radius: usize,
+        close: bool,
+        color: Color,
+    ) {
+        for r in angle_start..=angle_end {
+            let px = Coord::from_angle(center, radius, r);
+            self.set_pixel(px.x, px.y, color);
+        }
+        if close {
+            self.draw_line(
+                center,
+                Coord::from_angle(center, radius, angle_start),
+                color,
+            );
+            self.draw_line(center, Coord::from_angle(center, radius, angle_end), color);
+        }
+    }
+
     pub fn draw_line<P1: Into<Coord>, P2: Into<Coord>>(
         &mut self,
         start: P1,
@@ -370,8 +393,11 @@ impl Graphics<'_> {
 
 #[cfg(test)]
 mod test {
-    use crate::Graphics;
-    use graphics_shapes::coord::Coord;
+    use super::*;
+    use crate::prelude::*;
+    use crate::shapes::polyline::prelude::*;
+    use crate::shapes::polyline::Segment::*;
+    use crate::text::pos::TextPos::Px;
 
     #[test]
     fn is_inside() {
@@ -389,5 +415,22 @@ mod test {
         assert!(graphics.is_on_screen(Coord { x: 4, y: 0 }));
         assert!(!graphics.is_on_screen(Coord { x: 0, y: 0 }));
         assert!(!graphics.is_on_screen(Coord { x: 4, y: 9 }));
+    }
+
+    #[test]
+    fn check_draw() {
+        let mut buf = [0; 400];
+        let mut graphics = Graphics::new(&mut buf, 10, 10).unwrap();
+
+        let drawable = Drawable::from_obj(Line::new((10, 10), (20, 20)), stroke(RED));
+        let text = Text::new("", Px(1, 1), WHITE);
+        let polyline = Polyline::new(
+            vec![Start(Coord::new(0, 0)), LineTo(Coord::new(0, 0))],
+            WHITE,
+        );
+
+        graphics.draw(&drawable);
+        graphics.draw(&text);
+        graphics.draw(&polyline);
     }
 }
