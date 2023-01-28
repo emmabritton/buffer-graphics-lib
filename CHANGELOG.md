@@ -1,5 +1,12 @@
 # Changelog
 
+### Version 0.9.4
+- Update shapes library
+- Add prelude
+- Add Orange, Brown and Purple
+- Add `Polyline`
+- Add `Graphics::draw_arc`
+
 ### Version 0.9.3
 - Update shapes library
 
