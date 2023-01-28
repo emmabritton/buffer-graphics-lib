@@ -1,4 +1,5 @@
 pub mod collection;
+pub mod polyline;
 pub mod rendering;
 
 use crate::drawable::{DrawType, Drawable};
