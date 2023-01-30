@@ -138,7 +138,7 @@ pub const MAGENTA: Color = Color::rgb(255, 0, 255);
 pub const YELLOW: Color = Color::rgb(255, 255, 0);
 pub const ORANGE: Color = Color::rgb(255, 165, 0);
 pub const BROWN: Color = Color::rgb(139, 69, 19);
-pub const PURPLE: Color = Color::rgb(230, 230, 250);
+pub const PURPLE: Color = Color::rgb(75, 0, 130);
 pub const CYAN: Color = Color::rgb(0, 255, 255);
 pub const TRANSPARENT: Color = Color::rgba(0, 0, 0, 0);
 
