@@ -1,5 +1,10 @@
 # Changelog
 
+### Version 0.9.5
+- Add `left()`, `right()`, `top()`, `bottom()` and `center()` to `ShapeCollection` and `ShapeBox`()
+- Fix bug with `ShapeCollection::with_*`
+- Add `ShapeCollection::insert_*` for drawables and shapes 
+
 ### Version 0.9.4
 - Update shapes library
 - Add prelude
