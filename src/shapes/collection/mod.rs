@@ -47,6 +47,7 @@ pub fn calc_bounds(list: &[ShapeBox]) -> Rect {
 }
 
 impl ShapeCollection {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ShapeCollection {
             shapes: vec![],
