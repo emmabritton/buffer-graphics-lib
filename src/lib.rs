@@ -44,6 +44,8 @@ pub mod prelude {
     pub use crate::color::*;
     pub use crate::drawable::*;
     pub use crate::drawing::Renderable;
+    pub use crate::shapes::collection::prelude::*;
+    pub use crate::shapes::*;
     pub use crate::Graphics;
     pub use crate::GraphicsError;
     pub use graphics_shapes::prelude::*;
