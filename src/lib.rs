@@ -25,6 +25,8 @@
 
 #![deny(clippy::all)]
 
+extern crate core;
+
 pub mod color;
 pub mod drawable;
 pub mod drawing;
@@ -43,11 +45,16 @@ use thiserror::Error;
 pub mod prelude {
     pub use crate::color::*;
     pub use crate::drawable::*;
+    pub use crate::text::prelude::*;
     pub use crate::drawing::Renderable;
     pub use crate::shapes::collection::prelude::*;
     pub use crate::shapes::*;
+    pub use crate::shapes::polyline::*;
     pub use crate::Graphics;
     pub use crate::GraphicsError;
+    pub use crate::image::Image;
+    pub use crate::image_loading::*;
+    pub use image::ImageFormat;
     pub use graphics_shapes::prelude::*;
 }
 

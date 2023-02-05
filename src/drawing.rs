@@ -13,6 +13,7 @@ use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
 use std::mem::swap;
+use crate::image_loading::indexed::IndexedImage;
 
 /// Represents anything that [Graphics] can render
 pub trait Renderable<T> {
@@ -114,6 +115,18 @@ impl Graphics<'_> {
                 x += 1;
             }
             x = 0;
+        }
+    }
+
+    /// Draw an indexed image at `x`, `y`
+    pub fn draw_indexed_image<P: Into<Coord>>(&mut self, xy: P, image: &IndexedImage) {
+        let xy = xy.into();
+        for x in 0..image.width() {
+            for y in 0..image.height() {
+                let i = x + y * image.width();
+                let color = image.colors()[image.pixels()[i] as usize];
+                self.set_pixel(x as isize + xy.x,y as isize + xy.y, color);
+            }
         }
     }
 

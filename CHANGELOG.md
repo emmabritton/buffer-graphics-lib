@@ -1,5 +1,11 @@
 # Changelog
 
+### Version 0.9.6
+- Update shapes library
+- Add `IndexedImage` (image using indexed color that should be saved as RON)
+- Add `SUPPORTED_SYMBOLS`
+- Fix a few letters graphics
+
 ### Version 0.9.5
 - Add `left()`, `right()`, `top()`, `bottom()` and `center()` to `ShapeCollection` and `ShapeBox`()
 - Fix bug with `ShapeCollection::with_*`

@@ -47,7 +47,7 @@ impl Positioning {
 }
 
 impl TextFormat {
-    pub fn new(
+    pub const fn new(
         wrap_at: WrappingStrategy,
         size: TextSize,
         color: Color,
@@ -63,7 +63,7 @@ impl TextFormat {
         }
     }
 
-    pub fn new_with_spacing(
+    pub const fn new_with_spacing(
         wrap_at: WrappingStrategy,
         size: TextSize,
         color: Color,

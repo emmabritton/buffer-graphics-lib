@@ -4,9 +4,10 @@ use crate::scaling::*;
 use crate::{GraphicsError, Tint};
 use graphics_shapes::coord::Coord;
 use std::fmt::{Debug, Formatter};
+use serde::{Deserialize, Serialize};
 
 /// Images are rectangles of pixels that can be manipulated and drawn on screen
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Image {
     pub(crate) pixels: Vec<Color>,
     width: usize,

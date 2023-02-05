@@ -147,12 +147,12 @@ impl InsertShapeBox for ShapeCollection {
     }
 
     fn insert_above(&mut self, shape_box: ShapeBox) {
-        InsertShapeBox::insert(self, 0, shape_box);
+        self.shapes.push(shape_box);
         self.update_bounds();
     }
 
     fn insert_under(&mut self, shape_box: ShapeBox) {
-        self.shapes.push(shape_box);
+        InsertShapeBox::insert(self, 0, shape_box);
         self.update_bounds();
     }
 }

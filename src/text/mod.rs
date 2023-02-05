@@ -10,13 +10,27 @@ use crate::drawing::Renderable;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
 use crate::Graphics;
+use crate::text::wrapping::WrappingStrategy;
 
-const ASCII_DEGREE: u8 = 30;
-const ASCII_ELLIPSIS: u8 = 31;
-const ASCII_CURRENCY: u8 = 29;
-const ASCII_POUND: u8 = 28;
-const ASCII_YEN: u8 = 27;
-const ASCII_CENT: u8 = 26;
+pub const ASCII_DEGREE: u8 = 30;
+pub const ASCII_ELLIPSIS: u8 = 31;
+pub const ASCII_CURRENCY: u8 = 29;
+pub const ASCII_POUND: u8 = 28;
+pub const ASCII_YEN: u8 = 27;
+pub const ASCII_CENT: u8 = 26;
+
+pub const SUPPORTED_SYMBOLS: [char; 37] = ['!', '@', '£', '$', '%', '^', '&', '*', '(', ')', '_', '+', '_', '+', '#', '{',
+    '}', ':', '"', '|', '<', '?', '>', ',', '/', '.', ';', '\'', '\\', '[', ']', '`',
+    '~', '°', '…', '¢', '¥'];
+
+pub mod prelude {
+    pub use crate::text::*;
+    pub use crate::text::pos::*;
+    pub use crate::text::TextSize::*;
+    pub use crate::text::TextPos::*;
+    pub use crate::text::format::*;
+    pub use crate::text::wrapping::*;
+}
 
 const fn custom_ascii_code(chr: char) -> u8 {
     match chr {
@@ -108,7 +122,7 @@ impl Renderable<Text> for Text {
 }
 
 /// TextSize is used to set the size and positioning in pixels of text
-#[derive(Copy, Clone, Debug, Hash)]
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 pub enum TextSize {
     Small,
     Normal,
@@ -130,6 +144,14 @@ impl TextSize {
             TextSize::Normal => (normal::CHAR_WIDTH, normal::CHAR_HEIGHT),
             TextSize::Large => (large::CHAR_WIDTH, large::CHAR_HEIGHT),
         }
+    }
+
+    pub fn measure(&self, text: &str, wrapping: WrappingStrategy) -> (usize, usize) {
+        let lines = wrapping.wrap(text);
+        let longest_len = lines.iter().map(|line| line.len()).max().unwrap();
+        let (w,h) = self.get_size();
+        let spacing = self.get_spacing();
+        (longest_len*(w+spacing) , lines.len() * (h+spacing))
     }
 
     /// Returns the spacing between letters in pixels

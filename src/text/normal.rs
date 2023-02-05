@@ -102,9 +102,13 @@ const B: [bool; LETTER_PX_COUNT] = [
     true, false, false, true, false, false, true, false, false, true, true, true, false, false,
 ];
 const C: [bool; LETTER_PX_COUNT] = [
-    false, false, true, true, false, false, false, true, false, false, true, false, false, true,
-    false, false, false, false, false, true, false, false, false, false, false, true, false, false,
-    false, false, false, true, false, false, true, false, false, false, true, true, false, false,
+    false, false, true, true, true, false,
+    false, true, false, false, false, true,
+    false, true, false, false, false, false,
+    false, true, false, false, false, false,
+    false, true, false, false, false, false,
+    false, true, false, false, false, true,
+    false, false, true, true, true, false,
 ];
 const D: [bool; LETTER_PX_COUNT] = [
     false, true, true, true, false, false, false, true, false, false, true, false, false, true,
@@ -162,9 +166,13 @@ const N: [bool; LETTER_PX_COUNT] = [
     true, true, true, false, false, false, false, true, true, false, false, false, false, true,
 ];
 const O: [bool; LETTER_PX_COUNT] = [
-    false, false, true, true, false, false, false, true, false, false, true, false, false, true,
-    false, false, true, false, false, true, false, false, true, false, false, true, false, false,
-    true, false, false, true, false, false, true, false, false, false, true, true, false, false,
+    false, false, true, true, true, false,
+    false, true, false, false, false, true,
+    false, true, false, false, false, true,
+    false, true, false, false, false, true,
+    false, true, false, false, false, true,
+    false, true, false, false, false, true,
+    false, false, true, true, true, false,
 ];
 const P: [bool; LETTER_PX_COUNT] = [
     false, true, true, true, false, false, false, true, false, false, true, false, false, true,
