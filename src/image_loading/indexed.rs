@@ -1,13 +1,15 @@
-use std::collections::HashMap;
+use crate::color::Color;
+use crate::image::Image;
+use crate::image_loading::indexed::IndexedImageError::{
+    GraphicsLibError, InvalidLineLengths, TooManyColors, UnknownChar,
+};
+use crate::renderable_image::{DrawOffset, RenderableImage};
+use crate::{color, Graphics, GraphicsError};
 use graphics_shapes::coord::Coord;
 use serde::{Deserialize, Serialize};
-use crate::color::Color;
-use crate::{color, Graphics, GraphicsError};
-use crate::image::Image;
-use thiserror::Error;
-use crate::image_loading::indexed::IndexedImageError::{GraphicsLibError, InvalidLineLengths, TooManyColors, UnknownChar};
-use crate::renderable_image::{DrawOffset, RenderableImage};
+use std::collections::HashMap;
 use std::mem::swap;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum IndexedImageError {
@@ -34,18 +36,28 @@ pub struct IndexedImage {
 
 impl IndexedImage {
     pub fn new(colors: Vec<Color>, width: usize, height: usize, pixels: Vec<u8>) -> Self {
-        Self { colors, width, height, pixels }
+        Self {
+            colors,
+            width,
+            height,
+            pixels,
+        }
     }
 
     pub fn new_empty(colors: Vec<Color>, width: usize, height: usize) -> Self {
-        Self { colors, width, height, pixels: vec![TRANSPARENT; width * height] }
+        Self {
+            colors,
+            width,
+            height,
+            pixels: vec![TRANSPARENT; width * height],
+        }
     }
 }
 
 impl IndexedImage {
     pub fn color(&self, idx: u8) -> Color {
         if idx != TRANSPARENT {
-            return self.colors[idx as usize]
+            self.colors[idx as usize]
         } else {
             color::TRANSPARENT
         }
@@ -82,7 +94,7 @@ impl IndexedImage {
         if new_max < self.colors.len() as u8 {
             for idx in &mut self.pixels {
                 let r_idx = *idx;
-                if r_idx >= new_max -1 && r_idx != TRANSPARENT{
+                if r_idx >= new_max - 1 && r_idx != TRANSPARENT {
                     *idx = 0;
                 }
             }
@@ -94,7 +106,8 @@ impl IndexedImage {
 impl IndexedImage {
     pub fn to_image(&self) -> Result<Image, IndexedImageError> {
         let mut buffer = vec![0_u8; self.pixels.len() * 4];
-        let mut graphics = Graphics::new(&mut buffer, self.width, self.height).map_err(|e| GraphicsLibError(e))?;
+        let mut graphics =
+            Graphics::new(&mut buffer, self.width, self.height).map_err(GraphicsLibError)?;
         for x in 0..self.width {
             for y in 0..self.height {
                 let i = x + y * self.width;
@@ -105,13 +118,20 @@ impl IndexedImage {
         Ok(graphics.copy_to_image())
     }
 
-    pub fn to_renderable<P: Into<Coord>>(&self, xy: P, offset: DrawOffset) -> Result<RenderableImage, IndexedImageError> {
+    pub fn to_renderable<P: Into<Coord>>(
+        &self,
+        xy: P,
+        offset: DrawOffset,
+    ) -> Result<RenderableImage, IndexedImageError> {
         Ok(RenderableImage::new(self.to_image()?, xy.into(), offset))
     }
 }
 
 /// Creates an image using an index and a grid of chars
-pub fn create_image_from_string(palette: &HashMap<char, Color>, input: &str) -> Result<IndexedImage, IndexedImageError> {
+pub fn create_image_from_string(
+    palette: &HashMap<char, Color>,
+    input: &str,
+) -> Result<IndexedImage, IndexedImageError> {
     let mut pixels = vec![];
     let mut width = 0;
     let mut line = vec![];

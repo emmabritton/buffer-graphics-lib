@@ -1,12 +1,12 @@
-pub mod tilesets;
 pub mod indexed;
+pub mod tilesets;
 
-use std::io::{BufRead, Seek};
 use crate::color::Color;
 use crate::image::Image;
 use crate::image_loading::ImageWrapperError::GraphicsLibError;
 use crate::GraphicsError;
 use image::{DynamicImage, ImageFormat};
+use std::io::{BufRead, Seek};
 use std::path::Path;
 use thiserror::Error;
 
@@ -24,7 +24,10 @@ pub enum ImageWrapperError {
     ImageFileError(#[from] image::ImageError),
 }
 
-pub fn load_image<R: BufRead + Seek>(r: R, format: ImageFormat) -> Result<Image, ImageWrapperError> {
+pub fn load_image<R: BufRead + Seek>(
+    r: R,
+    format: ImageFormat,
+) -> Result<Image, ImageWrapperError> {
     convert_image(image::load(r, format)?)
 }
 

@@ -1,6 +1,7 @@
 use crate::color::Color;
 use crate::drawable::{DrawType, Drawable};
 use crate::image::Image;
+use crate::image_loading::indexed::IndexedImage;
 use crate::shapes::CreateDrawable;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
@@ -13,7 +14,6 @@ use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
 use std::mem::swap;
-use crate::image_loading::indexed::IndexedImage;
 
 /// Represents anything that [Graphics] can render
 pub trait Renderable<T> {
@@ -125,7 +125,7 @@ impl Graphics<'_> {
             for y in 0..image.height() {
                 let i = x + y * image.width();
                 let color = image.colors()[image.pixels()[i] as usize];
-                self.set_pixel(x as isize + xy.x,y as isize + xy.y, color);
+                self.set_pixel(x as isize + xy.x, y as isize + xy.y, color);
             }
         }
     }

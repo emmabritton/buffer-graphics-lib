@@ -3,8 +3,8 @@ use crate::renderable_image::{DrawOffset, RenderableImage};
 use crate::scaling::*;
 use crate::{GraphicsError, Tint};
 use graphics_shapes::coord::Coord;
-use std::fmt::{Debug, Formatter};
 use serde::{Deserialize, Serialize};
+use std::fmt::{Debug, Formatter};
 
 /// Images are rectangles of pixels that can be manipulated and drawn on screen
 #[derive(Clone, Serialize, Deserialize)]

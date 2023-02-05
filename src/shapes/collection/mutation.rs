@@ -144,8 +144,8 @@ mod test {
         assert_eq!(
             moved.shapes,
             vec![
-                ShapeBox::from_shape(Rect::new((60, 40), (80, 60)), fill(RED)),
                 ShapeBox::from_shape(Rect::new((20, 40), (40, 60)), fill(RED)),
+                ShapeBox::from_shape(Rect::new((60, 40), (80, 60)), fill(RED)),
             ]
         );
     }
@@ -161,8 +161,8 @@ mod test {
         assert_eq!(
             moved.shapes,
             vec![
-                ShapeBox::from_shape(Rect::new((40, 0), (60, 20)), fill(RED)),
                 ShapeBox::from_shape(Rect::new((0, 0), (20, 20)), fill(RED)),
+                ShapeBox::from_shape(Rect::new((40, 0), (60, 20)), fill(RED)),
             ]
         );
     }
