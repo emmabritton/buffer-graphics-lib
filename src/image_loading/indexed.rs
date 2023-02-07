@@ -111,7 +111,12 @@ impl IndexedImage {
         for x in 0..self.width {
             for y in 0..self.height {
                 let i = x + y * self.width;
-                let color = self.colors[self.pixels[i] as usize];
+                let c_i = self.pixels[i] as usize;
+                let color = if c_i == TRANSPARENT as usize {
+                    color::TRANSPARENT
+                } else {
+                    self.colors[c_i]
+                };
                 graphics.set_pixel(x as isize, y as isize, color);
             }
         }
