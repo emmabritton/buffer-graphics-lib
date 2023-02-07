@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.9.7
+- Fix `IndexedImage::to_image()`
+
 ### Version 0.9.6
 - Update shapes library
 - Add `IndexedImage` (image using indexed color that should be saved as RON)
