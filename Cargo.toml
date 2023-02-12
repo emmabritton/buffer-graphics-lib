@@ -5,9 +5,8 @@ edition = "2021"
 authors = ["Emma Britton <emmabritton@pm.me>"]
 description = "Simple graphics library for buffers"
 license-file = "LICENSE"
-repository = "https://github.com/raybritton/buffer-graphics-lib"
+repository = "https://github.com/emmabritton/buffer-graphics-lib"
 readme = "README.md"
-homepage = "https://github.com/raybritton/buffer-graphics-lib"
 keywords = ["graphics", "gamedev", "simple"]
 categories = ["graphics", "game-development"]
 
