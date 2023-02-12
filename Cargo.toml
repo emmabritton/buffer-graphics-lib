@@ -2,7 +2,7 @@
 name = "buffer-graphics-lib"
 version = "0.9.7"
 edition = "2021"
-authors = ["Ray Britton <raybritton@pm.me>"]
+authors = ["Emma Britton <emmabritton@pm.me>"]
 description = "Simple graphics library for buffers"
 license-file = "LICENSE"
 repository = "https://github.com/raybritton/buffer-graphics-lib"
