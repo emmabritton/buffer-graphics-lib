@@ -1,15 +1,15 @@
-use std::io::{BufRead, Seek};
-use std::path::Path;
-use image::{DynamicImage, ImageFormat};
-use thiserror::Error;
 use crate::drawing;
 use crate::image_loading::ImageWrapperError::GraphicsLibError;
 use crate::prelude::*;
+use image::{DynamicImage, ImageFormat};
+use std::io::{BufRead, Seek};
+use std::path::Path;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ImageWrapperError {
     #[error("Loading image")]
-    GraphicsLibError(#[from] GraphicsError)
+    GraphicsLibError(#[from] GraphicsError),
 }
 
 /// Load image bytes (from png, bmp, etc) as [Image]

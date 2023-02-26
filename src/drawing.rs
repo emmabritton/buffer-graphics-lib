@@ -12,9 +12,9 @@ use graphics_shapes::ellipse::Ellipse;
 use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
+#[cfg(feature = "indexed_images")]
+use ici_files::prelude::*;
 use std::mem::swap;
-use ici_files::animated::AnimatedIndexedImage;
-use ici_files::image::IndexedImage;
 
 /// Represents anything that [Graphics] can render
 pub trait Renderable<T> {
@@ -120,14 +120,14 @@ impl Graphics<'_> {
     }
 
     /// Draw an indexed image at `x`, `y`
-    #[cfg(feature="indexed_images")]
+    #[cfg(feature = "indexed_images")]
     pub fn draw_indexed_image<P: Into<Coord>>(&mut self, xy: P, image: &IndexedImage) {
         let xy = xy.into();
         let palette = image.get_palette();
-        let (width,height) = image.size();
+        let (width, height) = image.size();
         for x in 0..width {
             for y in 0..height {
-                let i = image.get_pixel_index(x,y).unwrap();
+                let i = image.get_pixel_index(x, y).unwrap();
                 let color_idx = image.get_pixel(i).unwrap() as usize;
                 let color = palette[color_idx];
                 self.set_pixel(x as isize + xy.x, y as isize + xy.y, color.into());
@@ -136,15 +136,15 @@ impl Graphics<'_> {
     }
 
     /// Draw an animated image at `x`, `y`
-    #[cfg(feature="indexed_images")]
+    #[cfg(feature = "indexed_images")]
     pub fn draw_animated_image<P: Into<Coord>>(&mut self, xy: P, image: &AnimatedIndexedImage) {
         let xy = xy.into();
         let palette = image.get_palette();
-        let (width,height) = image.size();
+        let (width, height) = image.size();
         let current_frame = image.get_current_frame_pixels();
         for x in 0..width {
             for y in 0..height {
-                let i = image.get_pixel_index(x,y).unwrap();
+                let i = image.get_pixel_index(x, y).unwrap();
                 let color_idx = current_frame[i] as usize;
                 let color = palette[color_idx];
                 self.set_pixel(x as isize + xy.x, y as isize + xy.y, color.into());

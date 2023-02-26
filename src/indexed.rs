@@ -1,20 +1,20 @@
-use graphics_shapes::coord::Coord;
-use ici_files::animated::AnimatedIndexedImage;
-use ici_files::IciColor;
-use ici_files::prelude::IndexedImage;
 use crate::color::Color;
 use crate::drawing::Renderable;
 use crate::Graphics;
+use graphics_shapes::coord::Coord;
+use ici_files::animated::AnimatedIndexedImage;
+use ici_files::prelude::IndexedImage;
+use ici_files::IciColor;
 
 impl From<IciColor> for Color {
     fn from(value: IciColor) -> Self {
-        Color::rgba(value.r,value.g, value.b,value.a)
+        Color::rgba(value.r, value.g, value.b, value.a)
     }
 }
 
 pub struct RenderableIndexedImage {
     pub xy: Coord,
-    pub image: IndexedImage
+    pub image: IndexedImage,
 }
 
 impl RenderableIndexedImage {
@@ -31,7 +31,7 @@ impl Renderable<RenderableIndexedImage> for RenderableIndexedImage {
 
 pub struct RenderableAnimatedImage {
     pub xy: Coord,
-    pub image: AnimatedIndexedImage
+    pub image: AnimatedIndexedImage,
 }
 
 impl RenderableAnimatedImage {
