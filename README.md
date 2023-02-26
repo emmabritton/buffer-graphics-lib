@@ -1,6 +1,6 @@
 # Buffer Graphics Lib
 
-This is a simple graphics library for drawing to a buffer, mainly designed to be used with [Rust Graphics Library](https://github.com/emmabritton/rust-graphics-lib) or [Pixels](https://github.com/parasyte/pixels)
+This is a simple graphics library for drawing to a buffer, mainly designed to be used with [Pixels Graphics](https://github.com/emmabritton/pixels-graphics-lib) or [Pixels](https://github.com/parasyte/pixels)
 
 It has basic shape drawing, bitmap text and image rendering.
 
@@ -12,7 +12,7 @@ The `Graphics` struct needs a mutable slice to work on and so mostly likely you'
 
 In your `Cargo.toml` file add
 ```toml
-buffer-graphics-lib = "0.9.7"
+buffer-graphics-lib = "0.10.0"
 ```
 
 ### Code
@@ -35,11 +35,18 @@ graphics.draw(&drawable);
 
 ## Features
 
-Both are enabled by default
+### `ici`
+
+Load ici image files as `IndexedImage`s
+
+```rust
+let image: IndexedImage...
+graphics.draw_indexed_image(coord, &image);
+```
 
 ### `image_loading`
 
-Load files as `Image`s
+Load png, bmp, etc image files as `Image`s
 
 #### Code
 ```rust
@@ -49,4 +56,6 @@ graphics.draw_image(40, 20, &image);
 
 ### `serde_derive`
 
-Adds derive `Serialize` and `Deserialize` for `Rect`
+Enabled by default
+
+Adds derive `Serialize` and `Deserialize` for `DrawType` and `Color`

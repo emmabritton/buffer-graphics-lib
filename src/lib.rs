@@ -37,6 +37,8 @@ pub mod renderable_image;
 pub mod scaling;
 pub mod shapes;
 pub mod text;
+#[cfg(feature="indexed_images")]
+pub mod indexed;
 
 use crate::GraphicsError::InvalidBufferLength;
 use graphics_shapes::coord::Coord;
@@ -45,8 +47,13 @@ use thiserror::Error;
 pub mod prelude {
     pub use crate::color::*;
     pub use crate::drawable::*;
-    pub use crate::drawing::Renderable;
-    pub use crate::image::Image;
+    pub use crate::drawing::*;
+    #[cfg(feature="indexed_images")]
+    pub use crate::indexed::*;
+    #[cfg(feature="indexed_images")]
+    pub use ici_files::prelude::*;
+    pub use crate::image::*;
+    #[cfg(feature = "image_loading")]
     pub use crate::image_loading::*;
     pub use crate::shapes::collection::prelude::*;
     pub use crate::shapes::polyline::*;
@@ -55,7 +62,6 @@ pub mod prelude {
     pub use crate::Graphics;
     pub use crate::GraphicsError;
     pub use graphics_shapes::prelude::*;
-    pub use image::ImageFormat;
 }
 
 #[derive(Error, Debug)]

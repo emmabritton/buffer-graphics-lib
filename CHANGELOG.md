@@ -1,5 +1,10 @@
 # Changelog
 
+### Version 0.10.0
+- Removed `IndexedImage`
+- Add optional `ici-files` dependency and feature, defaults to active
+- Adds `graphics::draw_indexed_image` and `graphics::draw_animated_image` for ICIs
+
 ### Version 0.9.7
 - Fix `IndexedImage::to_image()`
 
