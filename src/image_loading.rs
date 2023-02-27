@@ -1,11 +1,11 @@
-use crate::GraphicsError;
-use crate::image_loading::ImageWrapperError::{GraphicsLibError, ImageLibError};
-use std::io::{BufRead, Seek};
-use std::path::Path;
-use image::{DynamicImage, ImageError, ImageFormat};
-use thiserror::Error;
 use crate::color::Color;
 use crate::image::Image;
+use crate::image_loading::ImageWrapperError::{GraphicsLibError, ImageLibError};
+use crate::GraphicsError;
+use image::{DynamicImage, ImageError, ImageFormat};
+use std::io::{BufRead, Seek};
+use std::path::Path;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ImageWrapperError {
