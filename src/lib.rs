@@ -33,7 +33,7 @@ pub mod drawing;
 pub mod image;
 #[cfg(feature = "image_loading")]
 pub mod image_loading;
-#[cfg(feature = "indexed_images")]
+#[cfg(feature = "ici")]
 pub mod indexed;
 pub mod renderable_image;
 pub mod scaling;
@@ -51,7 +51,7 @@ pub mod prelude {
     pub use crate::image::*;
     #[cfg(feature = "image_loading")]
     pub use crate::image_loading::*;
-    #[cfg(feature = "indexed_images")]
+    #[cfg(feature = "ici")]
     pub use crate::indexed::*;
     pub use crate::shapes::collection::prelude::*;
     pub use crate::shapes::polyline::*;
@@ -60,7 +60,7 @@ pub mod prelude {
     pub use crate::Graphics;
     pub use crate::GraphicsError;
     pub use graphics_shapes::prelude::*;
-    #[cfg(feature = "indexed_images")]
+    #[cfg(feature = "ici")]
     pub use ici_files::prelude::*;
 }
 

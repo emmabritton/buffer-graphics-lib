@@ -12,7 +12,7 @@ use graphics_shapes::ellipse::Ellipse;
 use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
-#[cfg(feature = "indexed_images")]
+#[cfg(feature = "ici")]
 use ici_files::prelude::*;
 use std::mem::swap;
 
@@ -120,7 +120,7 @@ impl Graphics<'_> {
     }
 
     /// Draw an indexed image at `x`, `y`
-    #[cfg(feature = "indexed_images")]
+    #[cfg(feature = "ici")]
     pub fn draw_indexed_image<P: Into<Coord>>(&mut self, xy: P, image: &IndexedImage) {
         let xy = xy.into();
         let palette = image.get_palette();
@@ -136,7 +136,7 @@ impl Graphics<'_> {
     }
 
     /// Draw an animated image at `x`, `y`
-    #[cfg(feature = "indexed_images")]
+    #[cfg(feature = "ici")]
     pub fn draw_animated_image<P: Into<Coord>>(&mut self, xy: P, image: &AnimatedIndexedImage) {
         let xy = xy.into();
         let palette = image.get_palette();

@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.10.1
+- Fix `ici` feature so it actually exports
+
 ### Version 0.10.0
 - Removed `IndexedImage`
 - Add optional `ici-files` dependency and feature, defaults to active
