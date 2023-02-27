@@ -1,15 +1,18 @@
-use crate::drawing;
-use crate::image_loading::ImageWrapperError::GraphicsLibError;
-use crate::prelude::*;
-use image::{DynamicImage, ImageFormat};
+use crate::GraphicsError;
+use crate::image_loading::ImageWrapperError::{GraphicsLibError, ImageLibError};
 use std::io::{BufRead, Seek};
 use std::path::Path;
+use image::{DynamicImage, ImageError, ImageFormat};
 use thiserror::Error;
+use crate::color::Color;
+use crate::image::Image;
 
 #[derive(Error, Debug)]
 pub enum ImageWrapperError {
     #[error("Loading image")]
     GraphicsLibError(#[from] GraphicsError),
+    #[error("Reading image")]
+    ImageLibError(#[from] ImageError),
 }
 
 /// Load image bytes (from png, bmp, etc) as [Image]
@@ -18,12 +21,12 @@ pub fn load_image<R: BufRead + Seek>(
     r: R,
     format: ImageFormat,
 ) -> Result<Image, ImageWrapperError> {
-    convert_image(drawing::load(r, format)?)
+    convert_image(image::load(r, format).map_err(|e| ImageLibError(e))?)
 }
 
 /// Load an image (png, bmp, etc) as [Image]
 pub fn open_image<P: AsRef<Path>>(path: P) -> Result<Image, ImageWrapperError> {
-    convert_image(drawing::open(path)?)
+    convert_image(image::open(path).map_err(|e| ImageLibError(e))?)
 }
 
 ///Convert a [DynamicImage] from the `image` crate into an [Image]
