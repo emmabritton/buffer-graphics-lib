@@ -1,6 +1,6 @@
 # Buffer Graphics Lib
 
-This is a simple graphics library for drawing to a buffer, mainly designed to be used with [Pixels Graphics](https://github.com/emmabritton/pixels-graphics-lib) or [Pixels](https://github.com/parasyte/pixels)
+This is a simple graphics library for drawing to a buffer, mainly designed to be used with [Pixels Graphics](https://github.com/emmabritton/pixel-graphics-lib) or [Pixels](https://github.com/parasyte/pixels)
 
 It has basic shape drawing, bitmap text and image rendering.
 
