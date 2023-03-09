@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.10.3
+- Add brightness and saturation methods for `Color`, `IciColor`, `IndexedImage`, `AnimatedIndexedImage`
+
 ### Version 0.10.2
 - Fix `image_loading` feature
 

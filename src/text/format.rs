@@ -3,7 +3,7 @@ use crate::text::wrapping::WrappingStrategy;
 use crate::text::TextSize;
 
 /// Characters be drawn be at idx * char_width, idx * char_height
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct TextFormat {
     color: Color,
     size: TextSize,

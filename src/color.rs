@@ -1,7 +1,15 @@
 use crate::Tint;
 
+use crate::color::ColorError::InvalidHexFormat;
 #[cfg(feature = "serde_derive")]
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum ColorError {
+    #[error("Hex string has invalid format: {0}")]
+    InvalidHexFormat(String),
+}
 
 ///This represents an RGBA color and is used to store a pixel by [`Image`](crate::image::Image) and [`PixelsWrapper`](crate::drawing::PixelsWrapper)
 #[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
@@ -61,6 +69,35 @@ impl Color {
     pub fn from_f32_array(array: [f32; 4]) -> Self {
         Color::new(array[0], array[1], array[2], array[3])
     }
+
+    pub fn from_hex(hex: &str) -> Result<Color, ColorError> {
+        let mut hex = hex.to_string();
+        if hex.starts_with('#') {
+            hex.remove(0);
+        }
+        if hex.chars().count() != 6 && hex.chars().count() != 8 {
+            return Err(InvalidHexFormat("wrong length".to_string()));
+        }
+        if hex.chars().any(|c| !c.is_ascii_hexdigit()) {
+            return Err(InvalidHexFormat("non hex digits".to_string()));
+        }
+        let chars: Vec<char> = hex.chars().collect();
+        let mut colours = vec![];
+        for digits in chars.chunks_exact(2) {
+            let num = u8::from_str_radix(&format!("{}{}", digits[0], digits[1]), 16)
+                .map_err(|e| InvalidHexFormat(e.to_string()))?;
+            colours.push(num);
+        }
+        if colours.len() == 3 {
+            colours.push(255);
+        }
+        Ok(Color {
+            r: colours[0],
+            g: colours[1],
+            b: colours[2],
+            a: colours[3],
+        })
+    }
 }
 
 impl Color {
@@ -87,7 +124,6 @@ impl Color {
         ]
     }
 
-    #[inline]
     pub fn blend(&self, other: Color) -> Color {
         let base = self.as_f32_array();
         let added = other.as_f32_array();
@@ -98,6 +134,60 @@ impl Color {
         mix[2] = (added[2] * added[3] / mix[3]) + (base[2] * base[3] * (1.0 - added[3]) / mix[3]);
 
         Color::from_f32_array(mix)
+    }
+
+    /// ignores alpha
+    pub fn brightness(&self) -> f32 {
+        let rgba = self.as_f32_array();
+        0.2126 * rgba[0] + 0.7152 * rgba[1] + 0.0722 * rgba[2]
+    }
+
+    pub fn is_dark(&self) -> bool {
+        self.brightness() < 0.5
+    }
+
+    pub fn darken(&self) -> Color {
+        self.with_brightness(0.9)
+    }
+
+    pub fn lighten(&self) -> Color {
+        self.with_brightness(1.1)
+    }
+
+    /// Copy color with brightness
+    pub fn with_brightness(&self, amount: f32) -> Color {
+        let rgba = self.as_f32_array();
+        Color::new(
+            (rgba[0] * amount).min(1.0).max(0.0),
+            (rgba[1] * amount).min(1.0).max(0.0),
+            (rgba[2] * amount).min(1.0).max(0.0),
+            rgba[3],
+        )
+    }
+
+    /// De/saturate color by percentage
+    /// Negative amount increases saturation
+    pub fn with_saturate(&self, amount: f32) -> Color {
+        let mut rgba = self.as_f32_array();
+        let lum = 0.2989 * rgba[0] + 0.5870 * rgba[1] + 0.1140 * rgba[2];
+        rgba[0] = rgba[0] + amount * (lum - rgba[0]);
+        rgba[1] = rgba[1] + amount * (lum - rgba[1]);
+        rgba[2] = rgba[2] + amount * (lum - rgba[2]);
+        Color::from_f32_array(rgba)
+    }
+
+    /// Decrease saturation by 10%
+    pub fn desaturate(&self) -> Color {
+        self.with_saturate(0.1)
+    }
+
+    /// Increase saturation by 10%
+    pub fn saturate(&self) -> Color {
+        self.with_saturate(-0.1)
+    }
+
+    pub fn to_hex(&self) -> String {
+        format!("#{:02X}{:02X}{:02X}{:02X}", self.r, self.g, self.b, self.a)
     }
 }
 
@@ -351,5 +441,62 @@ mod test {
             Color::rgba(0, 0, 255, 128).blend(Color::rgba(255, 0, 0, 128)),
             Color::rgba(170, 0, 85, 192)
         );
+    }
+
+    #[test]
+    fn from_hex() {
+        assert_eq!(
+            Color::from_hex("112233").unwrap(),
+            Color {
+                r: 17,
+                g: 34,
+                b: 51,
+                a: 255,
+            }
+        );
+        assert_eq!(
+            Color::from_hex("#112233").unwrap(),
+            Color {
+                r: 17,
+                g: 34,
+                b: 51,
+                a: 255,
+            }
+        );
+        assert_eq!(
+            Color::from_hex("#11223344").unwrap(),
+            Color {
+                r: 17,
+                g: 34,
+                b: 51,
+                a: 68,
+            }
+        );
+        assert!(Color::from_hex("#aafgha").is_err())
+    }
+
+    #[test]
+    fn to_hex() {
+        assert_eq!(WHITE.to_hex(), "#FFFFFFFF".to_string());
+        assert_eq!(RED.to_hex(), "#FF0000FF".to_string());
+    }
+
+    #[test]
+    fn brightness() {
+        assert_eq!(WHITE.brightness(), 1.0);
+        assert_eq!(BLACK.brightness(), 0.0);
+        assert_eq!(Color::rgb(255, 0, 0).brightness(), 0.2126);
+        assert_eq!(Color::rgb(123, 0, 0).brightness(), 0.102548234);
+    }
+
+    #[test]
+    fn dark() {
+        assert!(!WHITE.is_dark());
+        assert!(BLACK.is_dark());
+        assert!(!GREEN.is_dark());
+        assert!(!CYAN.is_dark());
+        assert!(RED.is_dark());
+        assert!(DARK_GRAY.is_dark());
+        assert!(!LIGHT_GRAY.is_dark());
     }
 }

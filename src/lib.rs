@@ -35,6 +35,7 @@ pub mod image;
 pub mod image_loading;
 #[cfg(feature = "ici")]
 pub mod indexed;
+pub mod indexed_color;
 pub mod renderable_image;
 pub mod scaling;
 pub mod shapes;
@@ -53,6 +54,8 @@ pub mod prelude {
     pub use crate::image_loading::*;
     #[cfg(feature = "ici")]
     pub use crate::indexed::*;
+    #[cfg(feature = "ici")]
+    pub use crate::indexed_color::*;
     pub use crate::shapes::collection::prelude::*;
     pub use crate::shapes::polyline::*;
     pub use crate::shapes::*;
