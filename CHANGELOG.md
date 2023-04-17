@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.10.4
+- Add width and height to IndexedImage
+
 ### Version 0.10.3
 - Add brightness and saturation methods for `Color`, `IciColor`, `IndexedImage`, `AnimatedIndexedImage`
 
