@@ -1,5 +1,6 @@
-#[derive(Debug, Clone, Eq, PartialEq, Copy)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Default)]
 pub enum WrappingStrategy {
+    #[default]
     /// Don't wrap, will draw off screen
     None,
     /// Splits string at column
@@ -12,12 +13,6 @@ pub enum WrappingStrategy {
     Cutoff(usize),
     /// Same as Cutoff but adds an ellipsis
     Ellipsis(usize),
-}
-
-impl Default for WrappingStrategy {
-    fn default() -> Self {
-        WrappingStrategy::None
-    }
 }
 
 impl WrappingStrategy {

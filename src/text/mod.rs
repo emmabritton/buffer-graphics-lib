@@ -123,17 +123,12 @@ impl Renderable<Text> for Text {
 }
 
 /// TextSize is used to set the size and positioning in pixels of text
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, Default)]
 pub enum TextSize {
     Small,
+    #[default]
     Normal,
     Large,
-}
-
-impl Default for TextSize {
-    fn default() -> Self {
-        TextSize::Normal
-    }
 }
 
 impl TextSize {
