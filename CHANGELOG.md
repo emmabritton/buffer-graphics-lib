@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.10.5 
+- Add to ici and color for color and ici
+
 ### Version 0.10.4
 - Add width and height to IndexedImage
 

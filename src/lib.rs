@@ -28,6 +28,7 @@
 extern crate core;
 
 pub mod color;
+pub mod color_conversion;
 pub mod drawable;
 pub mod drawing;
 pub mod image;
@@ -47,6 +48,7 @@ use thiserror::Error;
 
 pub mod prelude {
     pub use crate::color::*;
+    pub use crate::color_conversion::*;
     pub use crate::drawable::*;
     pub use crate::drawing::*;
     pub use crate::image::*;

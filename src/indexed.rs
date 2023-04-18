@@ -1,16 +1,8 @@
-use crate::color::Color;
 use crate::drawing::Renderable;
 use crate::Graphics;
 use graphics_shapes::coord::Coord;
 use ici_files::animated::AnimatedIndexedImage;
 use ici_files::prelude::IndexedImage;
-use ici_files::IciColor;
-
-impl From<IciColor> for Color {
-    fn from(value: IciColor) -> Self {
-        Color::rgba(value.r, value.g, value.b, value.a)
-    }
-}
 
 pub struct RenderableIndexedImage {
     pub xy: Coord,

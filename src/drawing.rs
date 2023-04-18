@@ -1,4 +1,5 @@
 use crate::color::Color;
+use crate::color_conversion::ToColor;
 use crate::drawable::{DrawType, Drawable};
 use crate::image::Image;
 use crate::shapes::CreateDrawable;
@@ -130,7 +131,7 @@ impl Graphics<'_> {
                 let i = image.get_pixel_index(x, y).unwrap();
                 let color_idx = image.get_pixel(i).unwrap() as usize;
                 let color = palette[color_idx];
-                self.set_pixel(x as isize + xy.x, y as isize + xy.y, color.into());
+                self.set_pixel(x as isize + xy.x, y as isize + xy.y, color.to_color());
             }
         }
     }
@@ -147,7 +148,7 @@ impl Graphics<'_> {
                 let i = image.get_pixel_index(x, y).unwrap();
                 let color_idx = current_frame[i] as usize;
                 let color = palette[color_idx];
-                self.set_pixel(x as isize + xy.x, y as isize + xy.y, color.into());
+                self.set_pixel(x as isize + xy.x, y as isize + xy.y, color.to_color());
             }
         }
     }
