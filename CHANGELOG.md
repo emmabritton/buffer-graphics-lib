@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.10.6
+- Update deps
+- Add `is_transparent` to `Color`
+
 ### Version 0.10.5 
 - Add to ici and color for color and ici
 

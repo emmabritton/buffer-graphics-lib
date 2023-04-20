@@ -142,8 +142,14 @@ impl Color {
         0.2126 * rgba[0] + 0.7152 * rgba[1] + 0.0722 * rgba[2]
     }
 
+    #[inline]
     pub fn is_dark(&self) -> bool {
         self.brightness() < 0.5
+    }
+
+    #[inline]
+    pub fn is_transparent(&self) -> bool {
+        self.a == 0
     }
 
     pub fn darken(&self) -> Color {
@@ -177,15 +183,18 @@ impl Color {
     }
 
     /// Decrease saturation by 10%
+    #[inline]
     pub fn desaturate(&self) -> Color {
         self.with_saturate(0.1)
     }
 
     /// Increase saturation by 10%
+    #[inline]
     pub fn saturate(&self) -> Color {
         self.with_saturate(-0.1)
     }
 
+    #[inline]
     pub fn to_hex(&self) -> String {
         format!("#{:02X}{:02X}{:02X}{:02X}", self.r, self.g, self.b, self.a)
     }
