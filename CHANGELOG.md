@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.10.7
+- Update deps
+
 ### Version 0.10.6
 - Update deps
 - Add `is_transparent` to `Color`
