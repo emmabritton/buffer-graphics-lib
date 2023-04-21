@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.10.8
+- Update deps
+
 ### Version 0.10.7
 - Update deps
 
