@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.10.9
+- Update deps
+- Change rendering internals
+
 ### Version 0.10.8
 - Update deps
 

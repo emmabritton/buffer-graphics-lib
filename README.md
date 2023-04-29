@@ -1,10 +1,13 @@
+[![Crates.io](https://img.shields.io/crates/v/buffer-graphics-lib)](https://crates.io/crates/buffer-graphics-lib "Crates.io version")
+[![Documentation](https://img.shields.io/docsrs/buffer-graphics-lib)](https://docs.rs/buffer-graphics-lib "Documentation")
+
 # Buffer Graphics Lib
 
 This is a simple graphics library for drawing to a buffer, mainly designed to be used with [Pixels Graphics](https://github.com/emmabritton/pixel-graphics-lib) or [Pixels](https://github.com/parasyte/pixels)
 
 It has basic shape drawing, bitmap text and image rendering.
 
-The `Graphics` struct needs a mutable slice to work on and so mostly likely you'll need to create the struct and pass in the buffer from the rendering library every frame. 
+The `Graphics` struct needs a mutable slice to work on and so mostly likely you'll need to create the struct and pass in the buffer from the rendering library every frame but this should be fine as the struct is nearly empty. 
 
 ## Usage
 
@@ -12,7 +15,7 @@ The `Graphics` struct needs a mutable slice to work on and so mostly likely you'
 
 In your `Cargo.toml` file add
 ```toml
-buffer-graphics-lib = "0.10.8"
+buffer-graphics-lib = "0.10.9"
 ```
 
 ### Code
