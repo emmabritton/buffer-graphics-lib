@@ -18,7 +18,7 @@ ici = ["ici-files"]
 
 [dependencies]
 thiserror = "1.0"
-graphics-shapes = "0.1.11"
+graphics-shapes = {path="../graphics-shapes"}# "0.1.11"
 serde = { version = "1.0", features = ["derive"], optional = true }
 image = { version = "0.24.3", optional = true }
 log = "0.4.17"

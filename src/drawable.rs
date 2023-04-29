@@ -13,6 +13,10 @@ pub enum DrawType {
 }
 
 impl DrawType {
+    pub fn is_stroke(&self) -> bool {
+        matches!(self, DrawType::Stroke(_))
+    }
+
     #[inline]
     pub fn color(&self) -> Color {
         *match self {
