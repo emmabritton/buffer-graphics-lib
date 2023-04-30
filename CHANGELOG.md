@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.10.10
+- Update deps
+
 ### Version 0.10.9
 - Update deps
 - Change rendering internals

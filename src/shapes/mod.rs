@@ -28,7 +28,7 @@ pub trait CreateDrawable<T: Clone> {
 
 impl CreateDrawable<Line> for Drawable<Line> {
     fn from_obj(line: Line, draw_type: DrawType) -> Drawable<Line> {
-        let drawing_points = line.outline_points();
+        let drawing_points = line.outline_pixels();
         Drawable::new(line, draw_type, drawing_points)
     }
 }
@@ -38,9 +38,9 @@ macro_rules! create_drawable_from_points {
         impl CreateDrawable<$shape> for Drawable<$shape> {
             fn from_obj(shape: $shape, draw_type: DrawType) -> Drawable<$shape> {
                 let drawing_points = if draw_type.is_stroke() {
-                    shape.outline_points()
+                    shape.outline_pixels()
                 } else {
-                    shape.filled_points()
+                    shape.filled_pixels()
                 };
                 Drawable::new(shape, draw_type, drawing_points)
             }
