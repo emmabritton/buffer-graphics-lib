@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.10.11
+- Fix bug in ICI rendering
+
 ### Version 0.10.10
 - Update deps
 

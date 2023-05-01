@@ -131,7 +131,7 @@ impl Graphics<'_> {
                 let i = image.get_pixel_index(x, y).unwrap();
                 let color_idx = image.get_pixel(i).unwrap() as usize;
                 let color = palette[color_idx];
-                self.set_pixel(x as isize + xy.x, y as isize + xy.y, color.to_color());
+                self.update_pixel(x as isize + xy.x, y as isize + xy.y, color.to_color());
             }
         }
     }
@@ -148,7 +148,7 @@ impl Graphics<'_> {
                 let i = image.get_pixel_index(x, y).unwrap();
                 let color_idx = current_frame[i] as usize;
                 let color = palette[color_idx];
-                self.set_pixel(x as isize + xy.x, y as isize + xy.y, color.to_color());
+                self.update_pixel(x as isize + xy.x, y as isize + xy.y, color.to_color());
             }
         }
     }
@@ -280,14 +280,15 @@ impl Graphics<'_> {
         None
     }
 
-    /// Update a pixel color, using [Graphics::set_pixel] or [Graphics::blend_pixel] depending
+    /// Update a pixel color, using [set_pixel][Graphics::set_pixel] or [blend_pixel][Graphics::blend_pixel] depending
     /// on whether `color`s alpha is 255 or not
+    /// If the alpha is 0 the call is does nothing
     #[inline]
     pub fn update_pixel(&mut self, x: isize, y: isize, color: Color) {
-        if color.a == 255 {
-            self.set_pixel(x, y, color);
-        } else {
-            self.blend_pixel(x, y, color);
+        match color.a {
+            255 => self.set_pixel(x, y, color),
+            0 => {}
+            _ => self.blend_pixel(x, y, color),
         }
     }
 
@@ -407,7 +408,7 @@ impl Graphics<'_> {
 
     /// Set the RGB values for a pixel
     ///
-    /// Generally you should use [Graphics::update_pixel] instead
+    /// Generally you should use [update_pixel][Graphics::update_pixel] instead
     ///
     /// This ignores alpha, so 255,0,0,0 will draw a red pixel
     #[inline]
