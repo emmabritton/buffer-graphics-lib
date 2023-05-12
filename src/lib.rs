@@ -27,6 +27,7 @@
 
 extern crate core;
 
+pub mod clipping;
 pub mod color;
 pub mod color_conversion;
 pub mod drawable;
@@ -42,6 +43,7 @@ pub mod scaling;
 pub mod shapes;
 pub mod text;
 
+use crate::clipping::Clip;
 use crate::GraphicsError::InvalidBufferLength;
 use graphics_shapes::coord::Coord;
 use thiserror::Error;
@@ -84,6 +86,7 @@ pub struct Graphics<'buffer> {
     width: usize,
     height: usize,
     translate: Coord,
+    clip: Clip,
 }
 
 impl<'buffer> Graphics<'_> {
@@ -101,6 +104,7 @@ impl<'buffer> Graphics<'_> {
             width,
             height,
             translate: Coord::default(),
+            clip: Clip::new(width, height),
         })
     }
 
@@ -118,7 +122,22 @@ impl<'buffer> Graphics<'_> {
             width,
             height,
             translate: Coord::default(),
+            clip: Clip::new(width, height),
         }
+    }
+}
+
+impl Graphics<'_> {
+    pub fn set_clip(&mut self, clip: Clip) {
+        self.clip = clip;
+    }
+
+    pub fn clip(&self) -> &Clip {
+        &self.clip
+    }
+
+    pub fn clip_mut(&mut self) -> &mut Clip {
+        &mut self.clip
     }
 }
 

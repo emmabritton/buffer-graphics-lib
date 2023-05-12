@@ -9,7 +9,6 @@ use crate::text::{chr_to_code, Text, TextSize};
 use crate::Graphics;
 use graphics_shapes::circle::Circle;
 use graphics_shapes::coord::Coord;
-use graphics_shapes::ellipse::Ellipse;
 use graphics_shapes::polygon::Polygon;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
@@ -53,8 +52,19 @@ impl Graphics<'_> {
     /// Set the canvas offset in pixels
     ///
     /// All drawing commands will be offset by this value
-    pub fn set_translate(&mut self, new_value: Coord) {
+    ///
+    /// # Returns
+    /// The previous translate value
+    pub fn set_translate(&mut self, new_value: Coord) -> Coord {
+        let old = self.translate;
         self.translate = new_value;
+        old
+    }
+
+    pub fn with_translate<F: Fn(&mut Graphics)>(&mut self, set: Coord, method: F) {
+        let old_trans = self.set_translate(set);
+        method(self);
+        self.set_translate(old_trans);
     }
 
     /// Adds `delta` to the current canvas offset
@@ -292,7 +302,7 @@ impl Graphics<'_> {
         }
     }
 
-    /// Sets every pixel to the same color, this ignores translate
+    /// Sets every pixel to the same color, this ignores translate and clip
     pub fn clear(&mut self, color: Color) {
         self.buffer.chunks_exact_mut(4).for_each(|px| {
             px[0] = color.r;
@@ -300,6 +310,15 @@ impl Graphics<'_> {
             px[2] = color.b;
             px[3] = color.a;
         });
+    }
+
+    /// Sets every pixel to the same color, same as [clear] but this follows translate and clip
+    pub fn clear_aware(&mut self, color: Color) {
+        for y in 0..self.height {
+            for x in 0..self.width {
+                self.set_pixel(x as isize, y as isize, color);
+            }
+        }
     }
 
     /// Draw a letter at pos
@@ -385,9 +404,9 @@ impl Graphics<'_> {
         Drawable::from_obj(triangle.into(), draw_type).render(self)
     }
 
-    pub fn draw_ellipse<E: Into<Ellipse>>(&mut self, ellipse: E, draw_type: DrawType) {
-        Drawable::from_obj(ellipse.into(), draw_type).render(self)
-    }
+    // pub fn draw_ellipse<E: Into<Ellipse>>(&mut self, ellipse: E, draw_type: DrawType) {
+    //     Drawable::from_obj(ellipse.into(), draw_type).render(self)
+    // }
 
     /// Set the RGB values for a pixel by blending it with the provided color
     /// This method uses alpha blending, note that the canvas pixels always have 255 alpha
@@ -395,7 +414,7 @@ impl Graphics<'_> {
     pub fn blend_pixel(&mut self, x: isize, y: isize, color: Color) {
         let x = x + self.translate.x;
         let y = y + self.translate.y;
-        if x >= 0 && y >= 0 && x < self.width as isize {
+        if x >= 0 && y >= 0 && x < self.width as isize && self.clip.is_valid((x, y)) {
             if let Some(base) = self.get_pixel(x, y, false) {
                 let new_color = base.blend(color);
                 let idx = self.index(x as usize, y as usize);
@@ -415,7 +434,7 @@ impl Graphics<'_> {
     pub fn set_pixel(&mut self, x: isize, y: isize, color: Color) {
         let x = x + self.translate.x;
         let y = y + self.translate.y;
-        if x >= 0 && y >= 0 && x < self.width as isize {
+        if x >= 0 && y >= 0 && x < self.width as isize && self.clip.is_valid((x, y)) {
             let idx = self.index(x as usize, y as usize);
 
             if idx < self.buffer.len() {

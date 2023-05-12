@@ -1,5 +1,14 @@
 # Changelog
 
+### Version 0.11.0
+- Add clipping
+- Add `Graphics::clear_aware` for clear that uses translate and clipping
+- Move `ShapeBox` to `graphics-shapes`
+  - It now holds a shape directly, and needs to be wrapped in `Drawable` to render
+  - `ShapeCollection` now holds `Drawable<ShapeBox>`
+- Update graphics-shapes to 0.2.0
+  - Removed `Ellipse`
+
 ### Version 0.10.11
 - Fix bug in ICI rendering
 

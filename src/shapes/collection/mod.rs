@@ -1,29 +1,26 @@
-pub mod mutation;
-pub mod shape_box;
-
 use crate::drawing::Renderable;
-use crate::prelude::collection::shape_box::FromDrawable;
 use crate::prelude::*;
-use crate::shapes::collection::shape_box::{FromShape, ShapeBox};
 use crate::Graphics;
 use graphics_shapes::coord::Coord;
 use graphics_shapes::rect::Rect;
+use graphics_shapes::shape_box::ShapeBox;
 use graphics_shapes::Shape;
 use std::fmt::Debug;
 use std::slice::Iter;
 
+pub mod mutation;
+
 pub mod prelude {
-    pub use crate::shapes::collection::shape_box::*;
     pub use crate::shapes::collection::*;
 }
 
 #[derive(Debug, Clone)]
 pub struct ShapeCollection {
-    shapes: Vec<ShapeBox>,
+    shapes: Vec<Drawable<ShapeBox>>,
     bounds: Rect,
 }
 
-pub fn calc_bounds(list: &[ShapeBox]) -> Rect {
+pub fn calc_bounds(list: &[Drawable<ShapeBox>]) -> Rect {
     if list.is_empty() {
         return Rect::new((0, 0), (0, 0));
     }
@@ -57,7 +54,7 @@ impl ShapeCollection {
 }
 
 impl ShapeCollection {
-    pub fn iter(&self) -> Iter<'_, ShapeBox> {
+    pub fn iter(&self) -> Iter<'_, Drawable<ShapeBox>> {
         self.shapes.iter()
     }
 
@@ -73,7 +70,7 @@ impl ShapeCollection {
         self.bounds = calc_bounds(&self.shapes);
     }
 
-    pub fn remove(&mut self, idx: usize) -> ShapeBox {
+    pub fn remove(&mut self, idx: usize) -> Drawable<ShapeBox> {
         self.shapes.remove(idx)
     }
 
@@ -106,54 +103,47 @@ impl Renderable<ShapeCollection> for ShapeCollection {
     }
 }
 
-impl<S: Clone> InsertDrawable<S> for ShapeCollection
-where
-    ShapeBox: FromDrawable<S>,
-{
-    fn insert(&mut self, index: usize, drawable: Drawable<S>) {
-        InsertShapeBox::insert(self, index, ShapeBox::from_drawable(drawable));
+impl InsertDrawable<ShapeBox> for ShapeCollection {
+    fn insert(&mut self, index: usize, drawable: Drawable<ShapeBox>) {
+        self.shapes.insert(index, drawable);
+        self.update_bounds();
     }
 
-    fn insert_above(&mut self, drawable: Drawable<S>) {
-        InsertShapeBox::insert_above(self, ShapeBox::from_drawable(drawable));
+    fn insert_above(&mut self, drawable: Drawable<ShapeBox>) {
+        self.shapes.push(drawable);
+        self.update_bounds();
     }
 
-    fn insert_under(&mut self, drawable: Drawable<S>) {
-        InsertShapeBox::insert_under(self, ShapeBox::from_drawable(drawable));
+    fn insert_under(&mut self, drawable: Drawable<ShapeBox>) {
+        InsertDrawable::<ShapeBox>::insert(self, 0, drawable);
     }
 }
 
-impl<S> InsertShape<S> for ShapeCollection
-where
-    ShapeBox: FromShape<S>,
-{
+impl<S: Shape> InsertShape<S> for ShapeCollection {
     fn insert(&mut self, index: usize, shape: S, draw_type: DrawType) {
-        InsertShapeBox::insert(self, index, ShapeBox::from_shape(shape, draw_type));
+        InsertShapeBox::insert(self, index, shape.to_shape_box(), draw_type);
     }
 
     fn insert_above(&mut self, shape: S, draw_type: DrawType) {
-        InsertShapeBox::insert_above(self, ShapeBox::from_shape(shape, draw_type));
+        InsertShapeBox::insert_above(self, shape.to_shape_box(), draw_type);
     }
 
     fn insert_under(&mut self, shape: S, draw_type: DrawType) {
-        InsertShapeBox::insert_under(self, ShapeBox::from_shape(shape, draw_type));
+        InsertShapeBox::insert_under(self, shape.to_shape_box(), draw_type);
     }
 }
 
 impl InsertShapeBox for ShapeCollection {
-    fn insert(&mut self, index: usize, shape_box: ShapeBox) {
-        self.shapes.insert(index, shape_box);
-        self.update_bounds();
+    fn insert(&mut self, index: usize, shape_box: ShapeBox, draw_type: DrawType) {
+        InsertDrawable::insert(self, index, Drawable::from_obj(shape_box, draw_type))
     }
 
-    fn insert_above(&mut self, shape_box: ShapeBox) {
-        self.shapes.push(shape_box);
-        self.update_bounds();
+    fn insert_above(&mut self, shape_box: ShapeBox, draw_type: DrawType) {
+        InsertDrawable::insert_above(self, Drawable::from_obj(shape_box, draw_type))
     }
 
-    fn insert_under(&mut self, shape_box: ShapeBox) {
-        InsertShapeBox::insert(self, 0, shape_box);
-        self.update_bounds();
+    fn insert_under(&mut self, shape_box: ShapeBox, draw_type: DrawType) {
+        InsertDrawable::insert_under(self, Drawable::from_obj(shape_box, draw_type))
     }
 }
 
@@ -170,7 +160,7 @@ pub trait InsertShape<S> {
 }
 
 pub trait InsertShapeBox {
-    fn insert(&mut self, index: usize, shape_box: ShapeBox);
-    fn insert_above(&mut self, shape_box: ShapeBox);
-    fn insert_under(&mut self, shape_box: ShapeBox);
+    fn insert(&mut self, index: usize, shape_box: ShapeBox, draw_type: DrawType);
+    fn insert_above(&mut self, shape_box: ShapeBox, draw_type: DrawType);
+    fn insert_under(&mut self, shape_box: ShapeBox, draw_type: DrawType);
 }
