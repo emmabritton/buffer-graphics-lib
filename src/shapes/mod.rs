@@ -4,13 +4,8 @@ pub mod polyline;
 use crate::drawable::{DrawType, Drawable};
 use crate::drawing::Renderable;
 use crate::Graphics;
-use graphics_shapes::circle::Circle;
-use graphics_shapes::line::Line;
-use graphics_shapes::polygon::Polygon;
-use graphics_shapes::rect::Rect;
+use graphics_shapes::prelude::*;
 use graphics_shapes::shape_box::ShapeBox;
-use graphics_shapes::triangle::Triangle;
-use graphics_shapes::Shape;
 
 impl<S: Shape + Clone> Renderable<S> for Drawable<S> {
     fn render(&self, graphics: &mut Graphics) {
@@ -52,5 +47,5 @@ create_drawable_from_points!(Triangle);
 create_drawable_from_points!(Rect);
 create_drawable_from_points!(Polygon);
 create_drawable_from_points!(Circle);
-// create_drawable_from_points!(Ellipse);
+create_drawable_from_points!(Ellipse);
 create_drawable_from_points!(ShapeBox);

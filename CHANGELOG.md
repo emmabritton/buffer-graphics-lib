@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.11.1
+- Update graphics-shapes
+  - Added Ellipse
+
 ### Version 0.11.0
 - Add clipping
 - Add `Graphics::clear_aware` for clear that uses translate and clipping
