@@ -60,15 +60,22 @@ pub mod prelude {
     pub use crate::indexed::*;
     #[cfg(feature = "ici")]
     pub use crate::indexed_color::*;
-    pub use crate::shapes::collection::prelude::*;
+    pub use crate::shapes::collection::*;
     pub use crate::shapes::polyline::*;
     pub use crate::shapes::*;
-    pub use crate::text::prelude::*;
+    pub use crate::text::format::*;
+    pub use crate::text::pos::*;
+    pub use crate::text::wrapping::*;
+    pub use crate::text::*;
     pub use crate::Graphics;
     pub use crate::GraphicsError;
     pub use graphics_shapes::prelude::*;
+    pub use ici_files::animated::*;
+    pub use ici_files::errors::*;
+    pub use ici_files::image::*;
+    pub use ici_files::palette::*;
     #[cfg(feature = "ici")]
-    pub use ici_files::prelude::*;
+    pub use ici_files::*;
 }
 
 #[derive(Error, Debug)]

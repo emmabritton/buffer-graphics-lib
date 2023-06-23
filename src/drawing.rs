@@ -451,7 +451,6 @@ impl Graphics<'_> {
 mod test {
     use super::*;
     use crate::prelude::*;
-    use crate::shapes::polyline::prelude::*;
     use crate::shapes::polyline::Segment::*;
     use crate::text::pos::TextPos::Px;
 

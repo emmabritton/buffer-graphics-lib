@@ -20,18 +20,9 @@ pub const ASCII_YEN: u8 = 27;
 pub const ASCII_CENT: u8 = 26;
 
 pub const SUPPORTED_SYMBOLS: [char; 37] = [
-    '!', '@', '£', '$', '%', '^', '&', '*', '(', ')', '_', '+', '_', '+', '#', '{', '}', ':', '"',
+    '!', '@', '£', '$', '%', '^', '&', '*', '(', ')', '_', '+', '-', '=', '#', '{', '}', ':', '"',
     '|', '<', '?', '>', ',', '/', '.', ';', '\'', '\\', '[', ']', '`', '~', '°', '…', '¢', '¥',
 ];
-
-pub mod prelude {
-    pub use crate::text::format::*;
-    pub use crate::text::pos::*;
-    pub use crate::text::wrapping::*;
-    pub use crate::text::TextPos::*;
-    pub use crate::text::TextSize::*;
-    pub use crate::text::*;
-}
 
 const fn custom_ascii_code(chr: char) -> u8 {
     match chr {

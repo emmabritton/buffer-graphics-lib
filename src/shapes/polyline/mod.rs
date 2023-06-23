@@ -1,11 +1,6 @@
 pub mod error;
 pub mod rendering;
 
-pub mod prelude {
-    pub use crate::shapes::polyline::error::*;
-    pub use crate::shapes::polyline::*;
-}
-
 use crate::color::Color;
 use crate::shapes::polyline::error::PolylineError;
 use crate::shapes::polyline::error::PolylineError::{InvalidPolyline, PolylineAlreadyClosed};

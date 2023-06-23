@@ -10,10 +10,6 @@ use std::slice::Iter;
 
 pub mod mutation;
 
-pub mod prelude {
-    pub use crate::shapes::collection::*;
-}
-
 #[derive(Debug, Clone)]
 pub struct ShapeCollection {
     shapes: Vec<Drawable<ShapeBox>>,

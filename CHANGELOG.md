@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.11.4
+- Fix invalid chars in `SUPPORTED_SYMBOLS`
+
 ### Version 0.11.3
 - Update ici-files
 
