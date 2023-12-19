@@ -115,18 +115,47 @@ impl Graphics<'_> {
         ((width + margin) * x, (height + margin) * y)
     }
 
+    /// Draw an image at `x`, `y` as fast as possible
+    /// If the image may draw outside the window you must use [draw_image] instead
+    /// Ignores clipping for opaque images
+    pub fn draw_image_unchecked<P: Into<Coord>>(&mut self, xy: P, image: &Image) {
+        let xy = xy.into();
+        if image.is_transparent() {
+            self.draw_image(xy, image);
+        } else {
+            let byte_count = image.width() * 4;
+            for (y,row) in image.bytes.chunks_exact(byte_count).enumerate() {
+                let addr = (((xy.y + y as isize) * self.width() as isize + xy.x) * 4) as usize;
+                unsafe {
+                    let dst = self.buffer.as_mut_ptr().add(addr);
+                    std::ptr::copy_nonoverlapping(row.as_ptr(), dst, byte_count);
+                }
+            }
+        }
+    }
+
     /// Draw an image at `x`, `y`
+    /// If the image definitely will draw inside the window you can use [draw_image_unchecked] instead
     pub fn draw_image<P: Into<Coord>>(&mut self, xy: P, image: &Image) {
         let xy = xy.into();
         let mut x = 0;
-        for (y, row) in image.pixels.chunks_exact(image.width()).enumerate() {
-            for color in row {
-                if color.a > 0 {
-                    self.update_pixel(xy.x + x, xy.y + y as isize, *color);
-                }
-                x += 1;
+        let mut y = 0;
+        for pixel in image.bytes.chunks_exact(4) {
+            self.update_pixel(
+                xy.x + x as isize,
+                xy.y + y,
+                Color {
+                    r: pixel[0],
+                    g: pixel[1],
+                    b: pixel[2],
+                    a: pixel[3],
+                },
+            );
+            x += 1;
+            if x >= image.width() {
+                x = 0;
+                y += 1;
             }
-            x = 0;
         }
     }
 

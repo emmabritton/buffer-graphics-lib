@@ -1,5 +1,15 @@
 # Changelog
 
+### Version 0.12.0
+- `Image`
+  - Change internals to use bytes
+  - Speed up drawing of opaque images
+  - Add `blend_pixel()`
+  - Add `is_transparent(): bool`
+  - Add `pixels(): Vec<Color>`
+  - Add `rotate_cw()`, `rotate_ccw()`
+  - Change `blend()` to change self rather than creating a new image (for consistency with other methods)
+
 ### Version 0.11.4
 - Fix invalid chars in `SUPPORTED_SYMBOLS`
 

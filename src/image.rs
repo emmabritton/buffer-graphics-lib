@@ -9,9 +9,10 @@ use std::fmt::{Debug, Formatter};
 /// Images are rectangles of pixels that can be manipulated and drawn on screen
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Image {
-    pub(crate) pixels: Vec<Color>,
+    pub(crate) bytes: Vec<u8>,
     width: usize,
     height: usize,
+    is_transparent: bool,
 }
 
 impl Debug for Image {
@@ -23,13 +24,16 @@ impl Debug for Image {
 impl Image {
     /// Create a image of width x height size using provided pixels
     pub fn new(pixels: Vec<Color>, width: usize, height: usize) -> Result<Self, GraphicsError> {
+        let is_transparent = pixels.iter().any(|c| c.is_transparent());
         if width * height != pixels.len() {
             Err(GraphicsError::ImageInitSize(width * height, pixels.len()))
         } else {
+            let bytes = pixels.into_iter().flat_map(|c| c.as_array()).collect();
             Ok(Image {
-                pixels,
+                bytes,
                 width,
                 height,
+                is_transparent,
             })
         }
     }
@@ -54,14 +58,59 @@ impl Image {
         self.height
     }
 
+    /// Returns true if any pixels are transparent
+    #[inline]
+    pub fn is_transparent(&self) -> bool {
+        self.is_transparent
+    }
+
+    /// This is calculated every time
+    pub fn pixels(&self) -> Vec<Color> {
+        self.bytes
+            .chunks_exact(4)
+            .map(|chunk| Color {
+                r: chunk[0],
+                g: chunk[1],
+                b: chunk[2],
+                a: chunk[3],
+            })
+            .collect()
+    }
+
+    fn recalc_transparency(&mut self) {
+        self.is_transparent = self.pixels().iter().any(|c| c.is_transparent());
+    }
+
     #[inline]
     pub fn get_pixel(&self, x: usize, y: usize) -> Color {
-        self.pixels[y * self.width + x]
+        let addr = (y * self.width + x) * 4;
+        Color {
+            r: self.bytes[addr],
+            g: self.bytes[addr + 1],
+            b: self.bytes[addr + 2],
+            a: self.bytes[addr + 3],
+        }
     }
 
     #[inline]
     pub fn set_pixel(&mut self, x: usize, y: usize, value: Color) {
-        self.pixels[y * self.width + x] = value;
+        let addr = (y * self.width + x) * 4;
+        self.bytes[addr] = value.r;
+        self.bytes[addr + 1] = value.g;
+        self.bytes[addr + 2] = value.b;
+        self.bytes[addr + 3] = value.a;
+        self.recalc_transparency();
+    }
+
+    #[inline]
+    pub fn blend_pixel(&mut self, x: usize, y: usize, value: Color) {
+        let new_color = self.get_pixel(x, y).blend(value);
+        let addr = (y * self.width + x) * 4;
+        self.bytes[addr] = new_color.r;
+        self.bytes[addr + 1] = new_color.g;
+        self.bytes[addr + 2] = new_color.b;
+        self.bytes[addr + 3] = new_color.a;
+        self.recalc_transparency();
     }
 
     /// Flip image horizontally
@@ -71,9 +120,10 @@ impl Image {
             for x in 0..half_width {
                 let y = y * self.width;
                 unsafe {
-                    std::ptr::swap(
-                        &mut self.pixels[y + x],
-                        &mut self.pixels[y + self.width - 1 - x],
+                    std::ptr::swap_nonoverlapping(
+                        &mut self.bytes[(y + x) * 4],
+                        &mut self.bytes[(y + self.width - 1 - x) * 4],
+                        4,
                     );
                 }
             }
@@ -86,16 +136,42 @@ impl Image {
         for y in 0..half_height {
             unsafe {
                 std::ptr::swap_nonoverlapping(
-                    &mut self.pixels[y * self.width],
-                    &mut self.pixels[(self.height - 1 - y) * self.width],
-                    self.width,
+                    &mut self.bytes[(y * self.width) * 4],
+                    &mut self.bytes[((self.height - 1 - y) * self.width) * 4],
+                    self.width * 4,
                 );
             }
         }
     }
 
-    /// Blend two images making a new one
-    pub fn blend(&self, other: &Image) -> Result<Image, GraphicsError> {
+    /// Rotate 90° clockwise
+    pub fn rotate_cw(&mut self) -> Image {
+        let mut output = Image::new_blank(self.height, self.width);
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let new_y = x;
+                let new_x = output.width - y - 1;
+                output.set_pixel(new_x, new_y, self.get_pixel(x, y));
+            }
+        }
+        output
+    }
+
+    /// Rotate 90° counterclockwise
+    pub fn rotate_ccw(&mut self) -> Image {
+        let mut output = Image::new_blank(self.height, self.width);
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let new_y = output.height - x - 1;
+                let new_x = y;
+                output.set_pixel(new_x, new_y, self.get_pixel(x, y));
+            }
+        }
+        output
+    }
+
+    /// Blend with another image
+    pub fn blend(&mut self, other: &Image) -> Result<(), GraphicsError> {
         if self.width != other.width || self.height != other.height {
             return Err(GraphicsError::ImageBlendSize(
                 self.width,
@@ -104,14 +180,15 @@ impl Image {
                 other.height,
             ));
         }
-        let size = self.width * self.height;
-        let mut pixels: Vec<Color> = Vec::with_capacity(size);
 
-        for i in 0..size {
-            pixels.push(self.pixels[i].blend(other.pixels[i]));
+        for y in 0..self.height {
+            for x in 0..self.width {
+                self.blend_pixel(x, y, other.get_pixel(x, y));
+            }
         }
 
-        Image::new(pixels, self.width, self.height)
+        self.recalc_transparency();
+        Ok(())
     }
 
     /// Return a new image after scaling
@@ -132,15 +209,37 @@ impl Image {
 
 impl Tint for Image {
     fn tint_add(&mut self, r_diff: isize, g_diff: isize, b_diff: isize, a_diff: isize) {
-        for pixel in self.pixels.iter_mut() {
-            (*pixel).tint_add(r_diff, g_diff, b_diff, a_diff);
+        for pixel in self.bytes.chunks_exact_mut(4) {
+            let mut color = Color {
+                r: pixel[0],
+                g: pixel[1],
+                b: pixel[2],
+                a: pixel[3],
+            };
+            color.tint_add(r_diff, g_diff, b_diff, a_diff);
+            pixel[0] = color.r;
+            pixel[1] = color.g;
+            pixel[2] = color.b;
+            pixel[3] = color.a;
         }
+        self.recalc_transparency();
     }
 
     fn tint_mul(&mut self, r_diff: f32, g_diff: f32, b_diff: f32, a_diff: f32) {
-        for pixel in self.pixels.iter_mut() {
-            (*pixel).tint_mul(r_diff, g_diff, b_diff, a_diff);
+        for pixel in self.bytes.chunks_exact_mut(4) {
+            let mut color = Color {
+                r: pixel[0],
+                g: pixel[1],
+                b: pixel[2],
+                a: pixel[3],
+            };
+            color.tint_mul(r_diff, g_diff, b_diff, a_diff);
+            pixel[0] = color.r;
+            pixel[1] = color.g;
+            pixel[2] = color.b;
+            pixel[3] = color.a;
         }
+        self.recalc_transparency();
     }
 }
 
@@ -176,9 +275,10 @@ mod test {
 
         assert_eq!(image.width, 3);
         assert_eq!(image.height, 3);
-        assert_eq!(image.pixels.len(), 9);
+        assert_eq!(image.bytes.len(), 9 * 4);
+        assert!(!image.is_transparent);
         assert_eq!(
-            image.pixels,
+            image.pixels(),
             vec![
                 Color::gray(1),
                 Color::gray(2),
@@ -197,7 +297,7 @@ mod test {
     fn test_flip() {
         let image = make_image();
         assert_eq!(
-            image.pixels,
+            image.pixels(),
             vec![
                 Color::gray(1),
                 Color::gray(2),
@@ -213,7 +313,7 @@ mod test {
         let mut horz = make_image();
         horz.flip_horizontal();
         assert_eq!(
-            horz.pixels,
+            horz.pixels(),
             vec![
                 Color::gray(3),
                 Color::gray(2),
@@ -229,7 +329,7 @@ mod test {
         let mut vert = make_image();
         vert.flip_vertical();
         assert_eq!(
-            vert.pixels,
+            vert.pixels(),
             vec![
                 Color::gray(7),
                 Color::gray(8),
@@ -246,7 +346,7 @@ mod test {
         horz_vert.flip_horizontal();
         horz_vert.flip_vertical();
         assert_eq!(
-            horz_vert.pixels,
+            horz_vert.pixels(),
             vec![
                 Color::gray(9),
                 Color::gray(8),
@@ -263,7 +363,7 @@ mod test {
         vert_horz.flip_horizontal();
         vert_horz.flip_vertical();
         assert_eq!(
-            vert_horz.pixels,
+            vert_horz.pixels(),
             vec![
                 Color::gray(9),
                 Color::gray(8),
@@ -283,7 +383,7 @@ mod test {
         let mut image = make_image();
         image.tint_add(10, 20, 30, -50);
         assert_eq!(
-            image.pixels,
+            image.pixels(),
             vec![
                 Color::rgba(11, 21, 31, 205),
                 Color::rgba(12, 22, 32, 205),
@@ -303,7 +403,7 @@ mod test {
         let mut image = make_image();
         image.tint_mul(0.5, 1.0, 2.0, 1.0);
         assert_eq!(
-            image.pixels,
+            image.pixels(),
             vec![
                 Color::rgba(1, 1, 2, 255),
                 Color::rgba(1, 2, 4, 255),

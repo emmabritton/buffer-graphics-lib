@@ -149,7 +149,7 @@ impl Color {
 
     #[inline]
     pub fn is_transparent(&self) -> bool {
-        self.a == 0
+        self.a < 255
     }
 
     pub fn darken(&self) -> Color {
@@ -227,9 +227,14 @@ impl Tint for Color {
 }
 
 pub const WHITE: Color = Color::gray(255);
+pub const OFF_WHITE: Color = Color::gray(250);
 pub const BLACK: Color = Color::gray(0);
+pub const OFF_BLACK: Color = Color::gray(5);
+pub const DARKER_GRAY: Color = Color::gray(45);
 pub const DARK_GRAY: Color = Color::gray(75);
+pub const MID_GRAY: Color = Color::gray(110);
 pub const LIGHT_GRAY: Color = Color::gray(180);
+pub const LIGHTER_GRAY: Color = Color::gray(205);
 pub const RED: Color = Color::rgb(255, 0, 0);
 pub const GREEN: Color = Color::rgb(0, 255, 0);
 pub const BLUE: Color = Color::rgb(0, 0, 255);
@@ -240,6 +245,12 @@ pub const BROWN: Color = Color::rgb(139, 69, 19);
 pub const PURPLE: Color = Color::rgb(75, 0, 130);
 pub const CYAN: Color = Color::rgb(0, 255, 255);
 pub const TRANSPARENT: Color = Color::rgba(0, 0, 0, 0);
+/// Gameboy DMG-01 Foreground/Darkest
+pub const GB_3: Color = Color::rgb(15, 56, 15);
+pub const GB_2: Color = Color::rgb(48, 98, 48);
+pub const GB_1: Color = Color::rgb(120, 145, 15);
+/// Gameboy DMG-01 Background/Lightest
+pub const GB_0: Color = Color::rgb(155, 188, 15);
 
 #[cfg(test)]
 mod test {
