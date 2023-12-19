@@ -124,7 +124,7 @@ impl Graphics<'_> {
             self.draw_image(xy, image);
         } else {
             let byte_count = image.width() * 4;
-            for (y,row) in image.bytes.chunks_exact(byte_count).enumerate() {
+            for (y, row) in image.bytes.chunks_exact(byte_count).enumerate() {
                 let addr = (((xy.y + y as isize) * self.width() as isize + xy.x) * 4) as usize;
                 unsafe {
                     let dst = self.buffer.as_mut_ptr().add(addr);
