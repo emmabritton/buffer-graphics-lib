@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.12.1
+- Add check char to font `✓`
+- Add support for up to 10 custom characters
+
 ### Version 0.12.0
 - `Image`
   - Change internals to use bytes

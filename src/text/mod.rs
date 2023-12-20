@@ -18,10 +18,11 @@ pub const ASCII_CURRENCY: u8 = 29;
 pub const ASCII_POUND: u8 = 28;
 pub const ASCII_YEN: u8 = 27;
 pub const ASCII_CENT: u8 = 26;
+pub const ASCII_CHECK: u8 = 25;
 
-pub const SUPPORTED_SYMBOLS: [char; 37] = [
+pub const SUPPORTED_SYMBOLS: [char; 38] = [
     '!', '@', '£', '$', '%', '^', '&', '*', '(', ')', '_', '+', '-', '=', '#', '{', '}', ':', '"',
-    '|', '<', '?', '>', ',', '/', '.', ';', '\'', '\\', '[', ']', '`', '~', '°', '…', '¢', '¥',
+    '|', '<', '?', '>', ',', '/', '.', ';', '\'', '\\', '[', ']', '`', '~', '°', '…', '¢', '¥', '✓'
 ];
 
 const fn custom_ascii_code(chr: char) -> u8 {
@@ -32,6 +33,7 @@ const fn custom_ascii_code(chr: char) -> u8 {
         '£' => ASCII_POUND,
         '¥' => ASCII_YEN,
         '¢' => ASCII_CENT,
+        '✓' => ASCII_CHECK,
         _ => 0,
     }
 }
