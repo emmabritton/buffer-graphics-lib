@@ -43,9 +43,9 @@ pub mod scaling;
 pub mod shapes;
 pub mod text;
 
-use fnv::FnvHashMap;
 use crate::clipping::Clip;
 use crate::GraphicsError::InvalidBufferLength;
+use fnv::FnvHashMap;
 use graphics_shapes::coord::Coord;
 use thiserror::Error;
 
@@ -103,7 +103,7 @@ pub struct Graphics<'buffer> {
     /// Note: case is ignored
     ///
     /// Note: `a-z 0-9 !@$%^&*(),./;'\\[]<>?:\"{}_+~#…¤£¥¢✓` are valid for [text::chr_to_code]
-    pub custom_font: FnvHashMap<u8, CustomLetter>
+    pub custom_font: FnvHashMap<u8, CustomLetter>,
 }
 
 /// Only the letter sizes you'll use need to be set
@@ -111,7 +111,7 @@ pub struct Graphics<'buffer> {
 pub struct CustomLetter {
     pub small: [bool; text::small::LETTER_PX_COUNT],
     pub normal: [bool; text::normal::LETTER_PX_COUNT],
-    pub large: [bool; text::large::LETTER_PX_COUNT]
+    pub large: [bool; text::large::LETTER_PX_COUNT],
 }
 
 impl Default for CustomLetter {
@@ -119,7 +119,7 @@ impl Default for CustomLetter {
         Self {
             small: [false; text::small::LETTER_PX_COUNT],
             normal: [false; text::normal::LETTER_PX_COUNT],
-            large: [false; text::large::LETTER_PX_COUNT]
+            large: [false; text::large::LETTER_PX_COUNT],
         }
     }
 }
@@ -140,7 +140,7 @@ impl<'buffer> Graphics<'_> {
             height,
             translate: Coord::default(),
             clip: Clip::new(width, height),
-            custom_font: FnvHashMap::default()
+            custom_font: FnvHashMap::default(),
         })
     }
 
@@ -159,7 +159,7 @@ impl<'buffer> Graphics<'_> {
             height,
             translate: Coord::default(),
             clip: Clip::new(width, height),
-            custom_font: FnvHashMap::default()
+            custom_font: FnvHashMap::default(),
         }
     }
 }

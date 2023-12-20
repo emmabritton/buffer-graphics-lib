@@ -1,3 +1,4 @@
+use crate::clipping::Clip;
 use crate::color::Color;
 use crate::color_conversion::ToColor;
 use crate::drawable::{DrawType, Drawable};
@@ -10,13 +11,12 @@ use crate::Graphics;
 use graphics_shapes::circle::Circle;
 use graphics_shapes::coord::Coord;
 use graphics_shapes::polygon::Polygon;
+use graphics_shapes::prelude::Ellipse;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
 #[cfg(feature = "ici")]
 use ici_files::prelude::*;
 use std::mem::swap;
-use graphics_shapes::prelude::Ellipse;
-use crate::clipping::Clip;
 
 /// Represents anything that [Graphics] can render
 pub trait Renderable<T> {
@@ -145,15 +145,19 @@ impl Graphics<'_> {
         let mut x = 0;
         let mut y = 0;
         for pixel in image.bytes.chunks_exact(4) {
-            update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width,
-                         xy.x + x as isize,
-                         xy.y + y,
-                         Color {
-                             r: pixel[0],
-                             g: pixel[1],
-                             b: pixel[2],
-                             a: pixel[3],
-                         },
+            update_pixel(
+                self.buffer,
+                &self.translate,
+                &self.clip,
+                self.width,
+                xy.x + x as isize,
+                xy.y + y,
+                Color {
+                    r: pixel[0],
+                    g: pixel[1],
+                    b: pixel[2],
+                    a: pixel[3],
+                },
             );
             x += 1;
             if x >= image.width() {
@@ -174,7 +178,15 @@ impl Graphics<'_> {
                 let i = image.get_pixel_index(x, y).unwrap();
                 let color_idx = image.get_pixel(i).unwrap() as usize;
                 let color = palette[color_idx];
-                update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x as isize + xy.x, y as isize + xy.y, color.to_color());
+                update_pixel(
+                    self.buffer,
+                    &self.translate,
+                    &self.clip,
+                    self.width,
+                    x as isize + xy.x,
+                    y as isize + xy.y,
+                    color.to_color(),
+                );
             }
         }
     }
@@ -191,7 +203,15 @@ impl Graphics<'_> {
                 let i = image.get_pixel_index(x, y).unwrap();
                 let color_idx = current_frame[i] as usize;
                 let color = palette[color_idx];
-                update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x as isize + xy.x, y as isize + xy.y, color.to_color());
+                update_pixel(
+                    self.buffer,
+                    &self.translate,
+                    &self.clip,
+                    self.width,
+                    x as isize + xy.x,
+                    y as isize + xy.y,
+                    color.to_color(),
+                );
             }
         }
     }
@@ -207,7 +227,15 @@ impl Graphics<'_> {
     ) {
         for r in angle_start..=angle_end {
             let px = Coord::from_angle(center, radius, r);
-            update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, px.x, px.y, color);
+            update_pixel(
+                self.buffer,
+                &self.translate,
+                &self.clip,
+                self.width,
+                px.x,
+                px.y,
+                color,
+            );
         }
         if close {
             self.draw_line(
@@ -232,11 +260,27 @@ impl Graphics<'_> {
         }
         if start.x == end.x {
             for y in start.y..=end.y {
-                update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, start.x, y, color);
+                update_pixel(
+                    self.buffer,
+                    &self.translate,
+                    &self.clip,
+                    self.width,
+                    start.x,
+                    y,
+                    color,
+                );
             }
         } else if start.y == end.y {
             for x in start.x..=end.x {
-                update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x, start.y, color);
+                update_pixel(
+                    self.buffer,
+                    &self.translate,
+                    &self.clip,
+                    self.width,
+                    x,
+                    start.y,
+                    color,
+                );
             }
         } else {
             let mut delta = 0;
@@ -254,7 +298,15 @@ impl Graphics<'_> {
             let mut y = y1;
             if dx >= dy {
                 loop {
-                    update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x, y, color);
+                    update_pixel(
+                        self.buffer,
+                        &self.translate,
+                        &self.clip,
+                        self.width,
+                        x,
+                        y,
+                        color,
+                    );
                     if x == x2 {
                         break;
                     }
@@ -267,7 +319,15 @@ impl Graphics<'_> {
                 }
             } else {
                 loop {
-                    update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x, y, color);
+                    update_pixel(
+                        self.buffer,
+                        &self.translate,
+                        &self.clip,
+                        self.width,
+                        x,
+                        y,
+                        color,
+                    );
                     if y == y2 {
                         break;
                     }
@@ -361,21 +421,29 @@ impl Graphics<'_> {
         }
         let (width, height) = size.get_size();
 
-        let px: &[bool] =if let Some(custom) = self.custom_font.get(&code) {
+        let px: &[bool] = if let Some(custom) = self.custom_font.get(&code) {
             match size {
                 TextSize::Small => &custom.small,
                 TextSize::Normal => &custom.normal,
-                TextSize::Large => &custom.large
+                TextSize::Large => &custom.large,
             }
         } else {
-             size.get_px_ascii(code)
+            size.get_px_ascii(code)
         };
 
         for x in 0..width {
             for y in 0..height {
                 let i = x + y * width;
                 if px[i] {
-                    update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x as isize + pos.0, y as isize + pos.1, color);
+                    update_pixel(
+                        self.buffer,
+                        &self.translate,
+                        &self.clip,
+                        self.width,
+                        x as isize + pos.0,
+                        y as isize + pos.1,
+                        color,
+                    );
                 }
             }
         }
@@ -451,14 +519,30 @@ impl Graphics<'_> {
     /// If the alpha is 0 the call is does nothing
     #[inline]
     pub fn set_pixel(&mut self, x: isize, y: isize, color: Color) {
-        update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x, y, color);
+        update_pixel(
+            self.buffer,
+            &self.translate,
+            &self.clip,
+            self.width,
+            x,
+            y,
+            color,
+        );
     }
 }
 
 /// Update a pixel color, using [set_pixel] or [blend_pixel] depending on whether `color`s alpha is 255 or not
 ///
 /// If the alpha is 0 the call is does nothing
-fn update_pixel(buffer: &mut [u8], translate: &Coord, clip: &Clip, width: usize, x: isize, y: isize, color: Color) {
+fn update_pixel(
+    buffer: &mut [u8],
+    translate: &Coord,
+    clip: &Clip,
+    width: usize,
+    x: isize,
+    y: isize,
+    color: Color,
+) {
     let x = x + translate.x;
     let y = y + translate.y;
     let idx = ((x + y * width as isize) * 4) as usize;
@@ -489,7 +573,12 @@ fn set_pixel(buffer: &mut [u8], idx: usize, color: Color) {
 /// This method uses alpha blending
 /// Generally you should use [update_pixel] instead
 fn blend_pixel(buffer: &mut [u8], idx: usize, color: Color) {
-    let existing_color = Color { r: buffer[idx], g: buffer[idx + 1], b: buffer[idx + 2], a: buffer[idx + 3] };
+    let existing_color = Color {
+        r: buffer[idx],
+        g: buffer[idx + 1],
+        b: buffer[idx + 2],
+        a: buffer[idx + 3],
+    };
     let new_color = existing_color.blend(color);
     buffer[idx] = new_color.r;
     buffer[idx + 1] = new_color.g;

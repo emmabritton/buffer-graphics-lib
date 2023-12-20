@@ -1,5 +1,5 @@
 use crate::text::{
-    ASCII_CENT, ASCII_CURRENCY, ASCII_DEGREE, ASCII_ELLIPSIS, ASCII_POUND, ASCII_YEN, ASCII_CHECK,
+    ASCII_CENT, ASCII_CHECK, ASCII_CURRENCY, ASCII_DEGREE, ASCII_ELLIPSIS, ASCII_POUND, ASCII_YEN,
 };
 
 pub const CHAR_WIDTH: usize = 4;
@@ -384,9 +384,6 @@ const CENT: [bool; LETTER_PX_COUNT] = [
     true, true, false, false, true, false,
 ];
 const CHECK: [bool; LETTER_PX_COUNT] = [
-    false, false, false, false,
-    false, false, false, true,
-    true, false, true, false,
-    false, true, false, false,
-    false, false, false, false,
+    false, false, false, false, false, false, false, true, true, false, true, false, false, true,
+    false, false, false, false, false, false,
 ];
