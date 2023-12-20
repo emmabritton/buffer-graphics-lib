@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.12.2
+- Update shapes lib
+
 ### Version 0.12.1
 - Add check char to font `✓`
 - Add support for custom replacement glyphs
