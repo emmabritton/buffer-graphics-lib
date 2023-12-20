@@ -85,7 +85,7 @@ pub const fn get_px_ascii(code: u8) -> &'static [bool] {
     }
 }
 
-const LETTER_PX_COUNT: usize = 6 * 7;
+pub const LETTER_PX_COUNT: usize = CHAR_WIDTH * CHAR_HEIGHT;
 
 const AT: [bool; LETTER_PX_COUNT] = [
     false, true, true, true, true, false, true, false, false, false, false, true, true, false,

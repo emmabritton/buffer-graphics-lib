@@ -15,6 +15,8 @@ use graphics_shapes::triangle::Triangle;
 #[cfg(feature = "ici")]
 use ici_files::prelude::*;
 use std::mem::swap;
+use graphics_shapes::prelude::Ellipse;
+use crate::clipping::Clip;
 
 /// Represents anything that [Graphics] can render
 pub trait Renderable<T> {
@@ -45,6 +47,7 @@ impl Graphics<'_> {
 
 impl Graphics<'_> {
     /// Get the canvas offset in pixels
+    #[inline]
     pub fn get_translate(&self) -> Coord {
         self.translate
     }
@@ -68,6 +71,7 @@ impl Graphics<'_> {
     }
 
     /// Adds `delta` to the current canvas offset
+    #[inline]
     pub fn update_translate(&mut self, delta: Coord) {
         self.translate.x += delta.x;
         self.translate.y += delta.y;
@@ -117,7 +121,7 @@ impl Graphics<'_> {
 
     /// Draw an image at `x`, `y` as fast as possible
     /// If the image may draw outside the window you must use [draw_image] instead
-    /// Ignores clipping for opaque images
+    /// Ignores clipping and translation for opaque images
     pub fn draw_image_unchecked<P: Into<Coord>>(&mut self, xy: P, image: &Image) {
         let xy = xy.into();
         if image.is_transparent() {
@@ -141,15 +145,15 @@ impl Graphics<'_> {
         let mut x = 0;
         let mut y = 0;
         for pixel in image.bytes.chunks_exact(4) {
-            self.update_pixel(
-                xy.x + x as isize,
-                xy.y + y,
-                Color {
-                    r: pixel[0],
-                    g: pixel[1],
-                    b: pixel[2],
-                    a: pixel[3],
-                },
+            update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width,
+                         xy.x + x as isize,
+                         xy.y + y,
+                         Color {
+                             r: pixel[0],
+                             g: pixel[1],
+                             b: pixel[2],
+                             a: pixel[3],
+                         },
             );
             x += 1;
             if x >= image.width() {
@@ -170,7 +174,7 @@ impl Graphics<'_> {
                 let i = image.get_pixel_index(x, y).unwrap();
                 let color_idx = image.get_pixel(i).unwrap() as usize;
                 let color = palette[color_idx];
-                self.update_pixel(x as isize + xy.x, y as isize + xy.y, color.to_color());
+                update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x as isize + xy.x, y as isize + xy.y, color.to_color());
             }
         }
     }
@@ -187,7 +191,7 @@ impl Graphics<'_> {
                 let i = image.get_pixel_index(x, y).unwrap();
                 let color_idx = current_frame[i] as usize;
                 let color = palette[color_idx];
-                self.update_pixel(x as isize + xy.x, y as isize + xy.y, color.to_color());
+                update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x as isize + xy.x, y as isize + xy.y, color.to_color());
             }
         }
     }
@@ -203,7 +207,7 @@ impl Graphics<'_> {
     ) {
         for r in angle_start..=angle_end {
             let px = Coord::from_angle(center, radius, r);
-            self.set_pixel(px.x, px.y, color);
+            update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, px.x, px.y, color);
         }
         if close {
             self.draw_line(
@@ -228,11 +232,11 @@ impl Graphics<'_> {
         }
         if start.x == end.x {
             for y in start.y..=end.y {
-                self.update_pixel(start.x, y, color);
+                update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, start.x, y, color);
             }
         } else if start.y == end.y {
             for x in start.x..=end.x {
-                self.update_pixel(x, start.y, color);
+                update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x, start.y, color);
             }
         } else {
             let mut delta = 0;
@@ -250,7 +254,7 @@ impl Graphics<'_> {
             let mut y = y1;
             if dx >= dy {
                 loop {
-                    self.update_pixel(x, y, color);
+                    update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x, y, color);
                     if x == x2 {
                         break;
                     }
@@ -263,7 +267,7 @@ impl Graphics<'_> {
                 }
             } else {
                 loop {
-                    self.update_pixel(x, y, color);
+                    update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x, y, color);
                     if y == y2 {
                         break;
                     }
@@ -287,6 +291,7 @@ impl Graphics<'_> {
     }
 
     /// Draw renderable
+    #[inline]
     pub fn draw<T>(&mut self, renderable: &dyn Renderable<T>) {
         renderable.render(self);
     }
@@ -298,7 +303,7 @@ impl Graphics<'_> {
     ///
     /// Although the method takes `&mut self` it doesn't mutate anything
     #[inline]
-    fn get_pixel(&mut self, x: isize, y: isize, use_translate: bool) -> Option<Color> {
+    pub fn get_pixel(&mut self, x: isize, y: isize, use_translate: bool) -> Option<Color> {
         let (x, y) = if use_translate {
             (x + self.translate.x, y + self.translate.y)
         } else {
@@ -317,18 +322,6 @@ impl Graphics<'_> {
         }
 
         None
-    }
-
-    /// Update a pixel color, using [set_pixel][Graphics::set_pixel] or [blend_pixel][Graphics::blend_pixel] depending
-    /// on whether `color`s alpha is 255 or not
-    /// If the alpha is 0 the call is does nothing
-    #[inline]
-    pub fn update_pixel(&mut self, x: isize, y: isize, color: Color) {
-        match color.a {
-            255 => self.set_pixel(x, y, color),
-            0 => {}
-            _ => self.blend_pixel(x, y, color),
-        }
     }
 
     /// Sets every pixel to the same color, this ignores translate and clip
@@ -351,6 +344,7 @@ impl Graphics<'_> {
     }
 
     /// Draw a letter at pos
+    #[inline]
     pub fn draw_letter(&mut self, pos: (isize, isize), chr: char, size: TextSize, color: Color) {
         self.draw_ascii_letter(pos, chr_to_code(chr), size, color);
     }
@@ -366,13 +360,22 @@ impl Graphics<'_> {
             return;
         }
         let (width, height) = size.get_size();
-        let px = size.get_px_ascii(code);
+
+        let px: &[bool] =if let Some(custom) = self.custom_font.get(&code) {
+            match size {
+                TextSize::Small => &custom.small,
+                TextSize::Normal => &custom.normal,
+                TextSize::Large => &custom.large
+            }
+        } else {
+             size.get_px_ascii(code)
+        };
 
         for x in 0..width {
             for y in 0..height {
                 let i = x + y * width;
                 if px[i] {
-                    self.update_pixel(x as isize + pos.0, y as isize + pos.1, color);
+                    update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x as isize + pos.0, y as isize + pos.1, color);
                 }
             }
         }
@@ -407,6 +410,7 @@ impl Graphics<'_> {
         }
     }
 
+    #[inline]
     pub fn draw_text<P: Into<TextPos>, F: Into<TextFormat>>(
         &mut self,
         text: &str,
@@ -417,63 +421,79 @@ impl Graphics<'_> {
         text.render(self);
     }
 
+    #[inline]
     pub fn draw_rect<R: Into<Rect>>(&mut self, rect: R, draw_type: DrawType) {
         Drawable::from_obj(rect.into(), draw_type).render(self)
     }
 
+    #[inline]
     pub fn draw_circle<C: Into<Circle>>(&mut self, circle: C, draw_type: DrawType) {
         Drawable::from_obj(circle.into(), draw_type).render(self)
     }
 
+    #[inline]
     pub fn draw_polygon<P: Into<Polygon>>(&mut self, polygon: P, draw_type: DrawType) {
         Drawable::from_obj(polygon.into(), draw_type).render(self)
     }
 
+    #[inline]
     pub fn draw_triangle<T: Into<Triangle>>(&mut self, triangle: T, draw_type: DrawType) {
         Drawable::from_obj(triangle.into(), draw_type).render(self)
     }
 
-    // pub fn draw_ellipse<E: Into<Ellipse>>(&mut self, ellipse: E, draw_type: DrawType) {
-    //     Drawable::from_obj(ellipse.into(), draw_type).render(self)
-    // }
-
-    /// Set the RGB values for a pixel by blending it with the provided color
-    /// This method uses alpha blending, note that the canvas pixels always have 255 alpha
     #[inline]
-    pub fn blend_pixel(&mut self, x: isize, y: isize, color: Color) {
-        let x = x + self.translate.x;
-        let y = y + self.translate.y;
-        if x >= 0 && y >= 0 && x < self.width as isize && self.clip.is_valid((x, y)) {
-            if let Some(base) = self.get_pixel(x, y, false) {
-                let new_color = base.blend(color);
-                let idx = self.index(x as usize, y as usize);
-                self.buffer[idx] = new_color.r;
-                self.buffer[idx + 1] = new_color.g;
-                self.buffer[idx + 2] = new_color.b;
-            }
-        }
+    pub fn draw_ellipse<E: Into<Ellipse>>(&mut self, ellipse: E, draw_type: DrawType) {
+        Drawable::from_obj(ellipse.into(), draw_type).render(self)
     }
 
-    /// Set the RGB values for a pixel
+    /// Update a pixel color, using [set_pixel] or [blend_pixel] depending on whether `color`s alpha is 255 or not
     ///
-    /// Generally you should use [update_pixel][Graphics::update_pixel] instead
-    ///
-    /// This ignores alpha, so 255,0,0,0 will draw a red pixel
+    /// If the alpha is 0 the call is does nothing
     #[inline]
     pub fn set_pixel(&mut self, x: isize, y: isize, color: Color) {
-        let x = x + self.translate.x;
-        let y = y + self.translate.y;
-        if x >= 0 && y >= 0 && x < self.width as isize && self.clip.is_valid((x, y)) {
-            let idx = self.index(x as usize, y as usize);
+        update_pixel(&mut self.buffer, &self.translate, &self.clip, self.width, x, y, color);
+    }
+}
 
-            if idx < self.buffer.len() {
-                self.buffer[idx] = color.r;
-                self.buffer[idx + 1] = color.g;
-                self.buffer[idx + 2] = color.b;
-                self.buffer[idx + 3] = color.a;
-            }
+/// Update a pixel color, using [set_pixel] or [blend_pixel] depending on whether `color`s alpha is 255 or not
+///
+/// If the alpha is 0 the call is does nothing
+fn update_pixel(buffer: &mut [u8], translate: &Coord, clip: &Clip, width: usize, x: isize, y: isize, color: Color) {
+    let x = x + translate.x;
+    let y = y + translate.y;
+    let idx = ((x + y * width as isize) * 4) as usize;
+    if x >= 0 && y >= 0 && x < width as isize && clip.is_valid((x, y)) {
+        match color.a {
+            255 => set_pixel(buffer, idx, color),
+            0 => {}
+            _ => blend_pixel(buffer, idx, color),
         }
     }
+}
+
+/// Set the RGB values for a pixel
+///
+/// Generally you should use [update_pixel] instead
+///
+/// This ignores alpha, so 255,0,0,0 will draw a red pixel
+fn set_pixel(buffer: &mut [u8], idx: usize, color: Color) {
+    if idx < buffer.len() {
+        buffer[idx] = color.r;
+        buffer[idx + 1] = color.g;
+        buffer[idx + 2] = color.b;
+        buffer[idx + 3] = color.a;
+    }
+}
+
+/// Set the RGB values for a pixel by blending it with the provided color
+/// This method uses alpha blending
+/// Generally you should use [update_pixel] instead
+fn blend_pixel(buffer: &mut [u8], idx: usize, color: Color) {
+    let existing_color = Color { r: buffer[idx], g: buffer[idx + 1], b: buffer[idx + 2], a: buffer[idx + 3] };
+    let new_color = existing_color.blend(color);
+    buffer[idx] = new_color.r;
+    buffer[idx + 1] = new_color.g;
+    buffer[idx + 2] = new_color.b;
 }
 
 #[cfg(test)]

@@ -12,7 +12,7 @@ impl<S: Shape + Clone> Renderable<S> for Drawable<S> {
         let color = self.draw_type().color();
 
         for px in self.drawing_points() {
-            graphics.update_pixel(px.x, px.y, color);
+            graphics.set_pixel(px.x, px.y, color);
         }
     }
 }

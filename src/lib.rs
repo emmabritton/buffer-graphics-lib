@@ -43,6 +43,7 @@ pub mod scaling;
 pub mod shapes;
 pub mod text;
 
+use fnv::FnvHashMap;
 use crate::clipping::Clip;
 use crate::GraphicsError::InvalidBufferLength;
 use graphics_shapes::coord::Coord;
@@ -94,6 +95,33 @@ pub struct Graphics<'buffer> {
     height: usize,
     translate: Coord,
     clip: Clip,
+    /// Allows you to replace any ASCII with a custom glyph
+    /// To replace 'a' with '█' write
+    ///
+    /// `custom_font.insert(chr_to_code('a'), CustomLetter { small: [true; 20], ..CustomLetter::default });`
+    ///
+    /// Note: case is ignored
+    ///
+    /// Note: `a-z 0-9 !@$%^&*(),./;'\\[]<>?:\"{}_+~#…¤£¥¢✓` are valid for [text::chr_to_code]
+    pub custom_font: FnvHashMap<u8, CustomLetter>
+}
+
+/// Only the letter sizes you'll use need to be set
+#[derive(Debug, Clone)]
+pub struct CustomLetter {
+    pub small: [bool; text::small::LETTER_PX_COUNT],
+    pub normal: [bool; text::normal::LETTER_PX_COUNT],
+    pub large: [bool; text::large::LETTER_PX_COUNT]
+}
+
+impl Default for CustomLetter {
+    fn default() -> Self {
+        Self {
+            small: [false; text::small::LETTER_PX_COUNT],
+            normal: [false; text::normal::LETTER_PX_COUNT],
+            large: [false; text::large::LETTER_PX_COUNT]
+        }
+    }
 }
 
 impl<'buffer> Graphics<'_> {
@@ -112,6 +140,7 @@ impl<'buffer> Graphics<'_> {
             height,
             translate: Coord::default(),
             clip: Clip::new(width, height),
+            custom_font: FnvHashMap::default()
         })
     }
 
@@ -130,6 +159,7 @@ impl<'buffer> Graphics<'_> {
             height,
             translate: Coord::default(),
             clip: Clip::new(width, height),
+            custom_font: FnvHashMap::default()
         }
     }
 }
