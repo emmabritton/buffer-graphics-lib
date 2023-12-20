@@ -2,7 +2,8 @@
 
 ### Version 0.12.1
 - Add check char to font `✓`
-- Add support for up to 10 custom characters
+- Add support for custom replacement glyphs
+  - For example, this allows 'a' to be printed as '@' (or any custom pattern)
 
 ### Version 0.12.0
 - `Image`
