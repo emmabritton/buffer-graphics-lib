@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.12.3
+- Update shapes lib
+
 ### Version 0.12.2
 - Update shapes lib
 
