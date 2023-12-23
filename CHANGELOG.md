@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.12.4
+- Add `ShapeCollection::bounds()`
+
 ### Version 0.12.3
 - Update shapes lib
 

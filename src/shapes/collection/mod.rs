@@ -70,6 +70,10 @@ impl ShapeCollection {
         self.shapes.remove(idx)
     }
 
+    pub fn bounds(&self) -> &Rect {
+        &self.bounds
+    }
+
     pub fn left(&self) -> isize {
         self.bounds.left()
     }
