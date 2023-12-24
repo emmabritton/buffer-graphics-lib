@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.12.6
+- Fix prelude/imports
+- Fix crash from offscreen drawing
+
 ### Version 0.12.5
 - Update shapes lib
 
