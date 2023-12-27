@@ -11,6 +11,8 @@ use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
 use crate::text::wrapping::WrappingStrategy;
 use crate::Graphics;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 pub const ASCII_DEGREE: u8 = 30;
 pub const ASCII_ELLIPSIS: u8 = 31;
@@ -47,7 +49,8 @@ pub const fn chr_to_code(chr: char) -> u8 {
     }
 }
 
-#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Text {
     content: Vec<Vec<u8>>,
     pos: TextPos,
@@ -117,6 +120,7 @@ impl Renderable<Text> for Text {
 }
 
 /// TextSize is used to set the size and positioning in pixels of text
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, Default)]
 pub enum TextSize {
     Small,

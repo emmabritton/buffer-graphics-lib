@@ -107,7 +107,7 @@ pub struct Graphics<'buffer> {
 }
 
 /// Only the letter sizes you'll use need to be set
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct CustomLetter {
     pub small: [bool; text::small::LETTER_PX_COUNT],
     pub normal: [bool; text::normal::LETTER_PX_COUNT],

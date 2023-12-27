@@ -5,12 +5,15 @@ use graphics_shapes::coord::Coord;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::shape_box::ShapeBox;
 use graphics_shapes::Shape;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::slice::Iter;
 
 pub mod mutation;
 
-#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ShapeCollection {
     shapes: Vec<Drawable<ShapeBox>>,
     bounds: Rect,

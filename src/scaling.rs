@@ -1,8 +1,11 @@
 use crate::image::Image;
 use crate::scaling::Scaling::*;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::num::NonZeroUsize;
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Scaling {
     /// Increase size of image by x_scale and y_scale
     /// Where {2,2} doubles the size

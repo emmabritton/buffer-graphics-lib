@@ -7,7 +7,7 @@ This is a simple graphics library for drawing to a buffer, mainly designed to be
 
 It has basic shape drawing, bitmap text and image rendering.
 
-The `Graphics` struct needs a mutable slice to work on and so mostly likely you'll need to create the struct and pass in the buffer from the rendering library every frame but this should be fine as the struct is nearly empty. 
+The `Graphics` struct needs a mutable slice to work on and so mostly likely you'll need to create the struct and pass in the buffer from the rendering library every frame but this should be fine for performance as the struct is nearly empty. 
 
 ## Usage
 
@@ -15,7 +15,7 @@ The `Graphics` struct needs a mutable slice to work on and so mostly likely you'
 
 In your `Cargo.toml` file add
 ```toml
-buffer-graphics-lib = "0.12.7"
+buffer-graphics-lib = "0.13.0"
 ```
 
 ### Code
@@ -38,9 +38,11 @@ graphics.draw(&drawable);
 
 ## Features
 
+> Default features: "ici", "serde"
+
 ### `ici`
 
-Load ici image files as `IndexedImage`s
+* Load ici, ica image files as `IndexedImage`s
 
 ```rust
 let image: IndexedImage...
@@ -49,7 +51,7 @@ graphics.draw_indexed_image(coord, &image);
 
 ### `image_loading`
 
-Load png, bmp, etc image files as `Image`s
+* Load png, bmp, etc image files as `Image`s
 
 #### Code
 ```rust
@@ -57,8 +59,11 @@ let image = load_image("resources/example.png")?;
 graphics.draw_image(40, 20, &image);
 ```
 
-### `serde_derive`
+### `serde`
 
-Enabled by default
+* Adds derive `Serialize` and `Deserialize` for most structs and enums
+* Enable `graphics-shapes/serde`
 
-Adds derive `Serialize` and `Deserialize` for `DrawType` and `Color`
+### `mint`
+
+Enable `graphics-shapes/mint` 

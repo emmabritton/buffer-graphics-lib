@@ -1,8 +1,11 @@
 use crate::color::Color;
 use crate::text::wrapping::WrappingStrategy;
 use crate::text::TextSize;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// Characters be drawn be at idx * char_width, idx * char_height
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct TextFormat {
     color: Color,
@@ -13,8 +16,10 @@ pub struct TextFormat {
     positioning: Positioning,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Default)]
 pub enum Positioning {
+    #[default]
     LeftTop,
     CenterTop,
     RightTop,

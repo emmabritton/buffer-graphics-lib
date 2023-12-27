@@ -6,7 +6,10 @@ use crate::shapes::polyline::error::PolylineError;
 use crate::shapes::polyline::error::PolylineError::{InvalidPolyline, PolylineAlreadyClosed};
 use crate::shapes::polyline::Segment::*;
 use graphics_shapes::coord::Coord;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Segment {
     Start(Coord),
@@ -34,7 +37,8 @@ impl Segment {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Polyline {
     segments: Vec<Segment>,
     color: Color,

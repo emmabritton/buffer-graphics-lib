@@ -1,5 +1,10 @@
 # Changelog
 
+### Version 0.13.0
+- Rename feature `serde_derive` to `serde`
+- Add feature based `Serialize` and `Deserialize` to most structs and enums
+- Add feature `mint`
+
 ### Version 0.12.7
 - Update shapes lib
 

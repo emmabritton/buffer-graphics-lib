@@ -1,7 +1,10 @@
 use crate::text::TextSize;
 use graphics_shapes::coord::Coord;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 pub enum TextPos {
     Px(isize, isize),
     /// See [TextSize::get_max_characters] for maximum x and y

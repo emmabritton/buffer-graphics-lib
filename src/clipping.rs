@@ -3,9 +3,12 @@ use graphics_shapes::coord::Coord;
 use graphics_shapes::prelude::{Circle, Rect};
 use graphics_shapes::Shape;
 use log::error;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::mem::swap;
 
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 enum ClipShape {
     Box(Rect),
     Round(Circle),
@@ -20,13 +23,15 @@ impl ClipShape {
     }
 }
 
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 enum ClipElement {
     Add(ClipShape),
     Remove(ClipShape),
 }
 
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 enum ClipMode {
     Nothing,
     Simple(ClipShape),
@@ -46,6 +51,8 @@ enum ClipMode {
 /// The last shape to touch a pixel determines it's validity
 ///
 /// With complex mode a list of valid pixels is stored internally and each time the complex clip is updated the valid list is updated as well, if you're making a bulk edit call `set_auto_build_map(false)` first
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Clip {
     width: usize,
     height: usize,

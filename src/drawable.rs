@@ -2,10 +2,10 @@ use crate::color::Color;
 use crate::shapes::CreateDrawable;
 use graphics_shapes::coord::Coord;
 use graphics_shapes::{IntersectsContains, Shape};
-#[cfg(feature = "serde_derive")]
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum DrawType {
     Stroke(Color),
@@ -37,6 +37,7 @@ pub fn stroke(color: Color) -> DrawType {
 }
 
 /// Represents a shape that is made of points that can be drawn either as a outline or solid
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Drawable<T: Clone> {
     obj: T,

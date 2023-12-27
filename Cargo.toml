@@ -1,6 +1,6 @@
 [package]
 name = "buffer-graphics-lib"
-version = "0.12.7"
+version = "0.13.0"
 edition = "2021"
 authors = ["Emma Britton <emmabritton@pm.me>"]
 description = "Simple graphics library for buffers"
@@ -11,14 +11,15 @@ keywords = ["graphics", "gamedev", "simple"]
 categories = ["graphics", "game-development"]
 
 [features]
-default = ["serde_derive", "ici"]
+default = ["serde", "ici"]
 image_loading = ["image"]
-serde_derive = ["serde"]
+serde = ["dep:serde", "graphics-shapes/serde"]
 ici = ["ici-files"]
+mint = ["graphics-shapes/mint"]
 
 [dependencies]
-thiserror = "1.0.51"
-graphics-shapes = "0.2.7"
+thiserror = "1.0.52"
+graphics-shapes = { version = "0.3.0", default-features = false }
 serde = { version = "1.0.193", features = ["derive"], optional = true }
 image = { version = "0.24.7", optional = true }
 log = "0.4.20"
@@ -27,4 +28,4 @@ fnv = "1.0.7"
 
 [dev-dependencies]
 fastrand = "2.0.1"
-anyhow = "1.0.75"
+anyhow = "1.0.77"
