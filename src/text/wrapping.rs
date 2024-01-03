@@ -22,15 +22,17 @@ pub enum WrappingStrategy {
 impl WrappingStrategy {
     pub fn wrap(&self, input: &str) -> Vec<String> {
         match self {
-            WrappingStrategy::None => vec![input.to_string()],
+            WrappingStrategy::None => input.split('\n').map(|s| s.to_string()).collect(),
             WrappingStrategy::AtCol(col) => {
                 let mut output = vec![];
-                let mut text = input.to_string();
-                while text.chars().count() > *col {
-                    output.push(text.chars().take(*col).collect());
-                    text = text.chars().skip(*col).collect();
+                let lines = WrappingStrategy::None.wrap(input);
+                for mut line in lines {
+                    while line.chars().count() > *col {
+                        output.push(line.chars().take(*col).collect());
+                        line = line.chars().skip(*col).collect();
+                    }
+                    output.push(line);
                 }
-                output.push(text);
                 output
             }
             WrappingStrategy::SpaceBeforeCol(col) => {
@@ -105,6 +107,8 @@ mod test {
     #[test]
     fn none() {
         assert_eq!(None.wrap("this is a test"), c(&["this is a test"]));
+        assert_eq!(None.wrap("this is\na test"), c(&["this is", "a test"]));
+        assert_eq!(None.wrap("this is \n a test"), c(&["this is ", " a test"]));
     }
 
     #[test]
@@ -113,6 +117,11 @@ mod test {
             AtCol(4).wrap("some words, and some are longer"),
             c(&["some", " wor", "ds, ", "and ", "some", " are", " lon", "ger"])
         );
+
+        assert_eq!(
+            AtCol(5).wrap("Split Here\nBut mid word\nhere"),
+            c(&["Split"," Here","But m", "id wo", "rd","here"])
+        )
     }
 
     #[test]
