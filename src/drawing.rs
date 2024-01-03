@@ -90,7 +90,7 @@ impl Graphics<'_> {
             })
             .collect::<Vec<Color>>();
         Image::new(pixels, self.width, self.height)
-            .expect("Copy to image failed, please create github issue for buffer-graphics-lib")
+            .expect("Copy to image failed, please create GitHub issue for buffer-graphics-lib")
     }
 
     /// Get top left pixel coord for letter px coord

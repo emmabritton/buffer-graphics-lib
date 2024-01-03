@@ -1,8 +1,9 @@
 use crate::color::{Color, WHITE};
 use crate::renderable_image::{DrawOffset, RenderableImage};
 use crate::scaling::*;
-use crate::{GraphicsError, Tint};
+use crate::{Graphics, GraphicsError, Tint};
 use graphics_shapes::coord::Coord;
+use ici_files::image::IndexedImage;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Formatter};
@@ -44,8 +45,16 @@ impl Image {
     pub fn new_blank(width: usize, height: usize) -> Self {
         let pixels = vec![WHITE; width * height];
         Image::new(pixels, width, height).expect(
-            "Failed to create blank image, please create github issue for buffer-graphics-lib",
+            "Failed to create blank image, please create GitHub issue for buffer-graphics-lib",
         )
+    }
+
+    pub fn from_indexed(indexed_image: IndexedImage) -> Image {
+        let mut pixels = vec![0; indexed_image.width() as usize * indexed_image.height() as usize];
+        let mut graphics = Graphics::new(&mut pixels, indexed_image.width() as usize, indexed_image.height() as usize)
+            .expect("Creating buffer to make image from indexed image, please raise an issue on GitHub buffer-graphics-lib");
+        graphics.draw_indexed_image((0, 0), &indexed_image);
+        graphics.copy_to_image()
     }
 }
 
@@ -268,7 +277,7 @@ mod test {
             3,
             3,
         )
-        .unwrap()
+            .unwrap()
     }
 
     #[test]
@@ -434,7 +443,7 @@ mod test {
             3,
             2,
         )
-        .unwrap();
+            .unwrap();
 
         let epx2 = image.scale(Scaling::Epx2x);
         let epx4 = image.scale(Scaling::Epx4x);
