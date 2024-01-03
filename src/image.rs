@@ -49,8 +49,8 @@ impl Image {
         )
     }
 
-    pub fn from_indexed(indexed_image: IndexedImage) -> Image {
-        let mut pixels = vec![0; indexed_image.width() as usize * indexed_image.height() as usize];
+    pub fn from_indexed(indexed_image: &IndexedImage) -> Image {
+        let mut pixels = vec![0; indexed_image.width() as usize * indexed_image.height() as usize * 4];
         let mut graphics = Graphics::new(&mut pixels, indexed_image.width() as usize, indexed_image.height() as usize)
             .expect("Creating buffer to make image from indexed image, please raise an issue on GitHub buffer-graphics-lib");
         graphics.draw_indexed_image((0, 0), &indexed_image);
