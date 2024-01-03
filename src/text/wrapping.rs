@@ -83,13 +83,17 @@ impl WrappingStrategy {
                 output.push(text);
                 output
             }
-            WrappingStrategy::Cutoff(col) => vec![input.chars().take(*col).collect()],
+            WrappingStrategy::Cutoff(col) => input.split('\n').map(|line| line.chars().take(*col).collect()).collect(),
             WrappingStrategy::Ellipsis(col) => {
-                if input.chars().count() >= *col {
-                    vec![format!("{}…", input.chars().take(*col).collect::<String>())]
-                } else {
-                    vec![input.to_string()]
-                }
+                input.split('\n')
+                    .map(|line| {
+                        if line.chars().count() >= *col {
+                            format!("{}…", line.chars().take(*col).collect::<String>())
+                        } else {
+                            line.to_string()
+                        }
+                    })
+                    .collect()
             }
         }
     }
@@ -148,11 +152,13 @@ mod test {
     fn cutoff() {
         assert_eq!(Cutoff(30).wrap("short test"), c(&["short test"]));
         assert_eq!(Cutoff(10).wrap("longer test string"), c(&["longer tes"]));
+        assert_eq!(Cutoff(10).wrap("longer\ntest string"), c(&["longer","test strin"]));
     }
 
     #[test]
     fn ellipsis() {
         assert_eq!(Ellipsis(30).wrap("short test"), c(&["short test"]));
         assert_eq!(Ellipsis(10).wrap("longer test string"), c(&["longer tes…"]));
+        assert_eq!(Ellipsis(10).wrap("longer\ntest string"), c(&["longer","test strin…"]));
     }
 }
