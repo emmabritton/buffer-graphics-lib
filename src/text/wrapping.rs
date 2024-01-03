@@ -5,14 +5,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Eq, PartialEq, Copy, Default)]
 pub enum WrappingStrategy {
     #[default]
-    /// Don't wrap, will draw off screen
+    /// Don't wrap, may draw off screen
     None,
     /// Splits string at column
     AtCol(usize),
     /// Wraps at the first space before column (acts like AtCol if no space is on that line)
     SpaceBeforeCol(usize),
-    /// Same as AtCol but adds a hypen if it's splitting a word
-    AtColWithHypen(usize),
+    /// Same as AtCol but adds a hyphen if it's splitting a word
+    AtColWithHyphen(usize),
     /// Chops off the end of string it's over specific length
     Cutoff(usize),
     /// Same as Cutoff but adds an ellipsis
@@ -66,7 +66,7 @@ impl WrappingStrategy {
                 output.push(text);
                 output.iter().map(|s| s.trim().to_string()).collect()
             }
-            WrappingStrategy::AtColWithHypen(col) => {
+            WrappingStrategy::AtColWithHyphen(col) => {
                 let mut output = vec![];
                 let mut text = input.to_string();
                 while text.chars().count() > *col {
@@ -125,7 +125,7 @@ mod test {
     }
 
     #[test]
-    fn at_col_hypen() {
+    fn at_col_hyphen() {
         assert_eq!(
             AtCol(4).wrap("some words, and some are longer"),
             c(&["some", " wor", "ds, ", "and ", "some", " are", " lon", "ger"])
