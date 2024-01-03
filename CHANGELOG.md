@@ -3,6 +3,8 @@
 ### Version 0.14.0
 - Add `Image` from `IndexedImage` method
 - Shift Font Small `0` right by 1px
+- Add new line support for text rendering
+- Fix `WrappingStrategy::AtColWithHyphen`
 
 ### Version 0.13.0
 - Rename feature `serde_derive` to `serde`

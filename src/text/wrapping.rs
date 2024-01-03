@@ -43,10 +43,10 @@ impl WrappingStrategy {
                     let line: String = text.chars().take(*col).collect();
                     if line.ends_with(|c: char| c.is_whitespace())
                         || text
-                            .chars()
-                            .nth(*col)
-                            .map(|c| c.is_whitespace())
-                            .unwrap_or(false)
+                        .chars()
+                        .nth(*col)
+                        .map(|c| c.is_whitespace())
+                        .unwrap_or(false)
                     {
                         output.push(text.chars().take(*col).collect());
                         text = text.chars().skip(*col).collect();
@@ -68,19 +68,20 @@ impl WrappingStrategy {
             }
             WrappingStrategy::AtColWithHyphen(col) => {
                 let mut output = vec![];
-                let mut text = input.to_string();
-                while text.chars().count() > *col {
-                    let line: String = text.chars().take(*col).collect();
-                    if line.chars().last().unwrap_or(' ').is_alphabetic()
-                        && text.chars().next().unwrap_or(' ').is_alphabetic()
-                    {
-                        output.push(format!("{line}-"));
-                    } else {
-                        output.push(line);
+                let lines = WrappingStrategy::None.wrap(input);
+                for mut line in lines {
+                    while line.chars().count() > *col {
+                        let text: String = line.chars().take(*col).collect();
+                        if text.chars().last().unwrap_or(' ').is_alphabetic() &&
+                            line.chars().skip(*col).next().unwrap_or(' ').is_alphabetic() {
+                            output.push(format!("{text}-"));
+                        } else {
+                            output.push(text.clone());
+                        }
+                        line = line.chars().skip(*col).collect();
                     }
-                    text = text.chars().skip(*col).collect();
+                    output.push(line)
                 }
-                output.push(text);
                 output
             }
             WrappingStrategy::Cutoff(col) => input.split('\n').map(|line| line.chars().take(*col).collect()).collect(),
@@ -124,15 +125,23 @@ mod test {
 
         assert_eq!(
             AtCol(5).wrap("Split Here\nBut mid word\nhere"),
-            c(&["Split"," Here","But m", "id wo", "rd","here"])
+            c(&["Split", " Here", "But m", "id wo", "rd", "here"])
         )
     }
 
     #[test]
     fn at_col_hyphen() {
         assert_eq!(
-            AtCol(4).wrap("some words, and some are longer"),
-            c(&["some", " wor", "ds, ", "and ", "some", " are", " lon", "ger"])
+            AtColWithHyphen(4).wrap("some words, and some are longer"),
+            c(&["some", " wor-", "ds, ", "and ", "some", " are", " lon-", "ger"])
+        );
+        assert_eq!(
+            AtColWithHyphen(4).wrap("smol large massive"),
+            c(&["smol", " lar-", "ge m-", "assi-", "ve"])
+        );
+        assert_eq!(
+            AtColWithHyphen(4).wrap("smol large\nmassive"),
+            c(&["smol", " lar-", "ge", "mass-", "ive"])
         );
     }
 
@@ -152,13 +161,13 @@ mod test {
     fn cutoff() {
         assert_eq!(Cutoff(30).wrap("short test"), c(&["short test"]));
         assert_eq!(Cutoff(10).wrap("longer test string"), c(&["longer tes"]));
-        assert_eq!(Cutoff(10).wrap("longer\ntest string"), c(&["longer","test strin"]));
+        assert_eq!(Cutoff(10).wrap("longer\ntest string"), c(&["longer", "test strin"]));
     }
 
     #[test]
     fn ellipsis() {
         assert_eq!(Ellipsis(30).wrap("short test"), c(&["short test"]));
         assert_eq!(Ellipsis(10).wrap("longer test string"), c(&["longer tes…"]));
-        assert_eq!(Ellipsis(10).wrap("longer\ntest string"), c(&["longer","test strin…"]));
+        assert_eq!(Ellipsis(10).wrap("longer\ntest string"), c(&["longer", "test strin…"]));
     }
 }
