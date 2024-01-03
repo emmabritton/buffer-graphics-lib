@@ -320,11 +320,15 @@ const ZERO: [bool; LETTER_PX_COUNT] = [
     true, true, true, true, false,
 ];
 const ONE: [bool; LETTER_PX_COUNT] = [
-    false, false, true, true, true, false, false, false, false, true, true, true, true, false,
-    false, false, true, true, true, true, true, false, false, false, true, true, false, true, true,
-    false, false, false, false, false, false, true, true, false, false, false, false, false, false,
-    true, true, false, false, false, false, false, false, true, true, false, false, false, false,
-    false, false, true, true, false, false, false, true, true, true, true, true, true, true, true,
+    false, false, false, true, true, true, false, false,
+    false, false, true, true, true, true, false, false,
+    false, true, true, true, true, true, false, false,
+    false, true, true, false, true, true, false, false,
+    false, false, false, false, true, true, false, false,
+    false, false, false, false, true, true, false, false,
+    false, false, false, false, true, true, false, false,
+    false, false, false, false, true, true, false, false,
+    true, true, true, true, true, true, true, true,
     true, true, true, true, true, true, true, true,
 ];
 const TWO: [bool; LETTER_PX_COUNT] = [
