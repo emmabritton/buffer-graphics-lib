@@ -50,10 +50,11 @@ impl Image {
     }
 
     pub fn from_indexed(indexed_image: &IndexedImage) -> Image {
-        let mut pixels = vec![0; indexed_image.width() as usize * indexed_image.height() as usize * 4];
+        let mut pixels =
+            vec![0; indexed_image.width() as usize * indexed_image.height() as usize * 4];
         let mut graphics = Graphics::new(&mut pixels, indexed_image.width() as usize, indexed_image.height() as usize)
             .expect("Creating buffer to make image from indexed image, please raise an issue on GitHub buffer-graphics-lib");
-        graphics.draw_indexed_image((0, 0), &indexed_image);
+        graphics.draw_indexed_image((0, 0), indexed_image);
         graphics.copy_to_image()
     }
 }
@@ -277,7 +278,7 @@ mod test {
             3,
             3,
         )
-            .unwrap()
+        .unwrap()
     }
 
     #[test]
@@ -443,7 +444,7 @@ mod test {
             3,
             2,
         )
-            .unwrap();
+        .unwrap();
 
         let epx2 = image.scale(Scaling::Epx2x);
         let epx4 = image.scale(Scaling::Epx4x);

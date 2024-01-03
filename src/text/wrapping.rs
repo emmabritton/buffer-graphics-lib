@@ -43,10 +43,10 @@ impl WrappingStrategy {
                     let line: String = text.chars().take(*col).collect();
                     if line.ends_with(|c: char| c.is_whitespace())
                         || text
-                        .chars()
-                        .nth(*col)
-                        .map(|c| c.is_whitespace())
-                        .unwrap_or(false)
+                            .chars()
+                            .nth(*col)
+                            .map(|c| c.is_whitespace())
+                            .unwrap_or(false)
                     {
                         output.push(text.chars().take(*col).collect());
                         text = text.chars().skip(*col).collect();
@@ -72,8 +72,9 @@ impl WrappingStrategy {
                 for mut line in lines {
                     while line.chars().count() > *col {
                         let text: String = line.chars().take(*col).collect();
-                        if text.chars().last().unwrap_or(' ').is_alphabetic() &&
-                            line.chars().skip(*col).next().unwrap_or(' ').is_alphabetic() {
+                        if text.chars().last().unwrap_or(' ').is_alphabetic()
+                            && line.chars().nth(*col).unwrap_or(' ').is_alphabetic()
+                        {
                             output.push(format!("{text}-"));
                         } else {
                             output.push(text.clone());
@@ -84,18 +85,20 @@ impl WrappingStrategy {
                 }
                 output
             }
-            WrappingStrategy::Cutoff(col) => input.split('\n').map(|line| line.chars().take(*col).collect()).collect(),
-            WrappingStrategy::Ellipsis(col) => {
-                input.split('\n')
-                    .map(|line| {
-                        if line.chars().count() >= *col {
-                            format!("{}…", line.chars().take(*col).collect::<String>())
-                        } else {
-                            line.to_string()
-                        }
-                    })
-                    .collect()
-            }
+            WrappingStrategy::Cutoff(col) => input
+                .split('\n')
+                .map(|line| line.chars().take(*col).collect())
+                .collect(),
+            WrappingStrategy::Ellipsis(col) => input
+                .split('\n')
+                .map(|line| {
+                    if line.chars().count() >= *col {
+                        format!("{}…", line.chars().take(*col).collect::<String>())
+                    } else {
+                        line.to_string()
+                    }
+                })
+                .collect(),
         }
     }
 }
@@ -161,13 +164,19 @@ mod test {
     fn cutoff() {
         assert_eq!(Cutoff(30).wrap("short test"), c(&["short test"]));
         assert_eq!(Cutoff(10).wrap("longer test string"), c(&["longer tes"]));
-        assert_eq!(Cutoff(10).wrap("longer\ntest string"), c(&["longer", "test strin"]));
+        assert_eq!(
+            Cutoff(10).wrap("longer\ntest string"),
+            c(&["longer", "test strin"])
+        );
     }
 
     #[test]
     fn ellipsis() {
         assert_eq!(Ellipsis(30).wrap("short test"), c(&["short test"]));
         assert_eq!(Ellipsis(10).wrap("longer test string"), c(&["longer tes…"]));
-        assert_eq!(Ellipsis(10).wrap("longer\ntest string"), c(&["longer", "test strin…"]));
+        assert_eq!(
+            Ellipsis(10).wrap("longer\ntest string"),
+            c(&["longer", "test strin…"])
+        );
     }
 }

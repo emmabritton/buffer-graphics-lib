@@ -5,6 +5,7 @@
 - Shift Font Small `0` right by 1px
 - Add new line support for text rendering
 - Fix `WrappingStrategy::AtColWithHyphen`
+- Update shapes lib
 
 ### Version 0.13.0
 - Rename feature `serde_derive` to `serde`

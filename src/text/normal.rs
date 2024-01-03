@@ -350,13 +350,9 @@ const ZERO: [bool; LETTER_PX_COUNT] = [
     true, false, false, true, false, false, true, false, false, false, true, true, false, false,
 ];
 const ONE: [bool; LETTER_PX_COUNT] = [
-    false, false, false, true, false, false,
-    false, false, true, true, false, false,
-    false, false, false, true, false, false,
-    false, false, false, true, false, false,
-    false, false, false, true, false, false,
-    false, false, false, true, false, false,
-    false, false, true, true, true, false,
+    false, false, false, true, false, false, false, false, true, true, false, false, false, false,
+    false, true, false, false, false, false, false, true, false, false, false, false, false, true,
+    false, false, false, false, false, true, false, false, false, false, true, true, true, false,
 ];
 const TWO: [bool; LETTER_PX_COUNT] = [
     false, false, true, true, false, false, false, true, false, false, true, false, false, false,

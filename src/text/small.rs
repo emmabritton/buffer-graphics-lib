@@ -284,11 +284,8 @@ const PERCENT: [bool; LETTER_PX_COUNT] = [
     false, true, false, false, false, false,
 ];
 const ZERO: [bool; LETTER_PX_COUNT] = [
-    false, false, true, false,
-    false, true, false, true,
-    false, true, false, true,
-    false, true, false, true,
-    false, false, true, false,
+    false, false, true, false, false, true, false, true, false, true, false, true, false, true,
+    false, true, false, false, true, false,
 ];
 const ONE: [bool; LETTER_PX_COUNT] = [
     false, false, true, false, false, true, true, false, false, false, true, false, false, false,
