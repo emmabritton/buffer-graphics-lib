@@ -1,5 +1,10 @@
 # Changelog
 
+### Version 0.15.0
+- Update ici lib
+- Remove `Graphics::get_text_size()`, use `Textsize::measure()` instead
+- Tidy up code
+
 ### Version 0.14.0
 - Add `Image` from `IndexedImage` method
 - Shift Font Small `0` right by 1px

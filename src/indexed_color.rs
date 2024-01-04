@@ -95,7 +95,7 @@ impl ChangeColors for IndexedImage {
         let mut image = self.clone();
         image
             .set_palette(&image.get_palette().to_vec().with_saturate(amount))
-            .expect("Color disappeared when changing saturation");
+            .expect("Color disappeared when changing saturation, please raise an issue on GitHub buffer-graphics-lib");
         image
     }
 
@@ -103,7 +103,7 @@ impl ChangeColors for IndexedImage {
         let mut image = self.clone();
         image
             .set_palette(&image.get_palette().to_vec().with_brightness(amount))
-            .expect("Color disappeared when changing saturation");
+            .expect("Color disappeared when changing saturation, please raise an issue on GitHub buffer-graphics-lib");
         image
     }
 }
@@ -113,7 +113,7 @@ impl ChangeColors for AnimatedIndexedImage {
         let mut image = self.clone();
         image
             .set_palette(&image.get_palette().to_vec().with_saturate(amount))
-            .expect("Color disappeared when changing saturation");
+            .expect("Color disappeared when changing saturation, please raise an issue on GitHub buffer-graphics-lib");
         image
     }
 
@@ -121,7 +121,7 @@ impl ChangeColors for AnimatedIndexedImage {
         let mut image = self.clone();
         image
             .set_palette(&image.get_palette().to_vec().with_brightness(amount))
-            .expect("Color disappeared when changing saturation");
+            .expect("Color disappeared when changing saturation, please raise an issue on GitHub buffer-graphics-lib");
         image
     }
 }

@@ -42,9 +42,8 @@ pub fn calc_bounds(list: &[Drawable<ShapeBox>]) -> Rect {
     bounds
 }
 
-impl ShapeCollection {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+impl Default for ShapeCollection {
+    fn default() -> Self {
         ShapeCollection {
             shapes: vec![],
             bounds: Rect::new((0, 0), (0, 0)),
@@ -53,46 +52,57 @@ impl ShapeCollection {
 }
 
 impl ShapeCollection {
+    #[inline]
     pub fn iter(&self) -> Iter<'_, Drawable<ShapeBox>> {
         self.shapes.iter()
     }
 
+    #[inline]
     pub fn len(&self) -> usize {
         self.shapes.len()
     }
 
+    #[inline]
     pub fn is_empty(&self) -> bool {
         self.shapes.is_empty()
     }
 
+    #[inline]
     fn update_bounds(&mut self) {
         self.bounds = calc_bounds(&self.shapes);
     }
 
+    #[inline]
     pub fn remove(&mut self, idx: usize) -> Drawable<ShapeBox> {
         self.shapes.remove(idx)
     }
 
+    #[inline]
     pub fn bounds(&self) -> &Rect {
         &self.bounds
     }
 
+    #[inline]
     pub fn left(&self) -> isize {
         self.bounds.left()
     }
 
+    #[inline]
     pub fn top(&self) -> isize {
         self.bounds.top()
     }
 
+    #[inline]
     pub fn bottom(&self) -> isize {
         self.bounds.bottom()
     }
 
+    #[inline]
     pub fn right(&self) -> isize {
         self.bounds.right()
     }
 
+    #[inline]
     pub fn center(&self) -> Coord {
         self.bounds.center()
     }

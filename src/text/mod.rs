@@ -99,6 +99,7 @@ impl Text {
         }
     }
 
+    #[inline]
     pub fn with_color(&self, color: Color) -> Self {
         self.with_formatting(self.formatting().with_color(color))
     }

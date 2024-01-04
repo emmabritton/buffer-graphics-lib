@@ -84,7 +84,7 @@ mod test {
 
     #[test]
     fn check_with_translation() {
-        let mut collection = ShapeCollection::new();
+        let mut collection = ShapeCollection::default();
         InsertShape::insert_above(&mut collection, Rect::new((20, 20), (40, 40)), fill(RED));
         InsertShape::insert_above(&mut collection, Rect::new((60, 20), (80, 40)), fill(RED));
 
@@ -101,7 +101,7 @@ mod test {
 
     #[test]
     fn check_with_move() {
-        let mut collection = ShapeCollection::new();
+        let mut collection = ShapeCollection::default();
         InsertShape::insert_above(&mut collection, Rect::new((20, 20), (40, 40)), fill(RED));
         InsertShape::insert_above(&mut collection, Rect::new((60, 20), (80, 40)), fill(RED));
 

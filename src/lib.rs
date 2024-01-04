@@ -23,8 +23,6 @@
 //! graphics.draw(&drawable);
 //! ```
 
-#![deny(clippy::all)]
-
 extern crate core;
 
 pub mod clipping;
@@ -71,12 +69,20 @@ pub mod prelude {
     pub use crate::Graphics;
     pub use crate::GraphicsError;
     pub use graphics_shapes::prelude::*;
+    #[cfg(feature = "ici")]
     pub use ici_files::animated::*;
+    #[cfg(feature = "ici")]
     pub use ici_files::errors::*;
+    #[cfg(feature = "ici")]
     pub use ici_files::image::*;
+    #[cfg(feature = "ici")]
     pub use ici_files::palette::*;
     #[cfg(feature = "ici")]
     pub use ici_files::*;
+    #[cfg(feature = "image_loading")]
+    pub use image_lib::ImageError;
+    #[cfg(feature = "image_loading")]
+    pub use image_lib::ImageFormat;
 }
 
 #[derive(Error, Debug)]

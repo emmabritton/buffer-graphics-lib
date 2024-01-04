@@ -30,10 +30,12 @@ impl Graphics<'_> {
         (x + y * self.width) * 4
     }
 
+    #[inline]
     pub fn width(&self) -> usize {
         self.width
     }
 
+    #[inline]
     pub fn height(&self) -> usize {
         self.height
     }
@@ -58,12 +60,14 @@ impl Graphics<'_> {
     ///
     /// # Returns
     /// The previous translate value
+    #[inline]
     pub fn set_translate(&mut self, new_value: Coord) -> Coord {
         let old = self.translate;
         self.translate = new_value;
         old
     }
 
+    #[inline]
     pub fn with_translate<F: Fn(&mut Graphics)>(&mut self, set: Coord, method: F) {
         let old_trans = self.set_translate(set);
         method(self);
@@ -93,30 +97,11 @@ impl Graphics<'_> {
             .expect("Copy to image failed, please create GitHub issue for buffer-graphics-lib")
     }
 
-    /// Get top left pixel coord for letter px coord
-    pub fn get_px_for_char(x: usize, y: usize, size: TextSize) -> (usize, usize) {
+    /// Get top left pixel coord for letter col row
+    pub fn get_px_for_char(col: usize, row: usize, size: TextSize) -> (usize, usize) {
         let (width, height) = size.get_size();
         let margin = size.get_spacing();
-        (x * (width + margin), y * (height + margin))
-    }
-
-    /// Get width and height for string
-    ///
-    /// # Arguments
-    /// * `text` - The string to be measured
-    /// * `width` - The line width in characters
-    /// * `size` - The text size to use when measuring
-    ///
-    /// # Returns
-    ///
-    /// The width and height of the string in pixels
-    pub fn get_text_size(text: &str, width: usize, size: TextSize) -> (usize, usize) {
-        let len = text.chars().count();
-        let x = if len < width { len } else { width };
-        let y = (len as f64 / width as f64).ceil() as usize;
-        let (width, height) = size.get_size();
-        let margin = size.get_spacing();
-        ((width + margin) * x, (height + margin) * y)
+        (col * (width + margin), row * (height + margin))
     }
 
     /// Draw an image at `x`, `y` as fast as possible
@@ -343,11 +328,9 @@ impl Graphics<'_> {
     }
 
     /// Draw renderable offset by [xy]
+    #[inline]
     pub fn draw_offset<T, P: Into<Coord>>(&mut self, xy: P, renderable: &dyn Renderable<T>) {
-        let xy = xy.into();
-        self.update_translate(xy);
-        renderable.render(self);
-        self.update_translate(-xy);
+        self.with_translate(xy.into(), |g| renderable.render(g));
     }
 
     /// Draw renderable

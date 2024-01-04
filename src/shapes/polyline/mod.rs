@@ -110,22 +110,6 @@ impl Polyline {
         Ok(self)
     }
 
-    // pub fn add_arc_to<P: Into<Coord>>(mut self, point: P) -> Result<Self, PolylineError> {
-    //     if self.closed { return Err(PolylineAlreadyClosed); }
-    //
-    //     let start = self.segments.last().unwrap().end_coord();
-    //     let end = point.into();
-    //     let cx =  start.x.min(end.x);
-    //     let cy =  start.y.min(end.y);
-    //     let center = Coord::new(cx, cy);
-    //     let radius = start.distance(end) / 2;
-    //     let angle_start = center.angle_to(start);
-    //     let angle_end = center.angle_to(end);
-    //     self.segments.push(ArcAround { center, radius, angle_start, angle_end });
-    //
-    //     Ok(self)
-    // }
-
     pub fn add_arc_around<P: Into<Coord>>(
         mut self,
         center: P,
