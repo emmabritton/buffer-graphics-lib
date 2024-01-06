@@ -1,6 +1,6 @@
 [package]
 name = "buffer-graphics-lib"
-version = "0.15.0"
+version = "0.15.1"
 edition = "2021"
 authors = ["Emma Britton <emmabritton@pm.me>"]
 description = "Simple graphics library for buffers"
@@ -20,10 +20,10 @@ mint = ["graphics-shapes/mint"]
 [dependencies]
 thiserror = "1.0.56"
 graphics-shapes = { version = "0.4.0", default-features = false }
-serde = { version = "1.0.194", features = ["derive"], optional = true }
+serde = { version = "1.0.195", features = ["derive"], optional = true }
 image_lib = { package = "image", version = "0.24.7", optional = true }
 log = "0.4.20"
-ici-files = { version = "0.1.5", optional = true }
+ici-files = { version = "0.1.7", optional = true }
 fnv = "1.0.7"
 
 [dev-dependencies]

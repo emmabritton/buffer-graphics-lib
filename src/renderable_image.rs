@@ -1,55 +1,11 @@
 use crate::drawing::Renderable;
 use crate::image::Image;
-use crate::Graphics;
+use crate::{sized_renderable, Graphics};
 use graphics_shapes::coord::Coord;
-use std::ops::Neg;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub enum DrawOffset {
-    TopLeft,
-    Center,
-    Custom(Coord),
-}
-
-#[derive(Debug, Clone)]
-pub struct RenderableImage {
-    image: Image,
-    xy: Coord,
-    offset: DrawOffset,
-}
-
-impl RenderableImage {
-    pub fn new(image: Image, xy: Coord, offset: DrawOffset) -> Self {
-        Self { image, xy, offset }
-    }
-}
-
-impl RenderableImage {
-    pub fn set_position<P: Into<Coord>>(&mut self, new_position: P) {
-        self.xy = new_position.into();
-    }
-
-    pub fn update_position<P: Into<Coord>>(&mut self, delta: P) {
-        self.xy = self.xy + delta.into();
-    }
-
-    pub fn set_offset(&mut self, offset: DrawOffset) {
-        self.offset = offset;
-    }
-}
-
-impl Renderable<Image> for RenderableImage {
-    fn render(&self, graphics: &mut Graphics) {
-        let offset = match self.offset {
-            DrawOffset::TopLeft => (0, 0).into(),
-            DrawOffset::Center => (
-                ((self.image.width() / 2) as isize).neg(),
-                ((self.image.height() / 2) as isize).neg(),
-            )
-                .into(),
-            DrawOffset::Custom(coord) => coord,
-        };
-
-        graphics.draw_image(self.xy + offset, &self.image);
-    }
-}
+sized_renderable!(
+    RenderableImage,
+    Image,
+    |img: &Image| (img.width(), img.height()),
+    |g: &mut Graphics, img: &Image| g.draw_image((0, 0), img)
+);

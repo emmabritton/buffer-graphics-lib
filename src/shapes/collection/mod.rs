@@ -1,6 +1,6 @@
 use crate::drawing::Renderable;
 use crate::prelude::*;
-use crate::Graphics;
+use crate::{sized_renderable, Graphics};
 use graphics_shapes::coord::Coord;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::shape_box::ShapeBox;
@@ -115,6 +115,13 @@ impl Renderable<ShapeCollection> for ShapeCollection {
         }
     }
 }
+
+sized_renderable!(
+    RenderableShapeCollection,
+    ShapeCollection,
+    |col: &ShapeCollection| (col.bounds().width(), col.bounds().height()),
+    |g: &mut Graphics, col: &ShapeCollection| col.render(g)
+);
 
 impl InsertDrawable<ShapeBox> for ShapeCollection {
     fn insert(&mut self, index: usize, drawable: Drawable<ShapeBox>) {

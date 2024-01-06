@@ -1,45 +1,35 @@
 use crate::drawing::Renderable;
-use crate::Graphics;
+use crate::{sized_renderable, Graphics};
 use graphics_shapes::coord::Coord;
-use ici_files::animated::AnimatedIndexedImage;
-use ici_files::prelude::IndexedImage;
+use ici_files::prelude::*;
 
-pub struct RenderableIndexedImage {
-    pub xy: Coord,
-    pub image: IndexedImage,
-}
-
-impl RenderableIndexedImage {
-    pub fn new(xy: Coord, image: IndexedImage) -> Self {
-        Self { xy, image }
-    }
-}
-
-impl Renderable<RenderableIndexedImage> for RenderableIndexedImage {
-    fn render(&self, graphics: &mut Graphics) {
-        graphics.draw_indexed_image(self.xy, &self.image);
-    }
-}
-
-pub struct RenderableAnimatedImage {
-    pub xy: Coord,
-    pub image: AnimatedIndexedImage,
-}
-
-impl RenderableAnimatedImage {
-    pub fn new(xy: Coord, image: AnimatedIndexedImage) -> Self {
-        Self { xy, image }
-    }
-}
-
-impl Renderable<RenderableAnimatedImage> for RenderableAnimatedImage {
-    fn render(&self, graphics: &mut Graphics) {
-        graphics.draw_animated_image(self.xy, &self.image);
-    }
-}
+sized_renderable!(
+    RenderableIndexedImage,
+    IndexedImage,
+    |img: &IndexedImage| (img.width() as usize, img.height() as usize),
+    |g: &mut Graphics, img: &IndexedImage| g.draw_indexed_image((0, 0), img)
+);
+sized_renderable!(
+    RenderableAnimatedImage,
+    AnimatedIndexedImage,
+    |img: &AnimatedIndexedImage| (img.width() as usize, img.height() as usize),
+    |g: &mut Graphics, img: &AnimatedIndexedImage| g.draw_animated_image((0, 0), img)
+);
+sized_renderable!(
+    RenderableWrappedImage,
+    IndexedWrapper,
+    |img: &IndexedWrapper| (img.width() as usize, img.height() as usize),
+    |g: &mut Graphics, img: &IndexedWrapper| g.draw_wrapped_image((0, 0), img)
+);
 
 impl RenderableAnimatedImage {
     pub fn update(&mut self, delta: f64) {
-        self.image.update(delta);
+        self.item.update(delta);
+    }
+}
+
+impl RenderableWrappedImage {
+    pub fn update(&mut self, delta: f64) {
+        self.item.update(delta);
     }
 }

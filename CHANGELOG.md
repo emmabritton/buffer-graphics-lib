@@ -1,5 +1,10 @@
 # Changelog
 
+### Version 0.15.1
+- Add `renderable` and `sized_renderable` macros
+- Add support for `ImageWrapper`
+- Update ici lib
+
 ### Version 0.15.0
 - Update ici lib
 - Remove `Graphics::get_text_size()`, use `Textsize::measure()` instead

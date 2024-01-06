@@ -176,6 +176,14 @@ impl Graphics<'_> {
         }
     }
 
+    #[cfg(feature = "ici")]
+    pub fn draw_wrapped_image<P: Into<Coord>>(&mut self, xy: P, image: &IndexedWrapper) {
+        match image {
+            IndexedWrapper::Static(img) => self.draw_indexed_image(xy, img),
+            IndexedWrapper::Animated(img) => self.draw_animated_image(xy, img),
+        }
+    }
+
     /// Draw an animated image at `x`, `y`
     #[cfg(feature = "ici")]
     pub fn draw_animated_image<P: Into<Coord>>(&mut self, xy: P, image: &AnimatedIndexedImage) {

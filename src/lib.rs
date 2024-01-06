@@ -37,6 +37,7 @@ pub mod image_loading;
 pub mod indexed;
 pub mod indexed_color;
 pub mod renderable_image;
+pub mod renderable_macros;
 pub mod scaling;
 pub mod shapes;
 pub mod text;
@@ -76,7 +77,11 @@ pub mod prelude {
     #[cfg(feature = "ici")]
     pub use ici_files::image::*;
     #[cfg(feature = "ici")]
+    pub use ici_files::jasc_palette::*;
+    #[cfg(feature = "ici")]
     pub use ici_files::palette::*;
+    #[cfg(feature = "ici")]
+    pub use ici_files::wrapper::*;
     #[cfg(feature = "ici")]
     pub use ici_files::*;
     #[cfg(feature = "image_loading")]
