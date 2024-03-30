@@ -41,6 +41,7 @@ pub mod renderable_macros;
 pub mod scaling;
 pub mod shapes;
 pub mod text;
+pub mod integration;
 
 use crate::clipping::Clip;
 use crate::GraphicsError::InvalidBufferLength;
