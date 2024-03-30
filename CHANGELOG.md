@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.16.2
+- Update ici lib
+
 ### Version 0.16.1
 - Fix import issues 
 
