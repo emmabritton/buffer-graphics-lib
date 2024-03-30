@@ -15,7 +15,7 @@ The `Graphics` struct needs a mutable slice to work on and so mostly likely you'
 
 In your `Cargo.toml` file add
 ```toml
-buffer-graphics-lib = "0.15.1"
+buffer-graphics-lib = "0.16.1"
 ```
 
 ### Code
@@ -38,16 +38,7 @@ graphics.draw(&drawable);
 
 ## Features
 
-> Default features: "ici", "serde"
-
-### `ici`
-
-* Load ici, ica image files as `IndexedImage`s
-
-```rust
-let image: IndexedImage...
-graphics.draw_indexed_image(coord, &image);
-```
+> Default features: "serde"
 
 ### `image_loading`
 

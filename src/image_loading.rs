@@ -1,7 +1,5 @@
-use crate::color::Color;
-use crate::image::Image;
-use crate::image_loading::ImageWrapperError::{GraphicsLibError, ImageLibError};
-use crate::GraphicsError;
+use crate::image_loading::ImageWrapperError::*;
+use crate::prelude::*;
 use image_lib::{DynamicImage, ImageError, ImageFormat};
 use std::io::{BufRead, Seek};
 use std::path::Path;
@@ -36,7 +34,7 @@ pub fn convert_image(image: DynamicImage) -> Result<Image, ImageWrapperError> {
     let pixels = image
         .into_rgba8()
         .chunks_exact(4)
-        .map(|px| Color::rgba(px[0], px[1], px[2], px[3]))
+        .map(|px| Color::new(px[0], px[1], px[2], px[3]))
         .collect();
 
     Image::new(pixels, width, height).map_err(GraphicsLibError)

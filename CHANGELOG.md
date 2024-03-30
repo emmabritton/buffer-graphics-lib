@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.16.1
+- Fix import issues 
+
 ### Version 0.16.0
 - Replaced `TextSize` with `PixelFont`
   - `Small` becomes `Standard4x5`
