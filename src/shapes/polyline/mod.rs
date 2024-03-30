@@ -1,7 +1,7 @@
 pub mod error;
 pub mod rendering;
 
-use crate::color::Color;
+use ici_files::prelude::*;
 use crate::shapes::polyline::error::PolylineError;
 use crate::shapes::polyline::error::PolylineError::{InvalidPolyline, PolylineAlreadyClosed};
 use crate::shapes::polyline::Segment::*;
@@ -142,10 +142,10 @@ impl Polyline {
 
 #[cfg(test)]
 mod test {
-    use crate::color::RED;
     use crate::shapes::polyline::Polyline;
     use crate::shapes::polyline::Segment::*;
     use graphics_shapes::coord::Coord;
+    use ici_files::prelude::RED;
 
     #[test]
     fn check_closing() {

@@ -1,6 +1,7 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+/// Use `PixelFont::px_to_cols` to convert pixels to columns
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, Eq, PartialEq, Copy, Default)]
 pub enum WrappingStrategy {
@@ -37,33 +38,35 @@ impl WrappingStrategy {
             }
             WrappingStrategy::SpaceBeforeCol(col) => {
                 let mut output = vec![];
-                let mut text = input.to_string();
-                while text.chars().count() > *col {
-                    let chars: Vec<char> = text.chars().collect();
-                    let line: String = text.chars().take(*col).collect();
-                    if line.ends_with(|c: char| c.is_whitespace())
-                        || text
+                let lines = WrappingStrategy::None.wrap(input);
+                for mut text in lines {
+                    while text.chars().count() > *col {
+                        let chars: Vec<char> = text.chars().collect();
+                        let line: String = text.chars().take(*col).collect();
+                        if line.ends_with(|c: char| c.is_whitespace())
+                            || text
                             .chars()
                             .nth(*col)
                             .map(|c| c.is_whitespace())
                             .unwrap_or(false)
-                    {
-                        output.push(text.chars().take(*col).collect());
-                        text = text.chars().skip(*col).collect();
-                    } else {
-                        let mut whitespace = chars
-                            .iter()
-                            .take(*col)
-                            .rposition(|c| c.is_whitespace())
-                            .unwrap_or(0);
-                        if whitespace == 0 {
-                            whitespace = *col
+                        {
+                            output.push(text.chars().take(*col).collect());
+                            text = text.chars().skip(*col).collect();
+                        } else {
+                            let mut whitespace = chars
+                                .iter()
+                                .take(*col)
+                                .rposition(|c| c.is_whitespace())
+                                .unwrap_or(0);
+                            if whitespace == 0 {
+                                whitespace = *col
+                            }
+                            output.push(text.chars().take(whitespace).collect());
+                            text = text.chars().skip(whitespace).collect();
                         }
-                        output.push(text.chars().take(whitespace).collect());
-                        text = text.chars().skip(whitespace).collect();
                     }
+                    output.push(text);
                 }
-                output.push(text);
                 output.iter().map(|s| s.trim().to_string()).collect()
             }
             WrappingStrategy::AtColWithHyphen(col) => {

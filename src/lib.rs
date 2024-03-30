@@ -7,17 +7,10 @@
 //! Using the library is as simple as:
 //!```
 //! # use graphics_shapes::rect::Rect;
-//! # use buffer_graphics_lib::color::{BLUE, LIGHT_GRAY};
-//! # use buffer_graphics_lib::drawable::{Drawable, stroke};
-//! # use buffer_graphics_lib::Graphics;
-//! # use buffer_graphics_lib::shapes::CreateDrawable;
-//! # use buffer_graphics_lib::text::pos::TextPos;
-//! # use buffer_graphics_lib::text::pos::NewTextPos;
-//! # use buffer_graphics_lib::text::Text;
-//! # use buffer_graphics_lib::text::TextSize::Large;
+//! # use buffer_graphics_lib::prelude::*;
 //! let mut buffer = [0_u8; 800 * 600 * 4]; //800 x 600 RGBA
 //! let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
-//! let text = Text::new("Some text", TextPos::cr((1,1)), (LIGHT_GRAY, Large));
+//! let text = Text::new("Some text", TextPos::cr((1,1)), (LIGHT_GRAY, PixelFont::Standard8x10));
 //! graphics.draw(&text);
 //! let drawable = Drawable::from_obj(Rect::new((1,1),(15,16)), stroke(BLUE));
 //! graphics.draw(&drawable);
@@ -26,16 +19,12 @@
 extern crate core;
 
 pub mod clipping;
-pub mod color;
-pub mod color_conversion;
 pub mod drawable;
 pub mod drawing;
 pub mod image;
 #[cfg(feature = "image_loading")]
 pub mod image_loading;
-#[cfg(feature = "ici")]
 pub mod indexed;
-pub mod indexed_color;
 pub mod renderable_image;
 pub mod renderable_macros;
 pub mod scaling;
@@ -50,17 +39,12 @@ use graphics_shapes::coord::Coord;
 use thiserror::Error;
 
 pub mod prelude {
-    pub use crate::color::*;
-    pub use crate::color_conversion::*;
     pub use crate::drawable::*;
     pub use crate::drawing::*;
     pub use crate::image::*;
     #[cfg(feature = "image_loading")]
     pub use crate::image_loading::*;
-    #[cfg(feature = "ici")]
     pub use crate::indexed::*;
-    #[cfg(feature = "ici")]
-    pub use crate::indexed_color::*;
     pub use crate::shapes::collection::*;
     pub use crate::shapes::polyline::*;
     pub use crate::shapes::*;
@@ -71,24 +55,13 @@ pub mod prelude {
     pub use crate::Graphics;
     pub use crate::GraphicsError;
     pub use graphics_shapes::prelude::*;
-    #[cfg(feature = "ici")]
-    pub use ici_files::animated::*;
-    #[cfg(feature = "ici")]
-    pub use ici_files::errors::*;
-    #[cfg(feature = "ici")]
-    pub use ici_files::image::*;
-    #[cfg(feature = "ici")]
-    pub use ici_files::jasc_palette::*;
-    #[cfg(feature = "ici")]
-    pub use ici_files::palette::*;
-    #[cfg(feature = "ici")]
-    pub use ici_files::wrapper::*;
-    #[cfg(feature = "ici")]
-    pub use ici_files::*;
+    pub use ici_files::prelude::*;
     #[cfg(feature = "image_loading")]
     pub use image_lib::ImageError;
     #[cfg(feature = "image_loading")]
     pub use image_lib::ImageFormat;
+    #[allow(unused_imports)]
+    pub use crate::integration::*;
 }
 
 #[derive(Error, Debug)]
@@ -105,38 +78,49 @@ pub struct Graphics<'buffer> {
     buffer: &'buffer mut [u8],
     width: usize,
     height: usize,
+    ///Offsets all drawing commands
     translate: Coord,
+    ///Used to restrict drawing to inside this region, initially includes the whole screen
     clip: Clip,
-    /// Allows you to replace any ASCII with a custom glyph
-    /// To replace 'a' with '█' write
+    /// Allows you to replace any supported ASCII with a custom glyph
+    /// To replace 'a' with '█' for 4x5 fonts (such as `Standard4x5`) write
     ///
-    /// `custom_font.insert(chr_to_code('a'), CustomLetter { small: [true; 20], ..CustomLetter::default });`
+    /// `graphics.custom_font.insert(chr_to_code('a'), CustomLetter { _4x5: [true; 20], ..CustomLetter::default });`
     ///
-    /// Note: case is ignored
+    /// Characters are replaced on a size basis, so if `_4x4` is provided then all _4x4 fonts will draw this custom character
     ///
-    /// Note: `a-z 0-9 !@$%^&*(),./;'\\[]<>?:\"{}_+~#…¤£¥¢✓` are valid for [text::chr_to_code]
+    /// Whitespace isn't supported and is skipped when drawing
+    ///
+    /// Note: `A-Za-z0-9!@$%^&*(),./;'\\[]<>?:\"{}_+~#…¤£¥¢✓|€` are valid for [text::chr_to_code]
     pub custom_font: FnvHashMap<u8, CustomLetter>,
 }
 
 /// Only the letter sizes you'll use need to be set
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct CustomLetter {
-    pub small: [bool; text::small::LETTER_PX_COUNT],
-    pub normal: [bool; text::normal::LETTER_PX_COUNT],
-    pub large: [bool; text::large::LETTER_PX_COUNT],
+    pub _4x4: [bool; text::font::standard_4x4::LETTER_PX_COUNT],
+    pub _4x5: [bool; text::font::standard_4x5::LETTER_PX_COUNT],
+    pub _6x7: [bool; text::font::standard_6x7::LETTER_PX_COUNT],
+    pub _7x9: [bool; text::font::outline_7x9::LETTER_PX_COUNT],
+    pub _8x8: [bool; text::font::script_8x8::LETTER_PX_COUNT],
+    pub _8x10: [bool; text::font::standard_8x10::LETTER_PX_COUNT],
 }
 
 impl Default for CustomLetter {
     fn default() -> Self {
         Self {
-            small: [false; text::small::LETTER_PX_COUNT],
-            normal: [false; text::normal::LETTER_PX_COUNT],
-            large: [false; text::large::LETTER_PX_COUNT],
+            _4x4: [false; text::font::standard_4x4::LETTER_PX_COUNT],
+            _4x5: [false; text::font::standard_4x5::LETTER_PX_COUNT],
+            _6x7: [false; text::font::standard_6x7::LETTER_PX_COUNT],
+            _7x9: [false; text::font::outline_7x9::LETTER_PX_COUNT],
+            _8x8: [false; text::font::script_8x8::LETTER_PX_COUNT],
+            _8x10: [false; text::font::standard_8x10::LETTER_PX_COUNT],
         }
     }
 }
 
 impl<'buffer> Graphics<'_> {
+    /// `buffer` needs to be `width * height * 4` long
     pub fn new(
         buffer: &'buffer mut [u8],
         width: usize,
@@ -188,15 +172,4 @@ impl Graphics<'_> {
     pub fn clip_mut(&mut self) -> &mut Clip {
         &mut self.clip
     }
-}
-
-pub trait Tint {
-    /// Add to the RGBA channels by the amounts specified
-    ///
-    /// Channels are clamped to 0..=255
-    fn tint_add(&mut self, r_diff: isize, g_diff: isize, b_diff: isize, a_diff: isize);
-    /// Multiple the RGBA channels by the amounts specified
-    ///
-    /// Channels are clamped to 0..=255
-    fn tint_mul(&mut self, r_diff: f32, g_diff: f32, b_diff: f32, a_diff: f32);
 }

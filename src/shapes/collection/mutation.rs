@@ -81,6 +81,7 @@ shapebox_mutate_two!(with_rotation_around, degrees, isize);
 mod test {
     use crate::prelude::*;
     use graphics_shapes::shape_box::ShapeBox;
+    use ici_files::prelude::*;
 
     #[test]
     fn check_with_translation() {

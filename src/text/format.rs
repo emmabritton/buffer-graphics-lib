@@ -1,18 +1,18 @@
-use crate::color::Color;
+use ici_files::prelude::*;
 use crate::text::wrapping::WrappingStrategy;
-use crate::text::TextSize;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use crate::text::PixelFont;
 
 /// Characters be drawn be at idx * char_width, idx * char_height
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct TextFormat {
     color: Color,
-    size: TextSize,
+    font: PixelFont,
     wrap_at: WrappingStrategy,
-    char_height: isize,
-    char_width: isize,
+    line_height: f32,
+    char_width: f32,
     positioning: Positioning,
 }
 
@@ -54,33 +54,33 @@ impl Positioning {
 impl TextFormat {
     pub const fn new(
         wrap_at: WrappingStrategy,
-        size: TextSize,
+        size: PixelFont,
         color: Color,
         positioning: Positioning,
     ) -> Self {
         Self {
             wrap_at,
-            size,
+            font: size,
             color,
-            char_height: (size.get_size().1 + size.get_spacing()) as isize,
-            char_width: (size.get_size().0 + size.get_spacing()) as isize,
+            line_height: 1.0,
+            char_width: 1.0,
             positioning,
         }
     }
 
     pub const fn new_with_spacing(
         wrap_at: WrappingStrategy,
-        size: TextSize,
+        size: PixelFont,
         color: Color,
-        char_height: isize,
-        char_width: isize,
+        line_height: f32,
+        char_width: f32,
         positioning: Positioning,
     ) -> Self {
         Self {
             wrap_at,
-            size,
+            font: size,
             color,
-            char_height,
+            line_height,
             char_width,
             positioning,
         }
@@ -89,13 +89,13 @@ impl TextFormat {
 
 impl Default for TextFormat {
     fn default() -> Self {
-        let size = TextSize::default();
+        let size = PixelFont::default();
         Self {
             wrap_at: WrappingStrategy::default(),
-            size,
+            font: size,
             color: Color::default(),
-            char_height: (size.get_size().1 + size.get_spacing()) as isize,
-            char_width: (size.get_size().0 + size.get_spacing()) as isize,
+            line_height: 1.0,
+            char_width: 1.0,
             positioning: Positioning::LeftTop,
         }
     }
@@ -108,8 +108,8 @@ impl TextFormat {
     }
 
     #[inline]
-    pub fn size(&self) -> TextSize {
-        self.size
+    pub fn font(&self) -> PixelFont {
+        self.font
     }
 
     #[inline]
@@ -118,13 +118,13 @@ impl TextFormat {
     }
 
     #[inline]
-    pub fn line_spacing(&self) -> isize {
-        self.char_height
+    pub fn line_height(&self) -> isize {
+        (self.line_height * (self.font.size().1 + self.font.spacing()) as f32).round() as isize
     }
 
     #[inline]
-    pub fn letter_spacing(&self) -> isize {
-        self.char_width
+    pub fn char_width(&self) -> isize {
+        (self.char_width * (self.font.size().0 + self.font.spacing()) as f32).round() as isize
     }
 
     #[inline]
@@ -138,81 +138,81 @@ impl TextFormat {
     }
 }
 
-impl From<(Color, TextSize, WrappingStrategy, isize, isize, Positioning)> for TextFormat {
+impl From<(Color, PixelFont, WrappingStrategy, f32, f32, Positioning)> for TextFormat {
     fn from(
-        (color, size, wrap_at, char_height, char_width, positioning): (
+        (color, size, wrap_at, line_height, char_width, positioning): (
             Color,
-            TextSize,
+            PixelFont,
             WrappingStrategy,
-            isize,
-            isize,
+            f32,
+            f32,
             Positioning,
         ),
     ) -> Self {
         TextFormat {
             color,
-            size,
+            font: size,
             wrap_at,
-            char_height,
+            line_height,
             char_width,
             positioning,
         }
     }
 }
 
-impl From<(Color, TextSize, WrappingStrategy, isize, isize)> for TextFormat {
+impl From<(Color, PixelFont, WrappingStrategy, f32, f32)> for TextFormat {
     fn from(
-        (color, size, wrap_at, char_height, char_width): (
+        (color, size, wrap_at, line_height, char_width): (
             Color,
-            TextSize,
+            PixelFont,
             WrappingStrategy,
-            isize,
-            isize,
+            f32,
+            f32,
         ),
     ) -> Self {
         TextFormat {
             color,
-            size,
+            font: size,
             wrap_at,
-            char_height,
+            line_height,
             char_width,
             ..Self::default()
         }
     }
 }
 
-impl From<(Color, TextSize, WrappingStrategy, isize)> for TextFormat {
+impl From<(Color, PixelFont, WrappingStrategy, f32)> for TextFormat {
     fn from(
-        (color, size, wrap_at, char_height): (Color, TextSize, WrappingStrategy, isize),
+        (color, size, wrap_at, line_height): (Color, PixelFont, WrappingStrategy, f32),
     ) -> Self {
         TextFormat {
             color,
-            size,
+            font: size,
             wrap_at,
-            char_height,
+            line_height,
             ..Self::default()
         }
     }
 }
 
-impl From<(Color, TextSize, WrappingStrategy)> for TextFormat {
-    fn from((color, size, wrap_at): (Color, TextSize, WrappingStrategy)) -> Self {
+impl From<(Color, PixelFont, WrappingStrategy)> for TextFormat {
+    fn from((color, size, wrap_at): (Color, PixelFont, WrappingStrategy)) -> Self {
         TextFormat {
             color,
-            size,
+            font: size,
             wrap_at,
             ..Self::default()
         }
     }
 }
 
-impl From<(Color, TextSize, WrappingStrategy, Positioning)> for TextFormat {
+impl From<(Color, PixelFont, WrappingStrategy, Positioning)> for TextFormat {
     fn from(
-        (color, size, wrap_at, positioning): (Color, TextSize, WrappingStrategy, Positioning),
+        (color, size, wrap_at, positioning): (Color, PixelFont, WrappingStrategy, Positioning),
     ) -> Self {
         TextFormat {
             color,
-            size,
+            font: size,
             wrap_at,
             positioning,
             ..Self::default()
@@ -220,21 +220,21 @@ impl From<(Color, TextSize, WrappingStrategy, Positioning)> for TextFormat {
     }
 }
 
-impl From<(Color, TextSize)> for TextFormat {
-    fn from((color, size): (Color, TextSize)) -> Self {
+impl From<(Color, PixelFont)> for TextFormat {
+    fn from((color, size): (Color, PixelFont)) -> Self {
         TextFormat {
             color,
-            size,
+            font: size,
             ..Self::default()
         }
     }
 }
 
-impl From<(Color, TextSize, Positioning)> for TextFormat {
-    fn from((color, size, positioning): (Color, TextSize, Positioning)) -> Self {
+impl From<(Color, PixelFont, Positioning)> for TextFormat {
+    fn from((color, size, positioning): (Color, PixelFont, Positioning)) -> Self {
         TextFormat {
             color,
-            size,
+            font: size,
             positioning,
             ..Self::default()
         }

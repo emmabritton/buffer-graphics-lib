@@ -1,6 +1,6 @@
 [package]
 name = "buffer-graphics-lib"
-version = "0.15.1"
+version = "0.16.0"
 edition = "2021"
 authors = ["Emma Britton <emmabritton@pm.me>"]
 description = "Simple graphics library for buffers"
@@ -11,25 +11,24 @@ keywords = ["graphics", "gamedev", "simple"]
 categories = ["graphics", "game-development"]
 
 [features]
-default = ["serde", "ici"]
+default = ["serde"]
 image_loading = ["image_lib"]
 serde = ["dep:serde", "graphics-shapes/serde"]
-ici = ["ici-files"]
 mint = ["graphics-shapes/mint"]
 embedded = ["embedded-graphics-core"]
 notosans = ["noto-sans-mono-bitmap"]
 
 [dependencies]
-thiserror = "1.0.56"
-graphics-shapes = { version = "0.4.0", default-features = false }
-serde = { version = "1.0.195", features = ["derive"], optional = true }
-image_lib = { package = "image", version = "0.24.7", optional = true }
-log = "0.4.20"
-ici-files = { version = "0.1.7", optional = true }
+thiserror = "1.0.58"
+graphics-shapes = { version = "0.4.1", default-features = false }
+serde = { version = "1.0.197", features = ["derive"], optional = true }
+image_lib = { package = "image", version = "0.25.0", optional = true }
+log = "0.4.21"
+ici-files = {path = "../ici_files"}
 fnv = "1.0.7"
 embedded-graphics-core = { version = "0.4.0", default-features = false, optional = true }
 noto-sans-mono-bitmap = { version = "0.2.0", optional = true, default-features = false }
 
 [dev-dependencies]
-fastrand = "2.0.1"
-anyhow = "1.0.79"
+fastrand = "2.0.2"
+anyhow = "1.0.81"

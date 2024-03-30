@@ -1,13 +1,13 @@
-use crate::color::{Color, WHITE};
+use ici_files::prelude::*;
 use crate::renderable_image::RenderableImage;
 use crate::renderable_macros::DrawOffset;
-use crate::scaling::*;
-use crate::{Graphics, GraphicsError, Tint};
+use crate::{Graphics, GraphicsError};
 use graphics_shapes::coord::Coord;
 use ici_files::image::IndexedImage;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Formatter};
+use crate::scaling::{scale_epx, scale_nearest_neighbor};
 
 /// Images are rectangles of pixels that can be manipulated and drawn on screen
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -258,10 +258,9 @@ impl Tint for Image {
 
 #[cfg(test)]
 mod test {
-    use crate::color::Color;
+    use ici_files::prelude::{Color, Scaling};
+    use ici_files::Tint;
     use crate::image::Image;
-    use crate::scaling::Scaling;
-    use crate::Tint;
 
     fn make_image() -> Image {
         Image::new(
@@ -398,15 +397,15 @@ mod test {
         assert_eq!(
             image.pixels(),
             vec![
-                Color::rgba(11, 21, 31, 205),
-                Color::rgba(12, 22, 32, 205),
-                Color::rgba(13, 23, 33, 205),
-                Color::rgba(14, 24, 34, 205),
-                Color::rgba(15, 25, 35, 205),
-                Color::rgba(16, 26, 36, 205),
-                Color::rgba(17, 27, 37, 205),
-                Color::rgba(18, 28, 38, 205),
-                Color::rgba(19, 29, 39, 205),
+                Color::new(11, 21, 31, 205),
+                Color::new(12, 22, 32, 205),
+                Color::new(13, 23, 33, 205),
+                Color::new(14, 24, 34, 205),
+                Color::new(15, 25, 35, 205),
+                Color::new(16, 26, 36, 205),
+                Color::new(17, 27, 37, 205),
+                Color::new(18, 28, 38, 205),
+                Color::new(19, 29, 39, 205),
             ]
         );
     }
@@ -418,15 +417,15 @@ mod test {
         assert_eq!(
             image.pixels(),
             vec![
-                Color::rgba(1, 1, 2, 255),
-                Color::rgba(1, 2, 4, 255),
-                Color::rgba(2, 3, 6, 255),
-                Color::rgba(2, 4, 8, 255),
-                Color::rgba(3, 5, 10, 255),
-                Color::rgba(3, 6, 12, 255),
-                Color::rgba(4, 7, 14, 255),
-                Color::rgba(4, 8, 16, 255),
-                Color::rgba(5, 9, 18, 255),
+                Color::new(1, 1, 2, 255),
+                Color::new(1, 2, 4, 255),
+                Color::new(2, 3, 6, 255),
+                Color::new(2, 4, 8, 255),
+                Color::new(3, 5, 10, 255),
+                Color::new(3, 6, 12, 255),
+                Color::new(4, 7, 14, 255),
+                Color::new(4, 8, 16, 255),
+                Color::new(5, 9, 18, 255),
             ]
         );
     }
@@ -449,8 +448,8 @@ mod test {
 
         let epx2 = image.scale(Scaling::Epx2x);
         let epx4 = image.scale(Scaling::Epx4x);
-        let nn2 = image.scale(Scaling::nearest_neighbour(2, 2));
-        let nn3 = image.scale(Scaling::nearest_neighbour(3, 3));
+        let nn2 = image.scale(Scaling::nearest_neighbour(2, 2).unwrap());
+        let nn3 = image.scale(Scaling::nearest_neighbour(3, 3).unwrap());
 
         assert_eq!(image.width, 3);
         assert_eq!(image.height, 2);
@@ -470,11 +469,11 @@ mod test {
         let epx2 = image.scale(Scaling::Epx2x);
         let epx4 = image.scale(Scaling::Epx4x);
         let nn_double = image.scale(Scaling::nn_double());
-        let nn2 = image.scale(Scaling::nearest_neighbour(2, 2));
-        let nn3 = image.scale(Scaling::nearest_neighbour(3, 3));
-        let nn1_1 = image.scale(Scaling::nearest_neighbour(1, 1));
-        let nn1_2 = image.scale(Scaling::nearest_neighbour(1, 2));
-        let nn2_1 = image.scale(Scaling::nearest_neighbour(2, 1));
+        let nn2 = image.scale(Scaling::nearest_neighbour(2, 2).unwrap());
+        let nn3 = image.scale(Scaling::nearest_neighbour(3, 3).unwrap());
+        let nn1_1 = image.scale(Scaling::nearest_neighbour(1, 1).unwrap());
+        let nn1_2 = image.scale(Scaling::nearest_neighbour(1, 2).unwrap());
+        let nn2_1 = image.scale(Scaling::nearest_neighbour(2, 1).unwrap());
 
         assert_eq!(image.width, 3);
         assert_eq!(image.height, 3);

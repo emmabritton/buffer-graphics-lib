@@ -1,5 +1,18 @@
 # Changelog
 
+### Version 0.16.0
+- Replaced `TextSize` with `PixelFont`
+  - `Small` becomes `Standard4x5`
+  - `Normal` becomes `Standard6x7`
+  - `Large` becomes `Standard8x10`
+  - Add `Stanard4x4`, `Standard5x5`, `Standard8x8`, `Standard16x16`, `Blocky4x4`, `Blocky8x8`, `Blocky16x16`, `BlockyBold4x4`, `BlockySerif8x8`, `Outline7x9`, `Inverted8x8`, `InvertedBold8x8`, `Script8x8`, `Script16x16`, `Western16x16`, `Cursive16x16`, `Gothic16x16`, `Bubbly16x16`
+- Fix `char_width` and `line_height` in formatting
+- Update ici lib
+  - Color and scaling has been moved
+  - `IndexedImage` can be rotated, scaled, tinted
+  - ICI feature removed
+- Fix new line support in `WrappingStrategy::SpaceBeforeCol`
+
 ### Version 0.15.1
 - Add `renderable` and `sized_renderable` macros
 - Add support for `ImageWrapper`

@@ -1,23 +1,23 @@
-use crate::text::TextSize;
 use graphics_shapes::coord::Coord;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use crate::text::PixelFont;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 pub enum TextPos {
     Px(isize, isize),
-    /// See [TextSize::get_max_characters] for maximum x and y
+    /// See [PixelFont::get_max_characters] for maximum x and y
     ColRow(usize, usize),
 }
 
 impl TextPos {
-    pub fn to_coord(&self, size: TextSize) -> (isize, isize) {
+    pub fn to_coord(&self, font: PixelFont) -> (isize, isize) {
         match self {
             TextPos::Px(x, y) => (*x, *y),
             TextPos::ColRow(col, row) => (
-                (col * (size.get_size().0 + size.get_spacing())) as isize,
-                (row * (size.get_size().1 + size.get_spacing())) as isize,
+                (col * (font.size().0 + font.spacing())) as isize,
+                (row * (font.size().1 + font.spacing())) as isize,
             ),
         }
     }

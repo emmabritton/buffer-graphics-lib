@@ -1,12 +1,11 @@
 use crate::clipping::Clip;
-use crate::color::Color;
-use crate::color_conversion::ToColor;
+use ici_files::prelude::*;
 use crate::drawable::{DrawType, Drawable};
 use crate::image::Image;
 use crate::shapes::CreateDrawable;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
-use crate::text::{chr_to_code, Text, TextSize};
+use crate::text::{chr_to_code, Text};
 use crate::Graphics;
 use graphics_shapes::circle::Circle;
 use graphics_shapes::coord::Coord;
@@ -14,9 +13,8 @@ use graphics_shapes::polygon::Polygon;
 use graphics_shapes::prelude::Ellipse;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
-#[cfg(feature = "ici")]
-use ici_files::prelude::*;
 use std::mem::swap;
+use crate::prelude::PixelFont;
 
 /// Represents anything that [Graphics] can render
 pub trait Renderable<T> {
@@ -98,10 +96,8 @@ impl Graphics<'_> {
     }
 
     /// Get top left pixel coord for letter col row
-    pub fn get_px_for_char(col: usize, row: usize, size: TextSize) -> (usize, usize) {
-        let (width, height) = size.get_size();
-        let margin = size.get_spacing();
-        (col * (width + margin), row * (height + margin))
+    pub fn get_px_for_char(col: usize, row: usize, font: &PixelFont) -> (usize, usize) {
+        (col * font.char_width(), row * font.line_height())
     }
 
     /// Draw an image at `x`, `y` as fast as possible
@@ -153,7 +149,7 @@ impl Graphics<'_> {
     }
 
     /// Draw an indexed image at `x`, `y`
-    #[cfg(feature = "ici")]
+
     pub fn draw_indexed_image<P: Into<Coord>>(&mut self, xy: P, image: &IndexedImage) {
         let xy = xy.into();
         let palette = image.get_palette();
@@ -170,13 +166,13 @@ impl Graphics<'_> {
                     (self.width, self.height),
                     x as isize + xy.x,
                     y as isize + xy.y,
-                    color.to_color(),
+                    color,
                 );
             }
         }
     }
 
-    #[cfg(feature = "ici")]
+
     pub fn draw_wrapped_image<P: Into<Coord>>(&mut self, xy: P, image: &IndexedWrapper) {
         match image {
             IndexedWrapper::Static(img) => self.draw_indexed_image(xy, img),
@@ -185,7 +181,7 @@ impl Graphics<'_> {
     }
 
     /// Draw an animated image at `x`, `y`
-    #[cfg(feature = "ici")]
+
     pub fn draw_animated_image<P: Into<Coord>>(&mut self, xy: P, image: &AnimatedIndexedImage) {
         let xy = xy.into();
         let palette = image.get_palette();
@@ -203,7 +199,7 @@ impl Graphics<'_> {
                     (self.width, self.height),
                     x as isize + xy.x,
                     y as isize + xy.y,
-                    color.to_color(),
+                    color,
                 );
             }
         }
@@ -364,10 +360,11 @@ impl Graphics<'_> {
         if x >= 0 && y >= 0 && x < self.width as isize {
             let idx = self.index(x as usize, y as usize);
             if idx < self.buffer.len() {
-                return Some(Color::rgb(
+                return Some(Color::new(
                     self.buffer[idx],
                     self.buffer[idx + 1],
                     self.buffer[idx + 2],
+                    255,
                 ));
             }
         }
@@ -396,30 +393,33 @@ impl Graphics<'_> {
 
     /// Draw a letter at pos
     #[inline]
-    pub fn draw_letter(&mut self, pos: (isize, isize), chr: char, size: TextSize, color: Color) {
-        self.draw_ascii_letter(pos, chr_to_code(chr), size, color);
+    pub fn draw_letter(&mut self, pos: (isize, isize), chr: char, font: PixelFont, color: Color) {
+        self.draw_ascii_letter(pos, chr_to_code(chr), font, color);
     }
 
     pub fn draw_ascii_letter(
         &mut self,
         pos: (isize, isize),
         code: u8,
-        size: TextSize,
+        font: PixelFont,
         color: Color,
     ) {
         if code == 32 || code == 9 {
             return;
         }
-        let (width, height) = size.get_size();
+        let (width, height) = font.size();
 
         let px: &[bool] = if let Some(custom) = self.custom_font.get(&code) {
-            match size {
-                TextSize::Small => &custom.small,
-                TextSize::Normal => &custom.normal,
-                TextSize::Large => &custom.large,
+            match font {
+                PixelFont::Standard4x4 => &custom._4x4,
+                PixelFont::Script8x8 => &custom._8x8,
+                PixelFont::Outline7x9 => &custom._7x9,
+                PixelFont::Standard4x5 => &custom._4x5,
+                PixelFont::Standard6x7 => &custom._6x7,
+                PixelFont::Standard8x10 => &custom._8x10,
             }
         } else {
-            size.get_px_ascii(code)
+            font.pixels(code)
         };
 
         for x in 0..width {
@@ -449,22 +449,26 @@ impl Graphics<'_> {
         format: F,
     ) {
         let format = format.into();
-        let size = format.size();
+        let font = format.font();
         let color = format.color();
-        let per_x = size.get_size().0 + size.get_spacing();
-        let per_y = size.get_size().1 + size.get_spacing();
+        let per_x = format.char_width();
+        let per_y = format.line_height();
+
+        if per_y == 0 || per_x == 0 {
+            return;
+        }
 
         let (start_x, start_y) = format.positioning().calc(
-            pos.into().to_coord(size),
-            text.iter().map(|list| list.len()).max().unwrap() * per_x,
-            text.len() * per_y,
+            pos.into().to_coord(font),
+            text.iter().map(|list| list.len()).max().unwrap() * per_x.unsigned_abs(),
+            text.len() * per_y.unsigned_abs(),
         );
 
         for (y, line) in text.iter().enumerate() {
-            let y = (y * per_y) as isize;
+            let y = y as isize * per_y;
             for (x, char) in line.iter().enumerate() {
-                let x = (x * per_x) as isize;
-                self.draw_ascii_letter((start_x + x, start_y + y), *char, size, color);
+                let x = x as isize * per_x;
+                self.draw_ascii_letter((start_x + x, start_y + y), *char, font, color);
             }
         }
     }

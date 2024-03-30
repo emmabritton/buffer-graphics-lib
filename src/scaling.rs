@@ -1,44 +1,4 @@
 use crate::image::Image;
-use crate::scaling::Scaling::*;
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-use std::num::NonZeroUsize;
-
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
-pub enum Scaling {
-    /// Increase size of image by x_scale and y_scale
-    /// Where {2,2} doubles the size
-    NearestNeighbour {
-        x_scale: NonZeroUsize,
-        y_scale: NonZeroUsize,
-    },
-    Epx2x,
-    Epx4x,
-}
-
-impl Scaling {
-    pub fn nearest_neighbour(x: usize, y: usize) -> Scaling {
-        assert!(x > 0, "x must be > 0");
-        assert!(y > 0, "y must be > 0");
-        unsafe {
-            NearestNeighbour {
-                x_scale: NonZeroUsize::new_unchecked(x),
-                y_scale: NonZeroUsize::new_unchecked(y),
-            }
-        }
-    }
-
-    /// Double image size using nearest neighbour
-    pub fn nn_double() -> Scaling {
-        unsafe {
-            NearestNeighbour {
-                x_scale: NonZeroUsize::new_unchecked(2),
-                y_scale: NonZeroUsize::new_unchecked(2),
-            }
-        }
-    }
-}
 
 pub(crate) fn scale_nearest_neighbor(image: &Image, x_scale: usize, y_scale: usize) -> Image {
     let new_width = image.width() * x_scale;
