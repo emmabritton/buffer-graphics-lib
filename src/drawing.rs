@@ -1,7 +1,7 @@
 use crate::clipping::Clip;
-use ici_files::prelude::*;
 use crate::drawable::{DrawType, Drawable};
 use crate::image::Image;
+use crate::prelude::PixelFont;
 use crate::shapes::CreateDrawable;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
@@ -13,8 +13,8 @@ use graphics_shapes::polygon::Polygon;
 use graphics_shapes::prelude::Ellipse;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
+use ici_files::prelude::*;
 use std::mem::swap;
-use crate::prelude::PixelFont;
 
 /// Represents anything that [Graphics] can render
 pub trait Renderable<T> {
@@ -171,7 +171,6 @@ impl Graphics<'_> {
             }
         }
     }
-
 
     pub fn draw_wrapped_image<P: Into<Coord>>(&mut self, xy: P, image: &IndexedWrapper) {
         match image {

@@ -1,8 +1,8 @@
-use ici_files::prelude::*;
 use crate::text::wrapping::WrappingStrategy;
+use crate::text::PixelFont;
+use ici_files::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use crate::text::PixelFont;
 
 /// Characters be drawn be at idx * char_width, idx * char_height
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

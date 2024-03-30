@@ -13,7 +13,7 @@ categories = ["graphics", "game-development"]
 [features]
 default = ["serde"]
 image_loading = ["image_lib"]
-serde = ["dep:serde", "graphics-shapes/serde"]
+serde = ["dep:serde", "graphics-shapes/serde", "ici-files/serde"]
 mint = ["graphics-shapes/mint"]
 embedded = ["embedded-graphics-core"]
 notosans = ["noto-sans-mono-bitmap"]
@@ -24,7 +24,7 @@ graphics-shapes = { version = "0.4.1", default-features = false }
 serde = { version = "1.0.197", features = ["derive"], optional = true }
 image_lib = { package = "image", version = "0.25.0", optional = true }
 log = "0.4.21"
-ici-files = {path = "../ici_files"}
+ici-files = { version = "0.2.1" , default-features = false}
 fnv = "1.0.7"
 embedded-graphics-core = { version = "0.4.0", default-features = false, optional = true }
 noto-sans-mono-bitmap = { version = "0.2.0", optional = true, default-features = false }

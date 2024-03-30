@@ -25,12 +25,12 @@ pub mod image;
 #[cfg(feature = "image_loading")]
 pub mod image_loading;
 pub mod indexed;
+pub mod integration;
 pub mod renderable_image;
 pub mod renderable_macros;
 pub mod scaling;
 pub mod shapes;
 pub mod text;
-pub mod integration;
 
 use crate::clipping::Clip;
 use crate::GraphicsError::InvalidBufferLength;
@@ -45,6 +45,8 @@ pub mod prelude {
     #[cfg(feature = "image_loading")]
     pub use crate::image_loading::*;
     pub use crate::indexed::*;
+    #[allow(unused_imports)]
+    pub use crate::integration::*;
     pub use crate::shapes::collection::*;
     pub use crate::shapes::polyline::*;
     pub use crate::shapes::*;
@@ -60,8 +62,6 @@ pub mod prelude {
     pub use image_lib::ImageError;
     #[cfg(feature = "image_loading")]
     pub use image_lib::ImageFormat;
-    #[allow(unused_imports)]
-    pub use crate::integration::*;
 }
 
 #[derive(Error, Debug)]

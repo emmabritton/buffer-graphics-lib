@@ -1,7 +1,7 @@
+use crate::text::PixelFont;
 use graphics_shapes::coord::Coord;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use crate::text::PixelFont;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]

@@ -1,17 +1,17 @@
+pub mod font;
 pub mod format;
 pub mod pos;
 pub mod wrapping;
-pub mod font;
 
-use graphics_shapes::prelude::Rect;
-use ici_files::prelude::*;
 use crate::drawing::Renderable;
+use crate::prelude::font::*;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
 use crate::Graphics;
+use graphics_shapes::prelude::Rect;
+use ici_files::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use crate::prelude::font::*;
 
 //from Latin-1/ISO 8859-1
 pub const ASCII_DEGREE: u8 = 176;
@@ -59,7 +59,7 @@ pub struct Text {
     content: Vec<Vec<u8>>,
     pos: TextPos,
     formatting: TextFormat,
-    bounds: Rect
+    bounds: Rect,
 }
 
 impl Text {
@@ -80,15 +80,19 @@ impl Text {
             content,
             pos,
             formatting,
-            bounds
+            bounds,
         }
     }
 
     fn calc_bounds(pos: TextPos, formatting: &TextFormat, text: &[Vec<u8>]) -> Rect {
-        let content =text.iter().map(|chrs| String::from_utf8_lossy(chrs).to_string()).collect::<Vec<String>>().join("\n");
+        let content = text
+            .iter()
+            .map(|chrs| String::from_utf8_lossy(chrs).to_string())
+            .collect::<Vec<String>>()
+            .join("\n");
         let pos_coord = pos.to_coord(formatting.font());
-        let (w,h) = formatting.font().measure(&content);
-        Rect::new_with_size(formatting.positioning().calc(pos_coord,w,h), w,h)
+        let (w, h) = formatting.font().measure(&content);
+        Rect::new_with_size(formatting.positioning().calc(pos_coord, w, h), w, h)
     }
 }
 
@@ -119,7 +123,7 @@ impl Text {
             content: self.content.clone(),
             pos: self.pos,
             formatting: format,
-            bounds: self.bounds.clone()
+            bounds: self.bounds.clone(),
         }
     }
 
@@ -134,7 +138,7 @@ impl Text {
             content: self.content.clone(),
             pos,
             formatting: self.formatting.clone(),
-            bounds: Self::calc_bounds(pos, &self.formatting, &self.content)
+            bounds: Self::calc_bounds(pos, &self.formatting, &self.content),
         }
     }
 }

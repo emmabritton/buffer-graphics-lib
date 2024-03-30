@@ -1,11 +1,11 @@
 pub mod error;
 pub mod rendering;
 
-use ici_files::prelude::*;
 use crate::shapes::polyline::error::PolylineError;
 use crate::shapes::polyline::error::PolylineError::{InvalidPolyline, PolylineAlreadyClosed};
 use crate::shapes::polyline::Segment::*;
 use graphics_shapes::coord::Coord;
+use ici_files::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

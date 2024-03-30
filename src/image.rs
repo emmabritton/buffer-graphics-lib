@@ -1,13 +1,13 @@
-use ici_files::prelude::*;
 use crate::renderable_image::RenderableImage;
 use crate::renderable_macros::DrawOffset;
+use crate::scaling::{scale_epx, scale_nearest_neighbor};
 use crate::{Graphics, GraphicsError};
 use graphics_shapes::coord::Coord;
 use ici_files::image::IndexedImage;
+use ici_files::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Formatter};
-use crate::scaling::{scale_epx, scale_nearest_neighbor};
 
 /// Images are rectangles of pixels that can be manipulated and drawn on screen
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -258,9 +258,9 @@ impl Tint for Image {
 
 #[cfg(test)]
 mod test {
+    use crate::image::Image;
     use ici_files::prelude::{Color, Scaling};
     use ici_files::Tint;
-    use crate::image::Image;
 
     fn make_image() -> Image {
         Image::new(

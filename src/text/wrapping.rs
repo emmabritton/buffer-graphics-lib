@@ -45,10 +45,10 @@ impl WrappingStrategy {
                         let line: String = text.chars().take(*col).collect();
                         if line.ends_with(|c: char| c.is_whitespace())
                             || text
-                            .chars()
-                            .nth(*col)
-                            .map(|c| c.is_whitespace())
-                            .unwrap_or(false)
+                                .chars()
+                                .nth(*col)
+                                .map(|c| c.is_whitespace())
+                                .unwrap_or(false)
                         {
                             output.push(text.chars().take(*col).collect());
                             text = text.chars().skip(*col).collect();
