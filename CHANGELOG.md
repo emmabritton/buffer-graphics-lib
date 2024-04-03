@@ -1,5 +1,10 @@
 # Changelog
 
+### Version 0.17.0
+- Add convenience method `Graphics::create_buffer`
+- Fix bug if WrappingStrategy was passed `0`
+- New font Limited 3x5 (no lower case, some symbols look bad)
+
 ### Version 0.16.2
 - Update ici lib
 
@@ -11,7 +16,7 @@
   - `Small` becomes `Standard4x5`
   - `Normal` becomes `Standard6x7`
   - `Large` becomes `Standard8x10`
-  - Add `Stanard4x4`, `Standard5x5`, `Standard8x8`, `Standard16x16`, `Blocky4x4`, `Blocky8x8`, `Blocky16x16`, `BlockyBold4x4`, `BlockySerif8x8`, `Outline7x9`, `Inverted8x8`, `InvertedBold8x8`, `Script8x8`, `Script16x16`, `Western16x16`, `Cursive16x16`, `Gothic16x16`, `Bubbly16x16`
+  - Add `Stanard4x4`, `Outline7x9`, `Script8x8`
 - Fix `char_width` and `line_height` in formatting
 - Update ici lib
   - Color and scaling has been moved

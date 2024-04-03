@@ -4,3 +4,4 @@ pub mod standard_4x4;
 pub mod standard_4x5;
 pub mod standard_6x7;
 pub mod standard_8x10;
+pub mod limited_3x5;

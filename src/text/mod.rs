@@ -168,6 +168,8 @@ pub enum PixelFont {
     Standard6x7,
     Standard8x10,
     Script8x8,
+    /// No lower case, some symbols look bad
+    Limited3x5,
 }
 
 impl PixelFont {
@@ -181,6 +183,7 @@ impl PixelFont {
             PixelFont::Standard6x7 => (standard_6x7::CHAR_WIDTH, standard_6x7::CHAR_HEIGHT),
             PixelFont::Standard8x10 => (standard_8x10::CHAR_WIDTH, standard_8x10::CHAR_HEIGHT),
             PixelFont::Script8x8 => (script_8x8::CHAR_WIDTH, script_8x8::CHAR_HEIGHT),
+            PixelFont::Limited3x5 => (limited_3x5::CHAR_WIDTH, limited_3x5::CHAR_HEIGHT),
         }
     }
 
@@ -211,6 +214,7 @@ impl PixelFont {
             PixelFont::Standard6x7 => 1,
             PixelFont::Standard8x10 => 2,
             PixelFont::Script8x8 => 1,
+            PixelFont::Limited3x5 => 1,
         }
     }
 
@@ -223,6 +227,7 @@ impl PixelFont {
             PixelFont::Standard6x7 => standard_6x7::get_px_ascii(code),
             PixelFont::Standard8x10 => standard_8x10::get_px_ascii(code),
             PixelFont::Script8x8 => script_8x8::get_px_ascii(code),
+            PixelFont::Limited3x5 => limited_3x5::get_px_ascii(code),
         }
     }
 

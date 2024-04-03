@@ -25,6 +25,9 @@ impl WrappingStrategy {
         match self {
             WrappingStrategy::None => input.split('\n').map(|s| s.to_string()).collect(),
             WrappingStrategy::AtCol(col) => {
+                if *col == 0 {
+                    return split_str_to_col(input);
+                }
                 let mut output = vec![];
                 let lines = WrappingStrategy::None.wrap(input);
                 for mut line in lines {
@@ -37,6 +40,9 @@ impl WrappingStrategy {
                 output
             }
             WrappingStrategy::SpaceBeforeCol(col) => {
+                if *col == 0 {
+                    return split_str_to_col(input);
+                }
                 let mut output = vec![];
                 let lines = WrappingStrategy::None.wrap(input);
                 for mut text in lines {
@@ -45,10 +51,10 @@ impl WrappingStrategy {
                         let line: String = text.chars().take(*col).collect();
                         if line.ends_with(|c: char| c.is_whitespace())
                             || text
-                                .chars()
-                                .nth(*col)
-                                .map(|c| c.is_whitespace())
-                                .unwrap_or(false)
+                            .chars()
+                            .nth(*col)
+                            .map(|c| c.is_whitespace())
+                            .unwrap_or(false)
                         {
                             output.push(text.chars().take(*col).collect());
                             text = text.chars().skip(*col).collect();
@@ -70,6 +76,9 @@ impl WrappingStrategy {
                 output.iter().map(|s| s.trim().to_string()).collect()
             }
             WrappingStrategy::AtColWithHyphen(col) => {
+                if *col == 0 {
+                    return split_str_to_col(input);
+                }
                 let mut output = vec![];
                 let lines = WrappingStrategy::None.wrap(input);
                 for mut line in lines {
@@ -88,22 +97,40 @@ impl WrappingStrategy {
                 }
                 output
             }
-            WrappingStrategy::Cutoff(col) => input
-                .split('\n')
-                .map(|line| line.chars().take(*col).collect())
-                .collect(),
-            WrappingStrategy::Ellipsis(col) => input
-                .split('\n')
-                .map(|line| {
-                    if line.chars().count() >= *col {
-                        format!("{}…", line.chars().take(*col).collect::<String>())
-                    } else {
-                        line.to_string()
-                    }
-                })
-                .collect(),
+            WrappingStrategy::Cutoff(col) => {
+                if *col == 0 {
+                    return split_str_to_col(input);
+                }
+                input
+                    .split('\n')
+                    .map(|line| line.chars().take(*col).collect())
+                    .collect()
+            }
+            WrappingStrategy::Ellipsis(col) => {
+                if *col == 0 {
+                    return split_str_to_col(input);
+                }
+                input
+                    .split('\n')
+                    .map(|line| {
+                        if line.chars().count() >= *col {
+                            format!("{}…", line.chars().take(*col).collect::<String>())
+                        } else {
+                            line.to_string()
+                        }
+                    })
+                    .collect()
+            }
         }
     }
+}
+
+fn split_str_to_col(str: &str) -> Vec<String> {
+    str
+        .chars()
+        .filter(|c| !c.is_whitespace())
+        .map(|c| c.to_string())
+        .collect()
 }
 
 #[cfg(test)]

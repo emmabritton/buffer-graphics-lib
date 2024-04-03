@@ -36,6 +36,7 @@ use crate::clipping::Clip;
 use crate::GraphicsError::InvalidBufferLength;
 use fnv::FnvHashMap;
 use graphics_shapes::coord::Coord;
+use ici_files::errors::IndexedImageError;
 use thiserror::Error;
 
 pub mod prelude {
@@ -72,6 +73,12 @@ pub enum GraphicsError {
     ImageInitSize(usize, usize),
     #[error("Both images must be the same size, expected: {0}x{1}, found: {2}x{3}")]
     ImageBlendSize(usize, usize, usize, usize),
+    #[error("Over 255 colours have been drawn")]
+    TooManyColors,
+    #[error("Size is greater than 255x255: {0}x{1}")]
+    TooBig(usize, usize),
+    #[error("Creating image")]
+    ImageError(IndexedImageError),
 }
 
 pub struct Graphics<'buffer> {
@@ -95,6 +102,13 @@ pub struct Graphics<'buffer> {
     pub custom_font: FnvHashMap<u8, CustomLetter>,
 }
 
+impl Graphics<'_> {
+    #[inline]
+    pub fn create_buffer(width: usize, height: usize) -> Vec<u8> {
+        vec![0; width * height * 4]
+    }
+}
+
 /// Only the letter sizes you'll use need to be set
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct CustomLetter {
@@ -104,6 +118,7 @@ pub struct CustomLetter {
     pub _7x9: [bool; text::font::outline_7x9::LETTER_PX_COUNT],
     pub _8x8: [bool; text::font::script_8x8::LETTER_PX_COUNT],
     pub _8x10: [bool; text::font::standard_8x10::LETTER_PX_COUNT],
+    pub _3x5: [bool; text::font::limited_3x5::LETTER_PX_COUNT],
 }
 
 impl Default for CustomLetter {
@@ -115,6 +130,7 @@ impl Default for CustomLetter {
             _7x9: [false; text::font::outline_7x9::LETTER_PX_COUNT],
             _8x8: [false; text::font::script_8x8::LETTER_PX_COUNT],
             _8x10: [false; text::font::standard_8x10::LETTER_PX_COUNT],
+            _3x5: [false; text::font::limited_3x5::LETTER_PX_COUNT],
         }
     }
 }

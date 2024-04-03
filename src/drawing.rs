@@ -6,14 +6,16 @@ use crate::shapes::CreateDrawable;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
 use crate::text::{chr_to_code, Text};
-use crate::Graphics;
+use crate::{Graphics, GraphicsError};
 use graphics_shapes::circle::Circle;
 use graphics_shapes::coord::Coord;
 use graphics_shapes::polygon::Polygon;
 use graphics_shapes::prelude::Ellipse;
 use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
+use ici_files::palette::simplify_palette_to_fit;
 use ici_files::prelude::*;
+use std::collections::HashSet;
 use std::mem::swap;
 
 /// Represents anything that [Graphics] can render
@@ -93,6 +95,57 @@ impl Graphics<'_> {
             .collect::<Vec<Color>>();
         Image::new(pixels, self.width, self.height)
             .expect("Copy to image failed, please create GitHub issue for buffer-graphics-lib")
+    }
+
+    /// Copy entire pixels array to an indexed image
+    /// `simplify_palette` if true and there's more than 255 colours, this will simplify/merge the palette until there are under 255 colours
+    ///
+    /// # Errors
+    ///
+    /// * `GraphicsError::TooManyColors` Over 255 colors have been used and `simplify_palette` was false
+    /// * `GraphicsError::TooBig` Image is bigger than 255x255
+    /// * `GraphicsError::ImageError` Something went wrong creating the IndexedImage
+    pub fn copy_to_indexed_image(
+        &self,
+        simplify_palette: bool,
+    ) -> Result<IndexedImage, GraphicsError> {
+        if self.width > 255 || self.height > 255 {
+            return Err(GraphicsError::TooBig(self.width, self.height));
+        }
+        let width = self.width as u8;
+        let height = self.height as u8;
+        let pixels = self
+            .buffer
+            .chunks_exact(4)
+            .map(|px| Color {
+                r: px[0],
+                g: px[1],
+                b: px[2],
+                a: px[3],
+            })
+            .collect::<Vec<Color>>();
+        let colors: HashSet<Color> = HashSet::from_iter(pixels.iter().copied());
+        let colors = if colors.len() > 255 {
+            if simplify_palette {
+                simplify_palette_to_fit(&colors.into_iter().collect::<Vec<Color>>(), 255)
+            } else {
+                return Err(GraphicsError::TooManyColors);
+            }
+        } else {
+            colors.into_iter().collect()
+        };
+
+        let pixels = pixels
+            .iter()
+            .map(|c| {
+                colors
+                    .iter()
+                    .position(|o| o == c)
+                    .unwrap_or_else(|| panic!()) as u8
+            })
+            .collect();
+
+        Ok(IndexedImage::new(width, height, colors, pixels).map_err(GraphicsError::ImageError)?)
     }
 
     /// Get top left pixel coord for letter col row
@@ -416,6 +469,7 @@ impl Graphics<'_> {
                 PixelFont::Standard4x5 => &custom._4x5,
                 PixelFont::Standard6x7 => &custom._6x7,
                 PixelFont::Standard8x10 => &custom._8x10,
+                PixelFont::Limited3x5 => &custom._3x5,
             }
         } else {
             font.pixels(code)
