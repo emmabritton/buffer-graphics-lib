@@ -51,10 +51,10 @@ impl WrappingStrategy {
                         let line: String = text.chars().take(*col).collect();
                         if line.ends_with(|c: char| c.is_whitespace())
                             || text
-                            .chars()
-                            .nth(*col)
-                            .map(|c| c.is_whitespace())
-                            .unwrap_or(false)
+                                .chars()
+                                .nth(*col)
+                                .map(|c| c.is_whitespace())
+                                .unwrap_or(false)
                         {
                             output.push(text.chars().take(*col).collect());
                             text = text.chars().skip(*col).collect();
@@ -126,8 +126,7 @@ impl WrappingStrategy {
 }
 
 fn split_str_to_col(str: &str) -> Vec<String> {
-    str
-        .chars()
+    str.chars()
         .filter(|c| !c.is_whitespace())
         .map(|c| c.to_string())
         .collect()

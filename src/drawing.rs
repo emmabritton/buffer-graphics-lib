@@ -145,7 +145,7 @@ impl Graphics<'_> {
             })
             .collect();
 
-        Ok(IndexedImage::new(width, height, colors, pixels).map_err(GraphicsError::ImageError)?)
+        IndexedImage::new(width, height, colors, pixels).map_err(GraphicsError::ImageError)
     }
 
     /// Get top left pixel coord for letter col row
