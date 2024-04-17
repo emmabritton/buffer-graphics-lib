@@ -15,6 +15,8 @@ The `Graphics` struct needs a mutable buffer to work on and so mostly likely you
 
 [Graphics tests](https://github.com/emmabritton/graphics-tester) has tests for this crate, and provides some examples
 
+[Integration tests](https://github.com/emmabritton/integration_tests) shows how to use some third party libraries
+
 ## Usage
 
 ### Cargo
