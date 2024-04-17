@@ -33,12 +33,12 @@ pub mod shapes;
 pub mod text;
 
 use crate::clipping::Clip;
+use crate::prelude::Image;
 use crate::GraphicsError::InvalidBufferLength;
 use fnv::FnvHashMap;
 use graphics_shapes::coord::Coord;
 use ici_files::errors::IndexedImageError;
 use thiserror::Error;
-use crate::prelude::Image;
 
 pub mod prelude {
     pub use crate::drawable::*;
@@ -136,7 +136,11 @@ impl Default for CustomLetter {
     }
 }
 
-pub fn make_image(width: usize, height: usize, method: fn(&mut Graphics)) -> Result<Image, GraphicsError> {
+pub fn make_image(
+    width: usize,
+    height: usize,
+    method: fn(&mut Graphics),
+) -> Result<Image, GraphicsError> {
     let mut buffer = Graphics::create_buffer(width, height);
     let mut graphics = Graphics::new(&mut buffer, width, height)?;
     method(&mut graphics);
