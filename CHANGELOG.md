@@ -1,9 +1,13 @@
 # Changelog
 
+### Version 0.18.0
+- Add `create_image` method
+- Update ici lib
+
 ### Version 0.17.0
 - Add convenience method `Graphics::create_buffer`
 - Fix bug if WrappingStrategy was passed `0`
-- New font Limited 3x5 (no lower case, some symbols look bad)
+- New font 'Limited 3x5' (no lower case, some symbols look bad)
 
 ### Version 0.16.2
 - Update ici lib

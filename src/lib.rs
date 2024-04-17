@@ -38,6 +38,7 @@ use fnv::FnvHashMap;
 use graphics_shapes::coord::Coord;
 use ici_files::errors::IndexedImageError;
 use thiserror::Error;
+use crate::prelude::Image;
 
 pub mod prelude {
     pub use crate::drawable::*;
@@ -133,6 +134,13 @@ impl Default for CustomLetter {
             _3x5: [false; text::font::limited_3x5::LETTER_PX_COUNT],
         }
     }
+}
+
+pub fn make_image(width: usize, height: usize, method: fn(&mut Graphics)) -> Result<Image, GraphicsError> {
+    let mut buffer = Graphics::create_buffer(width, height);
+    let mut graphics = Graphics::new(&mut buffer, width, height)?;
+    method(&mut graphics);
+    Ok(graphics.copy_to_image())
 }
 
 impl<'buffer> Graphics<'_> {

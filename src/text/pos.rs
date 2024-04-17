@@ -16,8 +16,8 @@ impl TextPos {
         match self {
             TextPos::Px(x, y) => (*x, *y),
             TextPos::ColRow(col, row) => (
-                (col * (font.size().0 + font.spacing())) as isize,
-                (row * (font.size().1 + font.spacing())) as isize,
+                (col * (font.char_width())) as isize,
+                (row * (font.line_height())) as isize,
             ),
         }
     }
