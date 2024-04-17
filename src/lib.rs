@@ -8,12 +8,11 @@
 //!```
 //! # use graphics_shapes::rect::Rect;
 //! # use buffer_graphics_lib::prelude::*;
-//! let mut buffer = [0_u8; 800 * 600 * 4]; //800 x 600 RGBA
+//! let mut buffer = Graphics::create_buffer(800, 600); //800 x 600 RGBA
 //! let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
-//! let text = Text::new("Some text", TextPos::cr((1,1)), (LIGHT_GRAY, PixelFont::Standard8x10));
+//! let text = Text::new("Some text", TextPos::cr((1,1)), (LIGHT_GRAY, PixelFont::Standard6x7));
 //! graphics.draw(&text);
-//! let drawable = Drawable::from_obj(Rect::new((1,1),(15,16)), stroke(BLUE));
-//! graphics.draw(&drawable);
+//! graphics.draw_rect(Rect::new((40, 50), (100, 100)), stroke(BLUE));
 //! ```
 
 extern crate core;

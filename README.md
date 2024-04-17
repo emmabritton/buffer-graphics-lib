@@ -7,7 +7,13 @@ This is a simple graphics library for drawing to a buffer, mainly designed to be
 
 It has basic shape drawing, bitmap text and image rendering.
 
-The `Graphics` struct needs a mutable slice to work on and so mostly likely you'll need to create the struct and pass in the buffer from the rendering library every frame but this should be fine for performance as the struct is nearly empty. 
+The `Graphics` struct needs a mutable buffer to work on and so mostly likely you'll need to create the struct and pass in the buffer from the rendering library every frame but this should be fine for performance as the struct is nearly empty. 
+
+[ICI Tools](https://github.com/emmabritton/ici_tools) can be useful when working with ICI files
+
+[ICI Image editor](https://github.com/emmabritton/ici-image-editor) is a MSPaint like program for ICI and ICA files
+
+[Graphics tests](https://github.com/emmabritton/graphics-tester) has tests for this crate, and provides some examples
 
 ## Usage
 
@@ -22,18 +28,16 @@ buffer-graphics-lib = "0.18.0"
 
 Setup a graphics instance
 ```rust
-let mut buffer: [u8; 1920000] = [0; 800 * 600 * 4]; //800 x 600 RGBA 
+let mut buffer: [u8; 1920000] = Graphics::create_buffer(800,600); //800 x 600 RGBA 
 let mut graphics = Graphics::new(&mut buffer, 800, 600)?;
 ```
 
 Drawing is then quite simple:
 ```rust
-let text = Text::new("Some text", (1,1), (WHITE, Large));
+let text = Text::new("Some text", (1,1), (WHITE, PixelFont::Standard6x7));
 graphics.draw(&text);
 graphics.draw_image(20, 20, &image);
-let shape = Rect::new((10,10),(50,50));
-let drawable = Drawable::from_obj(shape, stroke(BLUE));
-graphics.draw(&drawable);
+graphics.draw_rect(Rect::new((40, 50), (100, 100)), stroke(BLUE));
 ```
 
 ## Features
@@ -46,15 +50,15 @@ graphics.draw(&drawable);
 
 #### Code
 ```rust
-let image = load_image("resources/example.png")?;
+let image = open_image("resources/example.png")?;
 graphics.draw_image(40, 20, &image);
 ```
 
 ### `serde`
 
 * Adds derive `Serialize` and `Deserialize` for most structs and enums
-* Enable `graphics-shapes/serde`
+* Enables `graphics-shapes/serde`
 
 ### `mint`
 
-Enable `graphics-shapes/mint` 
+* Enables `graphics-shapes/mint` 

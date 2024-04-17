@@ -32,3 +32,7 @@ noto-sans-mono-bitmap = { version = "0.3.0", optional = true, default-features =
 [dev-dependencies]
 fastrand = "2.0.2"
 anyhow = "1.0.82"
+
+[[example]]
+name = "basic"
+required-features = ["image_loading"]
