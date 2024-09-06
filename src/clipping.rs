@@ -48,7 +48,8 @@ enum ClipMode {
 /// Complex starts with all pixels being valid
 /// * use `add_*` to decrease the valid area
 /// * use `remove_*` to increase the valid area
-/// The last shape to touch a pixel determines it's validity
+///
+/// the last shape to touch a pixel determines it's validity
 ///
 /// With complex mode a list of valid pixels is stored internally and each time the complex clip is updated the valid list is updated as well, if you're making a bulk edit call `set_auto_build_map(false)` first
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

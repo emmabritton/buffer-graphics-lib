@@ -473,17 +473,17 @@ const EXCLAIM: [bool; LETTER_PX_COUNT] = [
     false, false, false, true, true, false, false, false, false, false, false, true, true, false,
     false, false, false, false, false, true, true, false, false, false, false, false, false, true,
     true, false, false, false, false, false, false, true, true, false, false, false, false, false,
-    false, true, true, false, false, false, false, false, false, true, true, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, true, true, false,
-    false, false, false, false, false, true, true, false, false, false,
+    false, false, false, false, false, false, false, false, false, true, true, false, false, false,
+    false, false, false, true, true, false, false, false, false, false, false, false, false, false,
+    false, false, false, false, false, false, false, false, false, false,
 ];
 const QUESTION: [bool; LETTER_PX_COUNT] = [
     false, true, true, true, true, true, true, false, true, true, true, true, true, true, true,
     true, true, true, false, false, false, false, true, true, true, true, false, false, false,
     false, true, true, false, false, false, false, true, true, true, true, false, false, false,
-    true, true, true, true, false, false, false, false, true, true, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, true, true, false, false,
-    false, false, false, false, true, true, false, false, false,
+    true, true, true, true, false, false, false, false, false, false, false, false, false, false,
+    false, false, true, true, false, false, false, false, false, false, true, true, false, false,
+    false, false, false, false, false, false, false, false, false,
 ];
 const PAREN_L: [bool; LETTER_PX_COUNT] = [
     false, false, false, false, true, true, false, false, false, false, false, true, true, false,

@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.18.1
+- Update deps
+- Tidy up some letters
+
 ### Version 0.18.0
 - Add `create_image` method
 - Update ici lib

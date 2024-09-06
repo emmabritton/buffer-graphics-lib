@@ -1,6 +1,6 @@
 [package]
 name = "buffer-graphics-lib"
-version = "0.18.0"
+version = "0.18.1"
 edition = "2021"
 authors = ["Emma Britton <emmabritton@pm.me>"]
 description = "Simple graphics library for buffers"
@@ -19,19 +19,19 @@ embedded = ["embedded-graphics-core"]
 notosans = ["noto-sans-mono-bitmap"]
 
 [dependencies]
-thiserror = "1.0.58"
-graphics-shapes = { version = "0.4.1", default-features = false }
-serde = { version = "1.0.198", features = ["derive"], optional = true }
+thiserror = "1.0.63"
+graphics-shapes = { version = "0.4.2", default-features = false }
+serde = { version = "1.0.202", features = ["derive"], optional = true }
 image_lib = { package = "image", version = "0.25.0", optional = true }
-log = "0.4.21"
-ici-files = { version = "0.2.3" , default-features = false}
+log = "0.4.22"
+ici-files = { version="0.2.1", default-features = false}
 fnv = "1.0.7"
 embedded-graphics-core = { version = "0.4.0", default-features = false, optional = true }
 noto-sans-mono-bitmap = { version = "0.3.0", optional = true, default-features = false }
 
 [dev-dependencies]
-fastrand = "2.0.2"
-anyhow = "1.0.82"
+fastrand = "2.1.1"
+anyhow = "1.0.86"
 
 [[example]]
 name = "basic"

@@ -50,7 +50,7 @@ macro_rules! impl_to_px {
         impl NewTextPos<$num_type> for TextPos {
             /// Calls abs() on x and y
             fn cr((x, y): ($num_type, $num_type)) -> Self {
-                TextPos::ColRow(((x as isize).abs()) as usize, ((y as isize).abs()) as usize)
+                TextPos::ColRow((x as isize).unsigned_abs(), (y as isize).unsigned_abs())
             }
 
             fn px((x, y): ($num_type, $num_type)) -> Self {

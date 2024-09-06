@@ -172,7 +172,7 @@ impl<'buffer> Graphics<'_> {
         width: usize,
         height: usize,
     ) -> Graphics<'buffer> {
-        if cfg!(debug) {
+        if cfg!(debug_assertions) {
             let count = width * height * 4;
             debug_assert_eq!(count, buffer.len());
         }
