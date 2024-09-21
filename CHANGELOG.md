@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.18.2
+- Update deps
+- Add more docs
+
 ### Version 0.18.1
 - Update deps
 - Tidy up some letters

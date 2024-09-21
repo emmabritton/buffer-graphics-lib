@@ -398,11 +398,13 @@ impl Graphics<'_> {
     /// Get the RGB values for a pixel
     /// Alpha will always be 255
     ///
-    /// If `use_translate` is true than the x,y will be updated with `self.translate`
+    /// If `use_translate` is true then the x,y will be updated with `self.translate`
     ///
-    /// Although the method takes `&mut self` it doesn't mutate anything
+    /// # Returns
+    ///
+    /// `Some(Color)` if x,y is within bounds
     #[inline]
-    pub fn get_pixel(&mut self, x: isize, y: isize, use_translate: bool) -> Option<Color> {
+    pub fn get_pixel(&self, x: isize, y: isize, use_translate: bool) -> Option<Color> {
         let (x, y) = if use_translate {
             (x + self.translate.x, y + self.translate.y)
         } else {
@@ -424,7 +426,7 @@ impl Graphics<'_> {
         None
     }
 
-    /// Sets every pixel to the same color, this ignores translate and clip
+    /// Set every pixel to `color`, this ignores translate and clip
     pub fn clear(&mut self, color: Color) {
         self.buffer.chunks_exact_mut(4).for_each(|px| {
             px[0] = color.r;
@@ -434,7 +436,7 @@ impl Graphics<'_> {
         });
     }
 
-    /// Sets every pixel to the same color, same as [clear] but this follows translate and clip
+    /// Set/blend every pixel with `color`, same as [clear] but this follows translate and clip
     pub fn clear_aware(&mut self, color: Color) {
         for y in 0..self.height {
             for x in 0..self.width {
@@ -443,12 +445,21 @@ impl Graphics<'_> {
         }
     }
 
-    /// Draw a letter at pos
+    /// Draw `chr` at `pos`
+    ///
+    /// # Usage
+    /// ```
+    ///# use buffer_graphics_lib::prelude::*;
+    ///# fn doc(graphics: &mut Graphics) {
+    ///     graphics.draw_letter((20,20), 'A', PixelFont::Limited3x5, BLUE);
+    ///# }
+    /// ```
     #[inline]
     pub fn draw_letter(&mut self, pos: (isize, isize), chr: char, font: PixelFont, color: Color) {
         self.draw_ascii_letter(pos, chr_to_code(chr), font, color);
     }
 
+    /// Shouldn't be called in normal usage
     pub fn draw_ascii_letter(
         &mut self,
         pos: (isize, isize),
@@ -526,6 +537,35 @@ impl Graphics<'_> {
         }
     }
 
+    /// Draw `text` on screen at `pos` using `format`
+    ///
+    /// # Params
+    /// * `format` See [TextFormat], can be
+    ///     * `TextFormat`
+    ///     * `Color`
+    ///     * `(Color, PixelFont)`
+    ///     * `(Color, PixelFont, Positioning)`
+    ///     * `(Color, PixelFont, WrappingStrategy, Positioning)`
+    ///     * `(Color, PixelFont, WrappingStrategy)`
+    ///     * `(Color, PixelFont, WrappingStrategy, f32)` (f32 = line height)
+    ///     * `(Color, PixelFont, WrappingStrategy, f32, f32)` (1st f32 = line height, 2nd f32 = char width)
+    ///     * `(Color, PixelFont, WrappingStrategy, f32, f32, Positioning)` (1st f32 = line height, 2nd f32 = char width)
+    ///
+    /// # Usage
+    ///
+    /// ```
+    ///# use buffer_graphics_lib::prelude::*;
+    ///# fn doc(graphics: &mut Graphics) {
+    ///  //simple example
+    ///  graphics.draw_text("Test", TextPos::ColRow(1,1), RED);
+    ///# }
+    ///
+    /// //full example
+    /// fn draw_message(graphics: &mut Graphics, msg: String) {
+    ///     let width_in_columns = PixelFont::Standard6x7.get_max_characters(graphics.width(), graphics.height()).0;
+    ///     graphics.draw_text(&msg, TextPos::px(coord!(8,8)), (BLACK, PixelFont::Standard6x7, WrappingStrategy::AtCol(width_in_columns - 1)));
+    /// }
+    /// ```
     #[inline]
     pub fn draw_text<P: Into<TextPos>, F: Into<TextFormat>>(
         &mut self,
@@ -562,9 +602,9 @@ impl Graphics<'_> {
         Drawable::from_obj(ellipse.into(), draw_type).render(self)
     }
 
-    /// Update a pixel color, using [set_pixel] or [blend_pixel] depending on whether `color`s alpha is 255 or not
+    /// Update a pixel color, replacing or blending depending on whether `color`s alpha is 255 or not
     ///
-    /// If the alpha is 0 the call is does nothing
+    /// If the alpha is 0 the call does nothing
     #[inline]
     pub fn set_pixel(&mut self, x: isize, y: isize, color: Color) {
         update_pixel(

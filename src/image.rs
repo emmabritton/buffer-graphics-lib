@@ -9,7 +9,7 @@ use ici_files::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Formatter};
 
-/// Images are rectangles of pixels that can be manipulated and drawn on screen
+/// Images are a rectangle of pixels that can be manipulated and drawn on screen/saved to disk
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Eq, PartialEq)]
 pub struct Image {
@@ -26,7 +26,7 @@ impl Debug for Image {
 }
 
 impl Image {
-    /// Create a image of width x height size using provided pixels
+    /// Create an image of width x height size using provided pixels
     pub fn new(pixels: Vec<Color>, width: usize, height: usize) -> Result<Self, GraphicsError> {
         let is_transparent = pixels.iter().any(|c| c.is_transparent());
         if width * height != pixels.len() {

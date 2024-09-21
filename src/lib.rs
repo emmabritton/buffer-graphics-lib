@@ -37,6 +37,7 @@ use crate::GraphicsError::InvalidBufferLength;
 use fnv::FnvHashMap;
 use graphics_shapes::coord::Coord;
 use ici_files::errors::IndexedImageError;
+use ici_files::image::IndexedImage;
 use thiserror::Error;
 
 pub mod prelude {
@@ -103,6 +104,7 @@ pub struct Graphics<'buffer> {
 }
 
 impl Graphics<'_> {
+    /// Create a buffer of the correct size
     #[inline]
     pub fn create_buffer(width: usize, height: usize) -> Vec<u8> {
         vec![0; width * height * 4]
@@ -135,10 +137,21 @@ impl Default for CustomLetter {
     }
 }
 
-pub fn make_image(
+/// Create an image `width`x`height` px and then run drawing commands on it
+///
+/// # Usage
+/// ```
+///# use buffer_graphics_lib::make_image;
+///# use buffer_graphics_lib::prelude::*;
+///let image: Result<Image, GraphicsError> = make_image(30, 30, |g| {
+///    g.clear(BLACK);
+///    g.draw_rect(Rect::new(coord!(0,0), coord!(29,29)), stroke(WHITE))
+/// });
+/// ```
+pub fn make_image<F: FnOnce(&mut Graphics)>(
     width: usize,
     height: usize,
-    method: fn(&mut Graphics),
+    method: F,
 ) -> Result<Image, GraphicsError> {
     let mut buffer = Graphics::create_buffer(width, height);
     let mut graphics = Graphics::new(&mut buffer, width, height)?;
@@ -146,8 +159,40 @@ pub fn make_image(
     Ok(graphics.copy_to_image())
 }
 
+/// Create an indexed image `width`x`height` px and then run drawing commands on it
+///
+/// # Params
+/// * `simplify_palette` if true and there's more than 255 colours, this will simplify/merge the palette until there are under 255 colours
+///
+/// # Usage
+/// ```
+///# use buffer_graphics_lib::make_indexed_image;
+///# use buffer_graphics_lib::prelude::*;
+///let image: Result<IndexedImage, GraphicsError> = make_indexed_image(30, 30, true, |g| {
+///    g.clear(BLACK);
+///    g.draw_rect(Rect::new(coord!(0,0), coord!(29,29)), stroke(WHITE))
+/// });
+/// ```
+///
+/// # Errors
+/// * `GraphicsError::TooManyColors` Over 255 colors have been used and `simplify_palette` was false
+/// * `GraphicsError::TooBig` Image is bigger than 255x255
+pub fn make_indexed_image<F: FnOnce(&mut Graphics)>(
+    width: usize,
+    height: usize,
+    simplify_palette: bool,
+    method: F,
+) -> Result<IndexedImage, GraphicsError> {
+    let mut buffer = Graphics::create_buffer(width, height);
+    let mut graphics = Graphics::new(&mut buffer, width, height)?;
+    method(&mut graphics);
+    graphics.copy_to_indexed_image(simplify_palette)
+}
+
 impl<'buffer> Graphics<'_> {
     /// `buffer` needs to be `width * height * 4` long
+    ///
+    /// You can use [Graphics::create_buffer] to guarantee the correct size
     pub fn new(
         buffer: &'buffer mut [u8],
         width: usize,
@@ -167,6 +212,7 @@ impl<'buffer> Graphics<'_> {
         })
     }
 
+    /// Same as [Graphics::new] but doesn't check buffer size
     pub fn new_unchecked(
         buffer: &'buffer mut [u8],
         width: usize,
@@ -188,14 +234,19 @@ impl<'buffer> Graphics<'_> {
 }
 
 impl Graphics<'_> {
+    /// Replace the clip with `clip`
     pub fn set_clip(&mut self, clip: Clip) {
         self.clip = clip;
     }
 
+    /// Get ref to [Graphic]'s [Clip]
     pub fn clip(&self) -> &Clip {
         &self.clip
     }
 
+    /// Get mut ref to [Graphic]'s [Clip]
+    ///
+    /// Changes are effective immediately
     pub fn clip_mut(&mut self) -> &mut Clip {
         &mut self.clip
     }
