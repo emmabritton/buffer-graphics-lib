@@ -1,5 +1,23 @@
 # Changelog
 
+### Version 0.19.0
+### Breaking
+- To support other buffer types (`u8` and `u32`):
+  - Remove `Graphics::new` and `Graphics::create_buffer`
+  - Add `Graphics::new_u8_rgba`, `Graphics::create_buffer_u8`, `Graphics::new_u32_rgba`, `Graphics::new_u32_argb`, `Graphics::create_buffer_u32`
+- Migration
+```
+let mut buffer = Graphics::create_buffer(320, 200);
+let graphics = Graphics::new(&mut buffer, 320, 200);
+```
+becomes
+```
+let mut buffer = Graphics::create_buffer_u8(320, 200);
+let graphics = Graphics::new_u8_rgba(&mut buffer, 320, 200);
+```
+- `Image::pixels()` now returns a reference rather than a copy
+- Remove exact dep versions
+
 ### Version 0.18.2
 - Update deps
 - Add more docs

@@ -13,7 +13,7 @@ use std::fmt::{Debug, Formatter};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Eq, PartialEq)]
 pub struct Image {
-    pub(crate) bytes: Vec<u8>,
+    pixels: Vec<Color>,
     width: usize,
     height: usize,
     is_transparent: bool,
@@ -32,9 +32,8 @@ impl Image {
         if width * height != pixels.len() {
             Err(GraphicsError::ImageInitSize(width * height, pixels.len()))
         } else {
-            let bytes = pixels.into_iter().flat_map(|c| c.as_array()).collect();
             Ok(Image {
-                bytes,
+                pixels,
                 width,
                 height,
                 is_transparent,
@@ -51,9 +50,11 @@ impl Image {
     }
 
     pub fn from_indexed(indexed_image: &IndexedImage) -> Image {
-        let mut pixels =
-            vec![0; indexed_image.width() as usize * indexed_image.height() as usize * 4];
-        let mut graphics = Graphics::new(&mut pixels, indexed_image.width() as usize, indexed_image.height() as usize)
+        let mut pixels = Graphics::create_buffer_u8(
+            indexed_image.width() as usize,
+            indexed_image.height() as usize,
+        );
+        let mut graphics = Graphics::new_u8_rgba(&mut pixels, indexed_image.width() as usize, indexed_image.height() as usize)
             .expect("Creating buffer to make image from indexed image, please raise an issue on GitHub buffer-graphics-lib");
         graphics.draw_indexed_image((0, 0), indexed_image);
         graphics.copy_to_image()
@@ -61,68 +62,52 @@ impl Image {
 }
 
 impl Image {
-    #[inline]
+    #[inline(always)]
     pub fn width(&self) -> usize {
         self.width
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn height(&self) -> usize {
         self.height
     }
 
     /// Returns true if any pixels are transparent
-    #[inline]
+    #[inline(always)]
     pub fn is_transparent(&self) -> bool {
         self.is_transparent
     }
 
-    /// This is calculated every time
-    pub fn pixels(&self) -> Vec<Color> {
-        self.bytes
-            .chunks_exact(4)
-            .map(|chunk| Color {
-                r: chunk[0],
-                g: chunk[1],
-                b: chunk[2],
-                a: chunk[3],
-            })
-            .collect()
+    #[inline(always)]
+    pub fn pixels(&self) -> &[Color] {
+        &self.pixels
     }
 
+    #[inline]
     fn recalc_transparency(&mut self) {
         self.is_transparent = self.pixels().iter().any(|c| c.is_transparent());
     }
 
     #[inline]
     pub fn get_pixel(&self, x: usize, y: usize) -> Color {
-        let addr = (y * self.width + x) * 4;
-        Color {
-            r: self.bytes[addr],
-            g: self.bytes[addr + 1],
-            b: self.bytes[addr + 2],
-            a: self.bytes[addr + 3],
-        }
+        let addr = y * self.width + x;
+        self.pixels[addr]
     }
 
     #[inline]
     pub fn set_pixel(&mut self, x: usize, y: usize, value: Color) {
-        let addr = (y * self.width + x) * 4;
-        self.bytes[addr] = value.r;
-        self.bytes[addr + 1] = value.g;
-        self.bytes[addr + 2] = value.b;
-        self.bytes[addr + 3] = value.a;
-        self.recalc_transparency();
+        let addr = y * self.width + x;
+        self.pixels[addr] = value;
+        if !self.is_transparent && value.is_transparent() {
+            self.is_transparent = true;
+        }
     }
 
     #[inline]
     pub fn blend_pixel(&mut self, x: usize, y: usize, value: Color) {
         let new_color = self.get_pixel(x, y).blend(value);
-        let addr = (y * self.width + x) * 4;
-        self.bytes[addr] = new_color.r;
-        self.bytes[addr + 1] = new_color.g;
-        self.bytes[addr + 2] = new_color.b;
-        self.bytes[addr + 3] = new_color.a;
+        let addr = y * self.width + x;
+        self.pixels[addr] = new_color;
         self.recalc_transparency();
     }
 
@@ -134,9 +119,9 @@ impl Image {
                 let y = y * self.width;
                 unsafe {
                     std::ptr::swap_nonoverlapping(
-                        &mut self.bytes[(y + x) * 4],
-                        &mut self.bytes[(y + self.width - 1 - x) * 4],
-                        4,
+                        &mut self.pixels[y + x],
+                        &mut self.pixels[y + self.width - 1 - x],
+                        1,
                     );
                 }
             }
@@ -149,9 +134,9 @@ impl Image {
         for y in 0..half_height {
             unsafe {
                 std::ptr::swap_nonoverlapping(
-                    &mut self.bytes[(y * self.width) * 4],
-                    &mut self.bytes[((self.height - 1 - y) * self.width) * 4],
-                    self.width * 4,
+                    &mut self.pixels[y * self.width],
+                    &mut self.pixels[(self.height - 1 - y) * self.width],
+                    self.width,
                 );
             }
         }
@@ -215,6 +200,7 @@ impl Image {
         }
     }
 
+    #[inline]
     pub fn to_renderable<P: Into<Coord>>(self, xy: P, draw_offset: DrawOffset) -> RenderableImage {
         RenderableImage::new(self, xy, draw_offset)
     }
@@ -222,35 +208,15 @@ impl Image {
 
 impl Tint for Image {
     fn tint_add(&mut self, r_diff: isize, g_diff: isize, b_diff: isize, a_diff: isize) {
-        for pixel in self.bytes.chunks_exact_mut(4) {
-            let mut color = Color {
-                r: pixel[0],
-                g: pixel[1],
-                b: pixel[2],
-                a: pixel[3],
-            };
-            color.tint_add(r_diff, g_diff, b_diff, a_diff);
-            pixel[0] = color.r;
-            pixel[1] = color.g;
-            pixel[2] = color.b;
-            pixel[3] = color.a;
+        for pixel in self.pixels.iter_mut() {
+            pixel.tint_add(r_diff, g_diff, b_diff, a_diff);
         }
         self.recalc_transparency();
     }
 
     fn tint_mul(&mut self, r_diff: f32, g_diff: f32, b_diff: f32, a_diff: f32) {
-        for pixel in self.bytes.chunks_exact_mut(4) {
-            let mut color = Color {
-                r: pixel[0],
-                g: pixel[1],
-                b: pixel[2],
-                a: pixel[3],
-            };
-            color.tint_mul(r_diff, g_diff, b_diff, a_diff);
-            pixel[0] = color.r;
-            pixel[1] = color.g;
-            pixel[2] = color.b;
-            pixel[3] = color.a;
+        for pixel in self.pixels.iter_mut() {
+            pixel.tint_mul(r_diff, g_diff, b_diff, a_diff);
         }
         self.recalc_transparency();
     }
@@ -287,7 +253,7 @@ mod test {
 
         assert_eq!(image.width, 3);
         assert_eq!(image.height, 3);
-        assert_eq!(image.bytes.len(), 9 * 4);
+        assert_eq!(image.pixels.len(), 9);
         assert!(!image.is_transparent);
         assert_eq!(
             image.pixels(),

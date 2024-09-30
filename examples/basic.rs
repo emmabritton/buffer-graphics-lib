@@ -7,8 +7,8 @@ use graphics_shapes::shape_box::ShapeBox;
 use std::fs;
 
 fn main() -> Result<()> {
-    let mut buffer = Graphics::create_buffer(400, 400);
-    let mut graphics = Graphics::new(&mut buffer, 400, 400)?;
+    let mut buffer = Graphics::create_buffer_u8(400, 400);
+    let mut graphics = Graphics::new_u8_rgba(&mut buffer, 400, 400)?;
 
     draw_some_text(&mut graphics);
     draw_some_shapes(&mut graphics);
@@ -43,7 +43,7 @@ fn draw_some_text(graphics: &mut Graphics) {
 
     //The last param of text is `TextFormat`
     //it can be created with `TextFormat::new(...)` or with
-    //(Color)
+    //Color
     //(Color, PixelFont)
     //(Color, PixelFont, Positioning)
     //(Color, PixelFont, WrappingStrategy)
@@ -54,7 +54,7 @@ fn draw_some_text(graphics: &mut Graphics) {
 }
 
 fn draw_some_shapes(graphics: &mut Graphics) {
-    //Shapes can also be drawn in several ways
+    //Shapes can also be drawn in multiple ways
 
     //1 directly with `draw_rect`, `draw_circle`
     graphics.draw_triangle(Triangle::new((40, 40), (80, 40), (80, 40)), stroke(YELLOW));
@@ -69,7 +69,7 @@ fn draw_some_shapes(graphics: &mut Graphics) {
     let drawable_box = Drawable::from_obj(shape_box, stroke(GREEN));
     graphics.draw(&drawable_box);
 
-    //3 in bulk using a `ShapeCollection`
+    //4 in bulk using a `ShapeCollection`
     let mut collection = ShapeCollection::default();
     InsertShape::insert(
         &mut collection,
@@ -92,7 +92,7 @@ fn draw_to_image(graphics: &mut Graphics) {
 
 fn draw_some_images(graphics: &mut Graphics) -> Result<()> {
     //Image are normal images such as png or jpeg
-    //IndexedImage are ici (from `ici-files`)
+    //IndexedImage are .ici (from `ici-files`)
 
     //1 Images
     let png = open_image("examples/sample.png")?;

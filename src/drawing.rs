@@ -6,7 +6,8 @@ use crate::shapes::CreateDrawable;
 use crate::text::format::TextFormat;
 use crate::text::pos::TextPos;
 use crate::text::{chr_to_code, Text};
-use crate::{Graphics, GraphicsError};
+use crate::GraphicsBuffer::RgbaU8;
+use crate::{Graphics, GraphicsBuffer, GraphicsError};
 use graphics_shapes::circle::Circle;
 use graphics_shapes::coord::Coord;
 use graphics_shapes::polygon::Polygon;
@@ -23,19 +24,59 @@ pub trait Renderable<T> {
     fn render(&self, graphics: &mut Graphics);
 }
 
+#[inline]
+pub(crate) fn index_u8(width: usize, x: usize, y: usize) -> usize {
+    (x + y * width) * 4
+}
+
+#[inline]
+pub(crate) fn index_u32(width: usize, x: usize, y: usize) -> usize {
+    x + y * width
+}
+
+pub(crate) fn clear_u8(buffer: &mut GraphicsBuffer, color: Color) {
+    if let RgbaU8(buffer) = buffer {
+        buffer.chunks_exact_mut(4).for_each(|px| {
+            px[0] = color.r;
+            px[1] = color.g;
+            px[2] = color.b;
+            px[3] = color.a;
+        });
+    } else {
+        panic!(
+            "clear_u8 called on non u8 buffer, please create GitHub issue for buffer-graphics-lib"
+        )
+    }
+}
+
+pub(crate) fn clear_u32(buffer: &mut GraphicsBuffer, color: Color) {
+    #[allow(clippy::type_complexity)] //it's internal to this method
+    let result: Option<(&mut &mut [u32], fn(Color) -> u32)> = match buffer {
+        RgbaU8(_) => None,
+        GraphicsBuffer::RgbaU32(buf) => Some((buf, Color::to_rgba)),
+        GraphicsBuffer::ArgbU32(buf) => Some((buf, Color::to_argb)),
+    };
+    if let Some((buffer, method)) = result {
+        let color = method(color);
+        buffer.iter_mut().for_each(|p| *p = color);
+    } else {
+        panic!("clear_u32 called on non u32 buffer, please create GitHub issue for buffer-graphics-lib")
+    }
+}
+
 impl Graphics<'_> {
     /// Convert an x,y coord to idx for use with `self.pixels`
-    #[inline]
+    #[inline(always)]
     pub fn index(&self, x: usize, y: usize) -> usize {
-        (x + y * self.width) * 4
+        (self.index_method)(self.width, x, y)
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn width(&self) -> usize {
         self.width
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn height(&self) -> usize {
         self.height
     }
@@ -49,7 +90,7 @@ impl Graphics<'_> {
 
 impl Graphics<'_> {
     /// Get the canvas offset in pixels
-    #[inline]
+    #[inline(always)]
     pub fn get_translate(&self) -> Coord {
         self.translate
     }
@@ -59,7 +100,7 @@ impl Graphics<'_> {
     /// All drawing commands will be offset by this value
     ///
     /// # Returns
-    /// The previous translate value
+    /// The previous translation value
     #[inline]
     pub fn set_translate(&mut self, new_value: Coord) -> Coord {
         let old = self.translate;
@@ -83,16 +124,7 @@ impl Graphics<'_> {
 
     /// Copy entire pixels array to an image
     pub fn copy_to_image(&self) -> Image {
-        let pixels = self
-            .buffer
-            .chunks_exact(4)
-            .map(|px| Color {
-                r: px[0],
-                g: px[1],
-                b: px[2],
-                a: px[3],
-            })
-            .collect::<Vec<Color>>();
+        let pixels = self.buffer.to_pixels();
         Image::new(pixels, self.width, self.height)
             .expect("Copy to image failed, please create GitHub issue for buffer-graphics-lib")
     }
@@ -114,16 +146,7 @@ impl Graphics<'_> {
         }
         let width = self.width as u8;
         let height = self.height as u8;
-        let pixels = self
-            .buffer
-            .chunks_exact(4)
-            .map(|px| Color {
-                r: px[0],
-                g: px[1],
-                b: px[2],
-                a: px[3],
-            })
-            .collect::<Vec<Color>>();
+        let pixels = self.buffer.to_pixels();
         let colors: HashSet<Color> = HashSet::from_iter(pixels.iter().copied());
         let colors = if colors.len() > 255 {
             if simplify_palette {
@@ -153,45 +176,21 @@ impl Graphics<'_> {
         (col * font.char_width(), row * font.line_height())
     }
 
-    /// Draw an image at `x`, `y` as fast as possible
-    /// If the image may draw outside the window you must use [draw_image] instead
-    /// Ignores clipping and translation for opaque images
-    pub fn draw_image_unchecked<P: Into<Coord>>(&mut self, xy: P, image: &Image) {
-        let xy = xy.into();
-        if image.is_transparent() {
-            self.draw_image(xy, image);
-        } else {
-            let byte_count = image.width() * 4;
-            for (y, row) in image.bytes.chunks_exact(byte_count).enumerate() {
-                let addr = (((xy.y + y as isize) * self.width() as isize + xy.x) * 4) as usize;
-                unsafe {
-                    let dst = self.buffer.as_mut_ptr().add(addr);
-                    std::ptr::copy_nonoverlapping(row.as_ptr(), dst, byte_count);
-                }
-            }
-        }
-    }
-
     /// Draw an image at `x`, `y`
     /// If the image definitely will draw inside the window you can use [draw_image_unchecked] instead
     pub fn draw_image<P: Into<Coord>>(&mut self, xy: P, image: &Image) {
         let xy = xy.into();
         let mut x = 0;
         let mut y = 0;
-        for pixel in image.bytes.chunks_exact(4) {
+        for pixel in image.pixels() {
             update_pixel(
-                self.buffer,
+                &mut self.buffer,
                 &self.translate,
                 &self.clip,
                 (self.width, self.height),
                 xy.x + x as isize,
                 xy.y + y,
-                Color {
-                    r: pixel[0],
-                    g: pixel[1],
-                    b: pixel[2],
-                    a: pixel[3],
-                },
+                *pixel,
             );
             x += 1;
             if x >= image.width() {
@@ -213,7 +212,7 @@ impl Graphics<'_> {
                 let color_idx = image.get_pixel(i).unwrap() as usize;
                 let color = palette[color_idx];
                 update_pixel(
-                    self.buffer,
+                    &mut self.buffer,
                     &self.translate,
                     &self.clip,
                     (self.width, self.height),
@@ -245,7 +244,7 @@ impl Graphics<'_> {
                 let color_idx = current_frame[i] as usize;
                 let color = palette[color_idx];
                 update_pixel(
-                    self.buffer,
+                    &mut self.buffer,
                     &self.translate,
                     &self.clip,
                     (self.width, self.height),
@@ -269,7 +268,7 @@ impl Graphics<'_> {
         for r in angle_start..=angle_end {
             let px = Coord::from_angle(center, radius, r);
             update_pixel(
-                self.buffer,
+                &mut self.buffer,
                 &self.translate,
                 &self.clip,
                 (self.width, self.height),
@@ -302,7 +301,7 @@ impl Graphics<'_> {
         if start.x == end.x {
             for y in start.y..=end.y {
                 update_pixel(
-                    self.buffer,
+                    &mut self.buffer,
                     &self.translate,
                     &self.clip,
                     (self.width, self.height),
@@ -314,7 +313,7 @@ impl Graphics<'_> {
         } else if start.y == end.y {
             for x in start.x..=end.x {
                 update_pixel(
-                    self.buffer,
+                    &mut self.buffer,
                     &self.translate,
                     &self.clip,
                     (self.width, self.height),
@@ -340,7 +339,7 @@ impl Graphics<'_> {
             if dx >= dy {
                 loop {
                     update_pixel(
-                        self.buffer,
+                        &mut self.buffer,
                         &self.translate,
                         &self.clip,
                         (self.width, self.height),
@@ -361,7 +360,7 @@ impl Graphics<'_> {
             } else {
                 loop {
                     update_pixel(
-                        self.buffer,
+                        &mut self.buffer,
                         &self.translate,
                         &self.clip,
                         (self.width, self.height),
@@ -384,13 +383,13 @@ impl Graphics<'_> {
     }
 
     /// Draw renderable offset by [xy]
-    #[inline]
+    #[inline(always)]
     pub fn draw_offset<T, P: Into<Coord>>(&mut self, xy: P, renderable: &dyn Renderable<T>) {
         self.with_translate(xy.into(), |g| renderable.render(g));
     }
 
     /// Draw renderable
-    #[inline]
+    #[inline(always)]
     pub fn draw<T>(&mut self, renderable: &dyn Renderable<T>) {
         renderable.render(self);
     }
@@ -411,15 +410,11 @@ impl Graphics<'_> {
             (x, y)
         };
 
+        let len = self.width * self.height;
         if x >= 0 && y >= 0 && x < self.width as isize {
             let idx = self.index(x as usize, y as usize);
-            if idx < self.buffer.len() {
-                return Some(Color::new(
-                    self.buffer[idx],
-                    self.buffer[idx + 1],
-                    self.buffer[idx + 2],
-                    255,
-                ));
+            if idx < len {
+                return Some(self.buffer.get_color(idx));
             }
         }
 
@@ -427,13 +422,9 @@ impl Graphics<'_> {
     }
 
     /// Set every pixel to `color`, this ignores translate and clip
+    #[inline(always)]
     pub fn clear(&mut self, color: Color) {
-        self.buffer.chunks_exact_mut(4).for_each(|px| {
-            px[0] = color.r;
-            px[1] = color.g;
-            px[2] = color.b;
-            px[3] = color.a;
-        });
+        (self.clear_method)(&mut self.buffer, color);
     }
 
     /// Set/blend every pixel with `color`, same as [clear] but this follows translate and clip
@@ -454,7 +445,7 @@ impl Graphics<'_> {
     ///     graphics.draw_letter((20,20), 'A', PixelFont::Limited3x5, BLUE);
     ///# }
     /// ```
-    #[inline]
+    #[inline(always)]
     pub fn draw_letter(&mut self, pos: (isize, isize), chr: char, font: PixelFont, color: Color) {
         self.draw_ascii_letter(pos, chr_to_code(chr), font, color);
     }
@@ -491,7 +482,7 @@ impl Graphics<'_> {
                 let i = x + y * width;
                 if px[i] {
                     update_pixel(
-                        self.buffer,
+                        &mut self.buffer,
                         &self.translate,
                         &self.clip,
                         (self.width, self.height),
@@ -608,7 +599,7 @@ impl Graphics<'_> {
     #[inline]
     pub fn set_pixel(&mut self, x: isize, y: isize, color: Color) {
         update_pixel(
-            self.buffer,
+            &mut self.buffer,
             &self.translate,
             &self.clip,
             (self.width, self.height),
@@ -623,7 +614,7 @@ impl Graphics<'_> {
 ///
 /// If the alpha is 0 the call is does nothing
 fn update_pixel(
-    buffer: &mut [u8],
+    buffer: &mut GraphicsBuffer,
     translate: &Coord,
     clip: &Clip,
     (width, height): (usize, usize),
@@ -633,12 +624,51 @@ fn update_pixel(
 ) {
     let x = x + translate.x;
     let y = y + translate.y;
-    let idx = ((x + y * width as isize) * 4) as usize;
-    if x >= 0 && y >= 0 && x < width as isize && y < height as isize && clip.is_valid((x, y)) {
-        match color.a {
-            255 => set_pixel(buffer, idx, color),
-            0 => {}
-            _ => blend_pixel(buffer, idx, color),
+    match buffer {
+        RgbaU8(buffer) => {
+            let idx = ((x + y * width as isize) * 4) as usize;
+            if x >= 0
+                && y >= 0
+                && x < width as isize
+                && y < height as isize
+                && clip.is_valid((x, y))
+            {
+                match color.a {
+                    255 => set_pixel_u8_rgba(buffer, idx, color),
+                    0 => {}
+                    _ => blend_pixel_u8_rgba(buffer, idx, color),
+                }
+            }
+        }
+        GraphicsBuffer::RgbaU32(buffer) => {
+            let idx = (x + y * width as isize) as usize;
+            if x >= 0
+                && y >= 0
+                && x < width as isize
+                && y < height as isize
+                && clip.is_valid((x, y))
+            {
+                match color.a {
+                    255 => set_pixel_32(buffer, idx, color, Color::to_rgba),
+                    0 => {}
+                    _ => blend_pixel_32(buffer, idx, color, Color::to_rgba),
+                }
+            }
+        }
+        GraphicsBuffer::ArgbU32(buffer) => {
+            let idx = (x + y * width as isize) as usize;
+            if x >= 0
+                && y >= 0
+                && x < width as isize
+                && y < height as isize
+                && clip.is_valid((x, y))
+            {
+                match color.a {
+                    255 => set_pixel_32(buffer, idx, color, Color::to_argb),
+                    0 => {}
+                    _ => blend_pixel_32(buffer, idx, color, Color::to_argb),
+                }
+            }
         }
     }
 }
@@ -648,7 +678,27 @@ fn update_pixel(
 /// Generally you should use [update_pixel] instead
 ///
 /// This ignores alpha, so 255,0,0,0 will draw a red pixel
-fn set_pixel(buffer: &mut [u8], idx: usize, color: Color) {
+fn set_pixel_32(buffer: &mut [u32], idx: usize, color: Color, conv: fn(Color) -> u32) {
+    if idx < buffer.len() {
+        buffer[idx] = conv(color);
+    }
+}
+
+/// Set the RGB values for a pixel by blending it with the provided color
+/// This method uses alpha blending
+/// Generally you should use [update_pixel] instead
+fn blend_pixel_32(buffer: &mut [u32], idx: usize, color: Color, conv: fn(Color) -> u32) {
+    let existing_color = Color::from_rgba(buffer[idx]);
+    let new_color = existing_color.blend(color);
+    buffer[idx] = conv(new_color);
+}
+
+/// Set the RGB values for a pixel
+///
+/// Generally you should use [update_pixel] instead
+///
+/// This ignores alpha, so 255,0,0,0 will draw a red pixel
+fn set_pixel_u8_rgba(buffer: &mut [u8], idx: usize, color: Color) {
     if idx < buffer.len() {
         buffer[idx] = color.r;
         buffer[idx + 1] = color.g;
@@ -660,7 +710,7 @@ fn set_pixel(buffer: &mut [u8], idx: usize, color: Color) {
 /// Set the RGB values for a pixel by blending it with the provided color
 /// This method uses alpha blending
 /// Generally you should use [update_pixel] instead
-fn blend_pixel(buffer: &mut [u8], idx: usize, color: Color) {
+fn blend_pixel_u8_rgba(buffer: &mut [u8], idx: usize, color: Color) {
     let existing_color = Color {
         r: buffer[idx],
         g: buffer[idx + 1],
@@ -683,7 +733,7 @@ mod test {
     #[test]
     fn is_inside() {
         let mut buf = [0; 400];
-        let mut graphics = Graphics::new(&mut buf, 10, 10).unwrap();
+        let mut graphics = Graphics::new_u8_rgba(&mut buf, 10, 10).unwrap();
         assert!(graphics.is_on_screen(Coord { x: 1, y: 1 }));
         assert!(graphics.is_on_screen(Coord { x: 9, y: 9 }));
         assert!(graphics.is_on_screen(Coord { x: 0, y: 0 }));
@@ -701,7 +751,7 @@ mod test {
     #[test]
     fn check_draw() {
         let mut buf = [0; 400];
-        let mut graphics = Graphics::new(&mut buf, 10, 10).unwrap();
+        let mut graphics = Graphics::new_u8_rgba(&mut buf, 10, 10).unwrap();
 
         let drawable = Drawable::from_obj(Line::new((10, 10), (20, 20)), stroke(RED));
         let text = Text::new("", Px(1, 1), WHITE);

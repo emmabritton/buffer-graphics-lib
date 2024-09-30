@@ -8,8 +8,8 @@
 //!```
 //! # use graphics_shapes::rect::Rect;
 //! # use buffer_graphics_lib::prelude::*;
-//! let mut buffer = Graphics::create_buffer(800, 600); //800 x 600 RGBA
-//! let mut graphics = Graphics::new(&mut buffer, 800, 600).unwrap();
+//! let mut buffer = Graphics::create_buffer_u8(800, 600); //800 x 600 RGBA
+//! let mut graphics = Graphics::new_u8_rgba(&mut buffer, 800, 600).unwrap();
 //! let text = Text::new("Some text", TextPos::cr((1,1)), (LIGHT_GRAY, PixelFont::Standard6x7));
 //! graphics.draw(&text);
 //! graphics.draw_rect(Rect::new((40, 50), (100, 100)), stroke(BLUE));
@@ -31,16 +31,13 @@ pub mod scaling;
 pub mod shapes;
 pub mod text;
 
-use crate::clipping::Clip;
-use crate::prelude::Image;
+use crate::prelude::*;
 use crate::GraphicsError::InvalidBufferLength;
 use fnv::FnvHashMap;
-use graphics_shapes::coord::Coord;
-use ici_files::errors::IndexedImageError;
-use ici_files::image::IndexedImage;
 use thiserror::Error;
 
 pub mod prelude {
+    pub use crate::clipping::*;
     pub use crate::drawable::*;
     pub use crate::drawing::*;
     pub use crate::image::*;
@@ -56,6 +53,7 @@ pub mod prelude {
     pub use crate::text::pos::*;
     pub use crate::text::wrapping::*;
     pub use crate::text::*;
+    pub use crate::CustomLetter;
     pub use crate::Graphics;
     pub use crate::GraphicsError;
     pub use graphics_shapes::prelude::*;
@@ -82,8 +80,45 @@ pub enum GraphicsError {
     ImageError(IndexedImageError),
 }
 
+pub enum GraphicsBuffer<'a> {
+    RgbaU8(&'a mut [u8]),
+    RgbaU32(&'a mut [u32]),
+    ArgbU32(&'a mut [u32]),
+}
+
+impl GraphicsBuffer<'_> {
+    pub fn to_pixels(&self) -> Vec<Color> {
+        match self {
+            GraphicsBuffer::RgbaU8(buf) => buf
+                .chunks_exact(4)
+                .map(|p| Color::new(p[0], p[1], p[2], p[3]))
+                .collect(),
+            GraphicsBuffer::RgbaU32(buf) => buf.iter().copied().map(Color::from_rgba).collect(),
+            GraphicsBuffer::ArgbU32(buf) => buf.iter().copied().map(Color::from_argb).collect(),
+        }
+    }
+
+    pub const fn pixel_size(&self) -> usize {
+        match self {
+            GraphicsBuffer::RgbaU8(_) => 4,
+            GraphicsBuffer::RgbaU32(_) => 1,
+            GraphicsBuffer::ArgbU32(_) => 1,
+        }
+    }
+
+    pub fn get_color(&self, idx: usize) -> Color {
+        match self {
+            GraphicsBuffer::RgbaU8(buf) => {
+                Color::new(buf[idx], buf[idx + 1], buf[idx + 2], buf[idx + 3])
+            }
+            GraphicsBuffer::RgbaU32(buf) => Color::from_rgba(buf[idx]),
+            GraphicsBuffer::ArgbU32(buf) => Color::from_argb(buf[idx]),
+        }
+    }
+}
+
 pub struct Graphics<'buffer> {
-    buffer: &'buffer mut [u8],
+    buffer: GraphicsBuffer<'buffer>,
     width: usize,
     height: usize,
     ///Offsets all drawing commands
@@ -101,12 +136,20 @@ pub struct Graphics<'buffer> {
     ///
     /// Note: `A-Za-z0-9!@$%^&*(),./;'\\[]<>?:\"{}_+~#…¤£¥¢✓|€` are valid for [text::chr_to_code]
     pub custom_font: FnvHashMap<u8, CustomLetter>,
+    index_method: fn(usize, usize, usize) -> usize,
+    clear_method: fn(&mut GraphicsBuffer, Color),
 }
 
 impl Graphics<'_> {
     /// Create a buffer of the correct size
     #[inline]
-    pub fn create_buffer(width: usize, height: usize) -> Vec<u8> {
+    pub fn create_buffer_u32(width: usize, height: usize) -> Vec<u32> {
+        vec![0; width * height]
+    }
+
+    /// Create a buffer of the correct size
+    #[inline]
+    pub fn create_buffer_u8(width: usize, height: usize) -> Vec<u8> {
         vec![0; width * height * 4]
     }
 }
@@ -153,8 +196,8 @@ pub fn make_image<F: FnOnce(&mut Graphics)>(
     height: usize,
     method: F,
 ) -> Result<Image, GraphicsError> {
-    let mut buffer = Graphics::create_buffer(width, height);
-    let mut graphics = Graphics::new(&mut buffer, width, height)?;
+    let mut buffer = Graphics::create_buffer_u8(width, height);
+    let mut graphics = Graphics::new_u8_rgba(&mut buffer, width, height)?;
     method(&mut graphics);
     Ok(graphics.copy_to_image())
 }
@@ -183,8 +226,8 @@ pub fn make_indexed_image<F: FnOnce(&mut Graphics)>(
     simplify_palette: bool,
     method: F,
 ) -> Result<IndexedImage, GraphicsError> {
-    let mut buffer = Graphics::create_buffer(width, height);
-    let mut graphics = Graphics::new(&mut buffer, width, height)?;
+    let mut buffer = Graphics::create_buffer_u8(width, height);
+    let mut graphics = Graphics::new_u8_rgba(&mut buffer, width, height)?;
     method(&mut graphics);
     graphics.copy_to_indexed_image(simplify_palette)
 }
@@ -192,8 +235,8 @@ pub fn make_indexed_image<F: FnOnce(&mut Graphics)>(
 impl<'buffer> Graphics<'_> {
     /// `buffer` needs to be `width * height * 4` long
     ///
-    /// You can use [Graphics::create_buffer] to guarantee the correct size
-    pub fn new(
+    /// You can use [Graphics::create_buffer_u8] to guarantee the correct size
+    pub fn new_u8_rgba(
         buffer: &'buffer mut [u8],
         width: usize,
         height: usize,
@@ -202,6 +245,7 @@ impl<'buffer> Graphics<'_> {
         if count != buffer.len() {
             return Err(InvalidBufferLength(count, buffer.len()));
         }
+        let buffer = GraphicsBuffer::RgbaU8(buffer);
         Ok(Graphics {
             buffer,
             width,
@@ -209,27 +253,59 @@ impl<'buffer> Graphics<'_> {
             translate: Coord::default(),
             clip: Clip::new(width, height),
             custom_font: FnvHashMap::default(),
+            clear_method: clear_u8,
+            index_method: index_u8,
         })
     }
 
-    /// Same as [Graphics::new] but doesn't check buffer size
-    pub fn new_unchecked(
-        buffer: &'buffer mut [u8],
+    /// `buffer` needs to be `width * height` long
+    ///
+    /// You can use [Graphics::create_buffer_u32] to guarantee the correct size
+    pub fn new_u32_rgba(
+        buffer: &'buffer mut [u32],
         width: usize,
         height: usize,
-    ) -> Graphics<'buffer> {
-        if cfg!(debug_assertions) {
-            let count = width * height * 4;
-            debug_assert_eq!(count, buffer.len());
+    ) -> Result<Graphics<'buffer>, GraphicsError> {
+        let count = width * height;
+        if count != buffer.len() {
+            return Err(InvalidBufferLength(count, buffer.len()));
         }
-        Graphics {
+        let buffer = GraphicsBuffer::RgbaU32(buffer);
+        Ok(Graphics {
             buffer,
             width,
             height,
             translate: Coord::default(),
             clip: Clip::new(width, height),
             custom_font: FnvHashMap::default(),
+            clear_method: clear_u32,
+            index_method: index_u32,
+        })
+    }
+
+    /// `buffer` needs to be `width * height` long
+    ///
+    /// You can use [Graphics::create_buffer_u32] to guarantee the correct size
+    pub fn new_u32_argb(
+        buffer: &'buffer mut [u32],
+        width: usize,
+        height: usize,
+    ) -> Result<Graphics<'buffer>, GraphicsError> {
+        let count = width * height;
+        if count != buffer.len() {
+            return Err(InvalidBufferLength(count, buffer.len()));
         }
+        let buffer = GraphicsBuffer::ArgbU32(buffer);
+        Ok(Graphics {
+            buffer,
+            width,
+            height,
+            translate: Coord::default(),
+            clip: Clip::new(width, height),
+            custom_font: FnvHashMap::default(),
+            clear_method: clear_u32,
+            index_method: index_u32,
+        })
     }
 }
 

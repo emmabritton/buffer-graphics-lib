@@ -23,7 +23,7 @@ The `Graphics` struct needs a mutable buffer to work on and so mostly likely you
 
 In your `Cargo.toml` file add
 ```toml
-buffer-graphics-lib = "0.18.2"
+buffer-graphics-lib = "0.19.0"
 ```
 
 ### Code
@@ -59,8 +59,16 @@ graphics.draw_image(40, 20, &image);
 ### `serde`
 
 * Adds derive `Serialize` and `Deserialize` for most structs and enums
-* Enables `graphics-shapes/serde`
+* Enables `graphics-shapes/serde`, see [Graphic Shapes readme](https://github.com/emmabritton/graphics-shapes?tab=readme-ov-file#features)
 
 ### `mint`
 
-* Enables `graphics-shapes/mint` 
+* Enables `graphics-shapes/mint` , see [Graphic Shapes readme](https://github.com/emmabritton/graphics-shapes?tab=readme-ov-file#features)
+
+### `notosans`
+
+Add basic `Renderable` impl for `RasterizedChar` from [notosans](https://github.com/phip1611/noto-sans-mono-bitmap-rs)
+
+### `embedded`
+
+Adds `Graphics` as a target for [embedded-graphics](https://github.com/embedded-graphics/embedded-graphics)
