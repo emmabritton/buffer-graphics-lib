@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.19.1
+- Update deps (to fix ici-files dep issue)
+
 ### Version 0.19.0
 ### Breaking
 - To support other buffer types (`u8` and `u32`):

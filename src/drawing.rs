@@ -201,7 +201,6 @@ impl Graphics<'_> {
     }
 
     /// Draw an indexed image at `x`, `y`
-
     pub fn draw_indexed_image<P: Into<Coord>>(&mut self, xy: P, image: &IndexedImage) {
         let xy = xy.into();
         let palette = image.get_palette();
@@ -232,7 +231,6 @@ impl Graphics<'_> {
     }
 
     /// Draw an animated image at `x`, `y`
-
     pub fn draw_animated_image<P: Into<Coord>>(&mut self, xy: P, image: &AnimatedIndexedImage) {
         let xy = xy.into();
         let palette = image.get_palette();
