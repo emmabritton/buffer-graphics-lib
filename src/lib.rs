@@ -157,25 +157,25 @@ impl Graphics<'_> {
 /// Only the letter sizes you'll use need to be set
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct CustomLetter {
-    pub _4x4: [bool; text::font::standard_4x4::LETTER_PX_COUNT],
-    pub _4x5: [bool; text::font::standard_4x5::LETTER_PX_COUNT],
-    pub _6x7: [bool; text::font::standard_6x7::LETTER_PX_COUNT],
-    pub _7x9: [bool; text::font::outline_7x9::LETTER_PX_COUNT],
-    pub _8x8: [bool; text::font::script_8x8::LETTER_PX_COUNT],
-    pub _8x10: [bool; text::font::standard_8x10::LETTER_PX_COUNT],
-    pub _3x5: [bool; text::font::limited_3x5::LETTER_PX_COUNT],
+    pub font_4x4: [bool; text::font::standard_4x4::LETTER_PX_COUNT],
+    pub font_4x5: [bool; text::font::standard_4x5::LETTER_PX_COUNT],
+    pub font_6x7: [bool; text::font::standard_6x7::LETTER_PX_COUNT],
+    pub font_7x9: [bool; text::font::outline_7x9::LETTER_PX_COUNT],
+    pub font_8x8: [bool; text::font::script_8x8::LETTER_PX_COUNT],
+    pub font_8x10: [bool; text::font::standard_8x10::LETTER_PX_COUNT],
+    pub font_3x5: [bool; text::font::limited_3x5::LETTER_PX_COUNT],
 }
 
 impl Default for CustomLetter {
     fn default() -> Self {
         Self {
-            _4x4: [false; text::font::standard_4x4::LETTER_PX_COUNT],
-            _4x5: [false; text::font::standard_4x5::LETTER_PX_COUNT],
-            _6x7: [false; text::font::standard_6x7::LETTER_PX_COUNT],
-            _7x9: [false; text::font::outline_7x9::LETTER_PX_COUNT],
-            _8x8: [false; text::font::script_8x8::LETTER_PX_COUNT],
-            _8x10: [false; text::font::standard_8x10::LETTER_PX_COUNT],
-            _3x5: [false; text::font::limited_3x5::LETTER_PX_COUNT],
+            font_4x4: [false; text::font::standard_4x4::LETTER_PX_COUNT],
+            font_4x5: [false; text::font::standard_4x5::LETTER_PX_COUNT],
+            font_6x7: [false; text::font::standard_6x7::LETTER_PX_COUNT],
+            font_7x9: [false; text::font::outline_7x9::LETTER_PX_COUNT],
+            font_8x8: [false; text::font::script_8x8::LETTER_PX_COUNT],
+            font_8x10: [false; text::font::standard_8x10::LETTER_PX_COUNT],
+            font_3x5: [false; text::font::limited_3x5::LETTER_PX_COUNT],
         }
     }
 }

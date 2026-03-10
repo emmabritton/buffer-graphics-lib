@@ -16,7 +16,7 @@ use graphics_shapes::rect::Rect;
 use graphics_shapes::triangle::Triangle;
 use ici_files::palette::simplify_palette_to_fit;
 use ici_files::prelude::*;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::mem::swap;
 
 /// Represents anything that [Graphics] can render
@@ -158,13 +158,18 @@ impl Graphics<'_> {
             colors.into_iter().collect()
         };
 
+        let color_index: HashMap<Color, u8> = colors
+            .iter()
+            .enumerate()
+            .map(|(i, c)| (*c, i as u8))
+            .collect();
+
         let pixels = pixels
             .iter()
             .map(|c| {
-                colors
-                    .iter()
-                    .position(|o| o == c)
-                    .unwrap_or_else(|| panic!()) as u8
+                *color_index.get(c).unwrap_or_else(|| {
+                    panic!("color disappeared, please create GitHub issue for buffer-graphics-lib")
+                })
             })
             .collect();
 
@@ -408,12 +413,9 @@ impl Graphics<'_> {
             (x, y)
         };
 
-        let len = self.width * self.height;
-        if x >= 0 && y >= 0 && x < self.width as isize {
+        if x >= 0 && y >= 0 && x < self.width as isize && y < self.height as isize {
             let idx = self.index(x as usize, y as usize);
-            if idx < len {
-                return Some(self.buffer.get_color(idx));
-            }
+            return Some(self.buffer.get_color(idx));
         }
 
         None
@@ -463,13 +465,13 @@ impl Graphics<'_> {
 
         let px: &[bool] = if let Some(custom) = self.custom_font.get(&code) {
             match font {
-                PixelFont::Standard4x4 => &custom._4x4,
-                PixelFont::Script8x8 => &custom._8x8,
-                PixelFont::Outline7x9 => &custom._7x9,
-                PixelFont::Standard4x5 => &custom._4x5,
-                PixelFont::Standard6x7 => &custom._6x7,
-                PixelFont::Standard8x10 => &custom._8x10,
-                PixelFont::Limited3x5 => &custom._3x5,
+                PixelFont::Standard4x4 => &custom.font_4x4,
+                PixelFont::Script8x8 => &custom.font_8x8,
+                PixelFont::Outline7x9 => &custom.font_7x9,
+                PixelFont::Standard4x5 => &custom.font_4x5,
+                PixelFont::Standard6x7 => &custom.font_6x7,
+                PixelFont::Standard8x10 => &custom.font_8x10,
+                PixelFont::Limited3x5 => &custom.font_3x5,
             }
         } else {
             font.pixels(code)
@@ -649,7 +651,7 @@ fn update_pixel(
                 match color.a {
                     255 => set_pixel_32(buffer, idx, color, Color::to_rgba),
                     0 => {}
-                    _ => blend_pixel_32(buffer, idx, color, Color::to_rgba),
+                    _ => blend_pixel_32(buffer, idx, color, Color::from_rgba, Color::to_rgba),
                 }
             }
         }
@@ -664,7 +666,7 @@ fn update_pixel(
                 match color.a {
                     255 => set_pixel_32(buffer, idx, color, Color::to_argb),
                     0 => {}
-                    _ => blend_pixel_32(buffer, idx, color, Color::to_argb),
+                    _ => blend_pixel_32(buffer, idx, color, Color::from_argb, Color::to_argb),
                 }
             }
         }
@@ -685,8 +687,14 @@ fn set_pixel_32(buffer: &mut [u32], idx: usize, color: Color, conv: fn(Color) ->
 /// Set the RGB values for a pixel by blending it with the provided color
 /// This method uses alpha blending
 /// Generally you should use [update_pixel] instead
-fn blend_pixel_32(buffer: &mut [u32], idx: usize, color: Color, conv: fn(Color) -> u32) {
-    let existing_color = Color::from_rgba(buffer[idx]);
+fn blend_pixel_32(
+    buffer: &mut [u32],
+    idx: usize,
+    color: Color,
+    conv2: fn(u32) -> Color,
+    conv: fn(Color) -> u32,
+) {
+    let existing_color = conv2(buffer[idx]);
     let new_color = existing_color.blend(color);
     buffer[idx] = conv(new_color);
 }
@@ -719,6 +727,7 @@ fn blend_pixel_u8_rgba(buffer: &mut [u8], idx: usize, color: Color) {
     buffer[idx] = new_color.r;
     buffer[idx + 1] = new_color.g;
     buffer[idx + 2] = new_color.b;
+    buffer[idx + 3] = new_color.a;
 }
 
 #[cfg(test)]
@@ -761,5 +770,23 @@ mod test {
         graphics.draw(&drawable);
         graphics.draw(&text);
         graphics.draw(&polyline);
+    }
+
+    #[test]
+    fn get_pixel_u8_all_rows() {
+        // Bug: get_pixel compares a byte-offset index against a pixel count (width*height),
+        // so pixels beyond roughly the first quarter of the buffer incorrectly return None.
+        let mut buf = Graphics::create_buffer_u8(10, 10);
+        let mut graphics = Graphics::new_u8_rgba(&mut buf, 10, 10).unwrap();
+        graphics.set_pixel(0, 0, RED);
+        graphics.set_pixel(0, 3, GREEN); // byte idx 120, len 100 → returns None with the bug
+        graphics.set_pixel(9, 9, BLUE);
+
+        assert_eq!(graphics.get_pixel(0, 0, false), Some(RED));
+        assert_eq!(graphics.get_pixel(0, 3, false), Some(GREEN));
+        assert_eq!(graphics.get_pixel(9, 9, false), Some(BLUE));
+        // Out-of-bounds should still return None
+        assert_eq!(graphics.get_pixel(10, 0, false), None);
+        assert_eq!(graphics.get_pixel(0, 10, false), None);
     }
 }

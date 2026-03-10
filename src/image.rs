@@ -143,7 +143,7 @@ impl Image {
     }
 
     /// Rotate 90° clockwise
-    pub fn rotate_cw(&mut self) -> Image {
+    pub fn rotate_cw(&self) -> Image {
         let mut output = Image::new_blank(self.height, self.width);
         for y in 0..self.height {
             for x in 0..self.width {
@@ -156,7 +156,7 @@ impl Image {
     }
 
     /// Rotate 90° counterclockwise
-    pub fn rotate_ccw(&mut self) -> Image {
+    pub fn rotate_ccw(&self) -> Image {
         let mut output = Image::new_blank(self.height, self.width);
         for y in 0..self.height {
             for x in 0..self.width {

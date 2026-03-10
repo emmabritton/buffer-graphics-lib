@@ -5,7 +5,6 @@ use graphics_shapes::Shape;
 use log::error;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::mem::swap;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -58,9 +57,7 @@ pub struct Clip {
     width: usize,
     height: usize,
     mode: ClipMode,
-    old_mode: ClipMode,
     valid_pixel_map: Option<Vec<bool>>,
-    old_valid_pixel_map: Option<Vec<bool>>,
     auto_build_map: bool,
 }
 
@@ -70,9 +67,7 @@ impl Clip {
             width,
             height,
             mode: Nothing,
-            old_mode: Nothing,
             valid_pixel_map: None,
-            old_valid_pixel_map: None,
             auto_build_map: true,
         }
     }
@@ -121,35 +116,23 @@ impl Clip {
 }
 
 impl Clip {
-    fn store_current_mode(&mut self) {
-        swap(&mut self.old_mode, &mut self.mode);
-        swap(&mut self.old_valid_pixel_map, &mut self.valid_pixel_map);
-        self.valid_pixel_map = None;
-    }
-}
-
-impl Clip {
     /// Clears the clip so all pixels can be drawn to
     pub fn set_all_valid(&mut self) {
-        self.store_current_mode();
         self.mode = Nothing;
     }
 
     /// Set the valid pixels to `rect`
     pub fn set_valid_rect(&mut self, rect: Rect) {
-        self.store_current_mode();
         self.mode = Simple(ClipShape::Box(rect));
     }
 
     /// Set the valid pixels to `circle`
     pub fn set_valid_circle(&mut self, circle: Circle) {
-        self.store_current_mode();
         self.mode = Simple(ClipShape::Round(circle));
     }
 
     /// Set the valid pixels to `pixel_map`
     pub fn custom(&mut self, pixel_map: Vec<bool>) {
-        self.store_current_mode();
         self.mode = Custom(pixel_map);
     }
 
@@ -172,7 +155,6 @@ impl Clip {
 impl Clip {
     fn swap_to_complex(&mut self) {
         if !self.is_complex() {
-            self.store_current_mode();
             self.mode = Complex(vec![]);
         }
     }

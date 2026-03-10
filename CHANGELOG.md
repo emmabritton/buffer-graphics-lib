@@ -1,5 +1,10 @@
 # Changelog
 
+### Version 0.19.2
+- Update deps 
+- Fix alpha blending bug
+- Some code improvements
+
 ### Version 0.19.1
 - Update deps (to fix ici-files dep issue)
 
